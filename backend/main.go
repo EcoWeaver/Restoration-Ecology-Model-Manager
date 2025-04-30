@@ -1,40 +1,49 @@
 package main
 
 import (
+	"context"
 	"net/http"
-	"sync"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 )
 
-var (
-	rw    = sync.RWMutex{}
-	state = "Hello, World!"
-)
+var postgres_pool *pgxpool.Pool
 
 func main() {
+	ctx := context.Background()
+	err := error(nil)
 	e := echo.New()
 
-	e.GET("/set", set)
-	e.GET("/get", get)
+	e.GET("/", test)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	postgres_pool, err = pgxpool.New(ctx, "")
+	if err != nil {
+		e.Logger.Fatal(err)
+		return
+	}
+	defer postgres_pool.Close()
+
+	if err = e.Start(":8080"); err != nil {
+		e.Logger.Fatal(err)
+		return
+	}
 }
 
-func set(c echo.Context) error {
-	set := c.QueryString()
+func test(c echo.Context) error {
+	ctx := c.Request().Context()
 
-	rw.Lock()
-	state = set
-	rw.Unlock()
+	conn, err := postgres_pool.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
 
-	return c.String(http.StatusOK, set)
-}
+	rows, err := conn.Query(ctx, "placeholder sql query")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
 
-func get(c echo.Context) error {
-	rw.RLock()
-	get := state
-	rw.RUnlock()
-
-	return c.String(http.StatusOK, get)
+	return c.String(http.StatusOK, "Hello, World!")
 }
