@@ -6,16 +6,18 @@ type MetadataCategory struct {
 }
 
 type SubCategory struct {
-	SubCategoryId int
-	SubCategory   string
+	SubCategoryId      int
+	MetadataCategoryId int
+	SubCategory        string
 }
 
 type Element struct {
 	ElementId          int
-	MetadataCategoryId int
 	SubCategoryId      int
 	ElementName        string
 	ElementDescription string
+	IsMandatory        bool
+	AllowedOntology    string
 }
 
 type MetadataValues struct {
