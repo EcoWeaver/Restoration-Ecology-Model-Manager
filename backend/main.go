@@ -1,7 +1,6 @@
 package main
 
 import (
-	"backend/model"
 	"context"
 	"net/http"
 	"os"
@@ -23,7 +22,7 @@ func main() {
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 
-	e.GET("/model/relation-keywords", model.RelationKeywords)
+	e.GET("/relation-keywords", RelationKeywords)
 	e.GET("/", TestConnection)
 
 	err := godotenv.Load()
