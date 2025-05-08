@@ -1,10 +1,11 @@
-module remma
+module backend
 
-go 1.24.2
+go 1.24.3
 
 require (
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/labstack/echo/v4 v4.13.3
+	golang.org/x/time v0.8.0
 )
 
 require (
