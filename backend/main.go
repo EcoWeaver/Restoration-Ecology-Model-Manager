@@ -22,7 +22,8 @@ func main() {
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 
-	e.GET("/relation-keywords", RelationKeywords)
+	e.GET("/relation-keywords", GetRelationKeywords)
+	e.GET("/metadata-elements", GetMetadataElements)
 	e.GET("/", TestConnection)
 
 	err := godotenv.Load()
