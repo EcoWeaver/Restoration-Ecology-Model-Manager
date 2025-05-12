@@ -1,0 +1,20 @@
+version: '3.9'
+services:
+    # Define Service Name 
+    postgres:
+        image: postgres:15  # official PostgreSQL-Image version 15 
+        container_name: postgres-container
+    
+        environment:
+            POSTGRES_USER: user         # the user is automatically created 
+            POSTGRES_PASSWORD: Swep25!  
+            POSTGRES_DB: postgres_db    # the database is automatically created 
+        
+        volumes:    # connect all directories between host and computer
+            - ./postgresql:/docker-entrypoint-initdb.d  # all SQL files 
+        
+        ports:
+            - "15432:5432"          
+        
+        restart: unless-stopped         # container is automatically restarted 
+            
