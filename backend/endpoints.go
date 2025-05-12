@@ -12,15 +12,11 @@ func GetMetadataElements(c echo.Context) error {
 	response := map[string]map[string][]string{}
 
 	for _, element := range metadata.ElementValues() {
-		subCategory := element.SubCategory().String()
 		category := element.Category().String()
+		subCategory := element.SubCategory().String()
 
 		if response[category] == nil {
 			response[category] = map[string][]string{}
-		}
-
-		if response[category][subCategory] == nil {
-			response[category][subCategory] = []string{}
 		}
 
 		response[category][subCategory] = append(response[category][subCategory], element.String())
@@ -34,11 +30,6 @@ func GetRelationElements(c echo.Context) error {
 
 	for _, element := range relations.ElementValues() {
 		category := element.Category().String()
-
-		if response[category] == nil {
-			response[category] = []string{}
-		}
-
 		response[category] = append(response[category], element.String())
 	}
 
