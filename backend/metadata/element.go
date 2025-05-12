@@ -126,6 +126,6 @@ func (self Element) SubCategory() SubCategory {
 	}
 }
 
-func (self Element) MetadataCategory() MetadataCategory {
-	return self.SubCategory().MetadataCategory()
+func (self Element) Category() Category {
+	return self.SubCategory().Category()
 }

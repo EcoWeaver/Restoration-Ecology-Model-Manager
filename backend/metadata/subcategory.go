@@ -19,7 +19,7 @@ const (
 	CommunityEngagement
 )
 
-func (self SubCategory) MetadataCategory() MetadataCategory {
+func (self SubCategory) Category() Category {
 	switch self {
 	case ModelIdentification,
 		ModelDescription,
