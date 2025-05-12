@@ -1,20 +1,18 @@
-# backend/Makefile 
+_default:
+	@echo "usage: make [up|down|psql|build|run]"
 
-# Start Docker Compose 
-up: 
-	docker-compose up --build
+up:
+	docker compose build
+	docker compose up
 
-# Start Docker Container again 
-start_again: 
-	docker compose up 
-# Stop Docker Compose and delete container 
-down: 
-	docker-compose down -v 
+down:
+	docker compose down
 
-# Connect to database via psql 
-psql: 
-	psql -h localhost -p 15432 -U user -d postgres_db
+psql:
+	psql -h localhost -U postgres -d postgres
 
-# start backend 
+build:
+	go build .
+
 run:
-	go run main.go
+	go run .
