@@ -9,17 +9,15 @@ import (
 )
 
 func GetMetadataElements(c echo.Context) error {
-	response := map[string]map[string][]string{}
+	response := map[string][]string{}
 
 	for _, element := range metadata.ElementValues() {
-		category := element.Category().String()
-		subCategory := element.SubCategory().String()
-
-		if response[category] == nil {
-			response[category] = map[string][]string{}
+		obligation, err := element.Obligation()
+		if err != nil {
+			return err
 		}
-
-		response[category][subCategory] = append(response[category][subCategory], element.String())
+		obligationS := obligation.String()
+		response[obligationS] = append(response[obligationS], element.String())
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -29,8 +27,12 @@ func GetRelationElements(c echo.Context) error {
 	response := map[string][]string{}
 
 	for _, element := range relations.ElementValues() {
-		category := element.Category().String()
-		response[category] = append(response[category], element.String())
+		category, err := element.Category()
+		if err != nil {
+			return err
+		}
+		elementS := category.String()
+		response[elementS] = append(response[elementS], element.String())
 	}
 
 	return c.JSON(http.StatusOK, response)

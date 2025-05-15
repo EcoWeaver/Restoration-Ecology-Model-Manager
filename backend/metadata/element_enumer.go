@@ -8,15 +8,16 @@ import (
 	"strings"
 )
 
-const _ElementName = "uuidmodel-nameversioncreation-datelast-update-dateauthors-and-contributorslicenseabstractkeywordsmodel-typeecological-domainspatial-scaletemporal-scaletarget-species-or-ecosystemlanguage-or-softwaredependencies-and-librarieshardware-requirementsos-compatibilitydata-input-type-formatdata-output-type-formatdata-sourcesdata-preprocessingvariablesvariable-relationshipsparametersequations-and-algorithmscalibration-techniquesvalidation-techniquesperformance-metricssensitivity-analysisinstall-instructionsmanual-or-docsexample-use-caseslimitations-or-assumptionsrelated-publicationscitationsrepo-linkdocker-infocomputational-environmentapi-docsdata-exchange-formatsmodel-and-tool-integrationuncertainty-quantification-methodsrobustnesschangelogprevious-versionsversion-compatibilityuser-communityforums-or-discussionscontribution-guidelines"
+const _ElementName = "identifiercreatortitlepublisherpublication-yearsubjectcontributordatelanguageresource-typealternate-identifierrelated-identifiersizeformatversionrightsdescriptiongeo-locationfunding-referencerelated-item"
 
-var _ElementIndex = [...]uint16{0, 4, 14, 21, 34, 50, 74, 81, 89, 97, 107, 124, 137, 151, 178, 198, 224, 245, 261, 283, 306, 318, 336, 345, 367, 377, 401, 423, 444, 463, 483, 503, 517, 534, 560, 580, 589, 598, 609, 634, 642, 663, 689, 723, 733, 742, 759, 780, 794, 815, 838}
+var _ElementIndex = [...]uint8{0, 10, 17, 22, 31, 47, 54, 65, 69, 77, 90, 110, 128, 132, 138, 145, 151, 162, 174, 191, 203}
 
-const _ElementLowerName = "uuidmodel-nameversioncreation-datelast-update-dateauthors-and-contributorslicenseabstractkeywordsmodel-typeecological-domainspatial-scaletemporal-scaletarget-species-or-ecosystemlanguage-or-softwaredependencies-and-librarieshardware-requirementsos-compatibilitydata-input-type-formatdata-output-type-formatdata-sourcesdata-preprocessingvariablesvariable-relationshipsparametersequations-and-algorithmscalibration-techniquesvalidation-techniquesperformance-metricssensitivity-analysisinstall-instructionsmanual-or-docsexample-use-caseslimitations-or-assumptionsrelated-publicationscitationsrepo-linkdocker-infocomputational-environmentapi-docsdata-exchange-formatsmodel-and-tool-integrationuncertainty-quantification-methodsrobustnesschangelogprevious-versionsversion-compatibilityuser-communityforums-or-discussionscontribution-guidelines"
+const _ElementLowerName = "identifiercreatortitlepublisherpublication-yearsubjectcontributordatelanguageresource-typealternate-identifierrelated-identifiersizeformatversionrightsdescriptiongeo-locationfunding-referencerelated-item"
 
 func (i Element) String() string {
+	i -= 1
 	if i < 0 || i >= Element(len(_ElementIndex)-1) {
-		return fmt.Sprintf("Element(%d)", i)
+		return fmt.Sprintf("Element(%d)", i+1)
 	}
 	return _ElementName[_ElementIndex[i]:_ElementIndex[i+1]]
 }
@@ -25,214 +26,94 @@ func (i Element) String() string {
 // Re-run the stringer command to generate them again.
 func _ElementNoOp() {
 	var x [1]struct{}
-	_ = x[Uuid-(0)]
-	_ = x[ModelName-(1)]
-	_ = x[Version-(2)]
-	_ = x[CreationDate-(3)]
-	_ = x[LastUpdateDate-(4)]
-	_ = x[AuthorsAndContributors-(5)]
-	_ = x[License-(6)]
-	_ = x[Abstract-(7)]
-	_ = x[Keywords-(8)]
-	_ = x[ModelType-(9)]
-	_ = x[EcologicalDomain-(10)]
-	_ = x[SpatialScale-(11)]
-	_ = x[TemporalScale-(12)]
-	_ = x[TargetSpeciesOrEcosystem-(13)]
-	_ = x[LanguageOrSoftware-(14)]
-	_ = x[DependenciesAndLibraries-(15)]
-	_ = x[HardwareRequirements-(16)]
-	_ = x[OSCompatibility-(17)]
-	_ = x[DataInputTypeFormat-(18)]
-	_ = x[DataOutputTypeFormat-(19)]
-	_ = x[DataSources-(20)]
-	_ = x[DataPreprocessing-(21)]
-	_ = x[Variables-(22)]
-	_ = x[VariableRelationships-(23)]
-	_ = x[Parameters-(24)]
-	_ = x[EquationsAndAlgorithms-(25)]
-	_ = x[CalibrationTechniques-(26)]
-	_ = x[ValidationTechniques-(27)]
-	_ = x[PerformanceMetrics-(28)]
-	_ = x[SensitivityAnalysis-(29)]
-	_ = x[InstallInstructions-(30)]
-	_ = x[ManualOrDocs-(31)]
-	_ = x[ExampleUseCases-(32)]
-	_ = x[LimitationsOrAssumptions-(33)]
-	_ = x[RelatedPublications-(34)]
-	_ = x[Citations-(35)]
-	_ = x[RepoLink-(36)]
-	_ = x[DockerInfo-(37)]
-	_ = x[ComputationalEnvironment-(38)]
-	_ = x[ApiDocs-(39)]
-	_ = x[DataExchangeFormats-(40)]
-	_ = x[ModelAndToolIntegration-(41)]
-	_ = x[UncertaintyQuantificationMethods-(42)]
-	_ = x[Robustness-(43)]
-	_ = x[Changelog-(44)]
-	_ = x[PreviousVersions-(45)]
-	_ = x[VersionCompatibility-(46)]
-	_ = x[UserCommunity-(47)]
-	_ = x[ForumsOrDiscussions-(48)]
-	_ = x[ContributionGuidelines-(49)]
+	_ = x[Identifier-(1)]
+	_ = x[Creator-(2)]
+	_ = x[Title-(3)]
+	_ = x[Publisher-(4)]
+	_ = x[PublicationYear-(5)]
+	_ = x[Subject-(6)]
+	_ = x[Contributor-(7)]
+	_ = x[Date-(8)]
+	_ = x[Language-(9)]
+	_ = x[ResourceType-(10)]
+	_ = x[AlternateIdentifier-(11)]
+	_ = x[RelatedIdentifier-(12)]
+	_ = x[Size-(13)]
+	_ = x[Format-(14)]
+	_ = x[Version-(15)]
+	_ = x[Rights-(16)]
+	_ = x[Description-(17)]
+	_ = x[GeoLocation-(18)]
+	_ = x[FundingReference-(19)]
+	_ = x[RelatedItem-(20)]
 }
 
-var _ElementValues = []Element{Uuid, ModelName, Version, CreationDate, LastUpdateDate, AuthorsAndContributors, License, Abstract, Keywords, ModelType, EcologicalDomain, SpatialScale, TemporalScale, TargetSpeciesOrEcosystem, LanguageOrSoftware, DependenciesAndLibraries, HardwareRequirements, OSCompatibility, DataInputTypeFormat, DataOutputTypeFormat, DataSources, DataPreprocessing, Variables, VariableRelationships, Parameters, EquationsAndAlgorithms, CalibrationTechniques, ValidationTechniques, PerformanceMetrics, SensitivityAnalysis, InstallInstructions, ManualOrDocs, ExampleUseCases, LimitationsOrAssumptions, RelatedPublications, Citations, RepoLink, DockerInfo, ComputationalEnvironment, ApiDocs, DataExchangeFormats, ModelAndToolIntegration, UncertaintyQuantificationMethods, Robustness, Changelog, PreviousVersions, VersionCompatibility, UserCommunity, ForumsOrDiscussions, ContributionGuidelines}
+var _ElementValues = []Element{Identifier, Creator, Title, Publisher, PublicationYear, Subject, Contributor, Date, Language, ResourceType, AlternateIdentifier, RelatedIdentifier, Size, Format, Version, Rights, Description, GeoLocation, FundingReference, RelatedItem}
 
 var _ElementNameToValueMap = map[string]Element{
-	_ElementName[0:4]:          Uuid,
-	_ElementLowerName[0:4]:     Uuid,
-	_ElementName[4:14]:         ModelName,
-	_ElementLowerName[4:14]:    ModelName,
-	_ElementName[14:21]:        Version,
-	_ElementLowerName[14:21]:   Version,
-	_ElementName[21:34]:        CreationDate,
-	_ElementLowerName[21:34]:   CreationDate,
-	_ElementName[34:50]:        LastUpdateDate,
-	_ElementLowerName[34:50]:   LastUpdateDate,
-	_ElementName[50:74]:        AuthorsAndContributors,
-	_ElementLowerName[50:74]:   AuthorsAndContributors,
-	_ElementName[74:81]:        License,
-	_ElementLowerName[74:81]:   License,
-	_ElementName[81:89]:        Abstract,
-	_ElementLowerName[81:89]:   Abstract,
-	_ElementName[89:97]:        Keywords,
-	_ElementLowerName[89:97]:   Keywords,
-	_ElementName[97:107]:       ModelType,
-	_ElementLowerName[97:107]:  ModelType,
-	_ElementName[107:124]:      EcologicalDomain,
-	_ElementLowerName[107:124]: EcologicalDomain,
-	_ElementName[124:137]:      SpatialScale,
-	_ElementLowerName[124:137]: SpatialScale,
-	_ElementName[137:151]:      TemporalScale,
-	_ElementLowerName[137:151]: TemporalScale,
-	_ElementName[151:178]:      TargetSpeciesOrEcosystem,
-	_ElementLowerName[151:178]: TargetSpeciesOrEcosystem,
-	_ElementName[178:198]:      LanguageOrSoftware,
-	_ElementLowerName[178:198]: LanguageOrSoftware,
-	_ElementName[198:224]:      DependenciesAndLibraries,
-	_ElementLowerName[198:224]: DependenciesAndLibraries,
-	_ElementName[224:245]:      HardwareRequirements,
-	_ElementLowerName[224:245]: HardwareRequirements,
-	_ElementName[245:261]:      OSCompatibility,
-	_ElementLowerName[245:261]: OSCompatibility,
-	_ElementName[261:283]:      DataInputTypeFormat,
-	_ElementLowerName[261:283]: DataInputTypeFormat,
-	_ElementName[283:306]:      DataOutputTypeFormat,
-	_ElementLowerName[283:306]: DataOutputTypeFormat,
-	_ElementName[306:318]:      DataSources,
-	_ElementLowerName[306:318]: DataSources,
-	_ElementName[318:336]:      DataPreprocessing,
-	_ElementLowerName[318:336]: DataPreprocessing,
-	_ElementName[336:345]:      Variables,
-	_ElementLowerName[336:345]: Variables,
-	_ElementName[345:367]:      VariableRelationships,
-	_ElementLowerName[345:367]: VariableRelationships,
-	_ElementName[367:377]:      Parameters,
-	_ElementLowerName[367:377]: Parameters,
-	_ElementName[377:401]:      EquationsAndAlgorithms,
-	_ElementLowerName[377:401]: EquationsAndAlgorithms,
-	_ElementName[401:423]:      CalibrationTechniques,
-	_ElementLowerName[401:423]: CalibrationTechniques,
-	_ElementName[423:444]:      ValidationTechniques,
-	_ElementLowerName[423:444]: ValidationTechniques,
-	_ElementName[444:463]:      PerformanceMetrics,
-	_ElementLowerName[444:463]: PerformanceMetrics,
-	_ElementName[463:483]:      SensitivityAnalysis,
-	_ElementLowerName[463:483]: SensitivityAnalysis,
-	_ElementName[483:503]:      InstallInstructions,
-	_ElementLowerName[483:503]: InstallInstructions,
-	_ElementName[503:517]:      ManualOrDocs,
-	_ElementLowerName[503:517]: ManualOrDocs,
-	_ElementName[517:534]:      ExampleUseCases,
-	_ElementLowerName[517:534]: ExampleUseCases,
-	_ElementName[534:560]:      LimitationsOrAssumptions,
-	_ElementLowerName[534:560]: LimitationsOrAssumptions,
-	_ElementName[560:580]:      RelatedPublications,
-	_ElementLowerName[560:580]: RelatedPublications,
-	_ElementName[580:589]:      Citations,
-	_ElementLowerName[580:589]: Citations,
-	_ElementName[589:598]:      RepoLink,
-	_ElementLowerName[589:598]: RepoLink,
-	_ElementName[598:609]:      DockerInfo,
-	_ElementLowerName[598:609]: DockerInfo,
-	_ElementName[609:634]:      ComputationalEnvironment,
-	_ElementLowerName[609:634]: ComputationalEnvironment,
-	_ElementName[634:642]:      ApiDocs,
-	_ElementLowerName[634:642]: ApiDocs,
-	_ElementName[642:663]:      DataExchangeFormats,
-	_ElementLowerName[642:663]: DataExchangeFormats,
-	_ElementName[663:689]:      ModelAndToolIntegration,
-	_ElementLowerName[663:689]: ModelAndToolIntegration,
-	_ElementName[689:723]:      UncertaintyQuantificationMethods,
-	_ElementLowerName[689:723]: UncertaintyQuantificationMethods,
-	_ElementName[723:733]:      Robustness,
-	_ElementLowerName[723:733]: Robustness,
-	_ElementName[733:742]:      Changelog,
-	_ElementLowerName[733:742]: Changelog,
-	_ElementName[742:759]:      PreviousVersions,
-	_ElementLowerName[742:759]: PreviousVersions,
-	_ElementName[759:780]:      VersionCompatibility,
-	_ElementLowerName[759:780]: VersionCompatibility,
-	_ElementName[780:794]:      UserCommunity,
-	_ElementLowerName[780:794]: UserCommunity,
-	_ElementName[794:815]:      ForumsOrDiscussions,
-	_ElementLowerName[794:815]: ForumsOrDiscussions,
-	_ElementName[815:838]:      ContributionGuidelines,
-	_ElementLowerName[815:838]: ContributionGuidelines,
+	_ElementName[0:10]:         Identifier,
+	_ElementLowerName[0:10]:    Identifier,
+	_ElementName[10:17]:        Creator,
+	_ElementLowerName[10:17]:   Creator,
+	_ElementName[17:22]:        Title,
+	_ElementLowerName[17:22]:   Title,
+	_ElementName[22:31]:        Publisher,
+	_ElementLowerName[22:31]:   Publisher,
+	_ElementName[31:47]:        PublicationYear,
+	_ElementLowerName[31:47]:   PublicationYear,
+	_ElementName[47:54]:        Subject,
+	_ElementLowerName[47:54]:   Subject,
+	_ElementName[54:65]:        Contributor,
+	_ElementLowerName[54:65]:   Contributor,
+	_ElementName[65:69]:        Date,
+	_ElementLowerName[65:69]:   Date,
+	_ElementName[69:77]:        Language,
+	_ElementLowerName[69:77]:   Language,
+	_ElementName[77:90]:        ResourceType,
+	_ElementLowerName[77:90]:   ResourceType,
+	_ElementName[90:110]:       AlternateIdentifier,
+	_ElementLowerName[90:110]:  AlternateIdentifier,
+	_ElementName[110:128]:      RelatedIdentifier,
+	_ElementLowerName[110:128]: RelatedIdentifier,
+	_ElementName[128:132]:      Size,
+	_ElementLowerName[128:132]: Size,
+	_ElementName[132:138]:      Format,
+	_ElementLowerName[132:138]: Format,
+	_ElementName[138:145]:      Version,
+	_ElementLowerName[138:145]: Version,
+	_ElementName[145:151]:      Rights,
+	_ElementLowerName[145:151]: Rights,
+	_ElementName[151:162]:      Description,
+	_ElementLowerName[151:162]: Description,
+	_ElementName[162:174]:      GeoLocation,
+	_ElementLowerName[162:174]: GeoLocation,
+	_ElementName[174:191]:      FundingReference,
+	_ElementLowerName[174:191]: FundingReference,
+	_ElementName[191:203]:      RelatedItem,
+	_ElementLowerName[191:203]: RelatedItem,
 }
 
 var _ElementNames = []string{
-	_ElementName[0:4],
-	_ElementName[4:14],
-	_ElementName[14:21],
-	_ElementName[21:34],
-	_ElementName[34:50],
-	_ElementName[50:74],
-	_ElementName[74:81],
-	_ElementName[81:89],
-	_ElementName[89:97],
-	_ElementName[97:107],
-	_ElementName[107:124],
-	_ElementName[124:137],
-	_ElementName[137:151],
-	_ElementName[151:178],
-	_ElementName[178:198],
-	_ElementName[198:224],
-	_ElementName[224:245],
-	_ElementName[245:261],
-	_ElementName[261:283],
-	_ElementName[283:306],
-	_ElementName[306:318],
-	_ElementName[318:336],
-	_ElementName[336:345],
-	_ElementName[345:367],
-	_ElementName[367:377],
-	_ElementName[377:401],
-	_ElementName[401:423],
-	_ElementName[423:444],
-	_ElementName[444:463],
-	_ElementName[463:483],
-	_ElementName[483:503],
-	_ElementName[503:517],
-	_ElementName[517:534],
-	_ElementName[534:560],
-	_ElementName[560:580],
-	_ElementName[580:589],
-	_ElementName[589:598],
-	_ElementName[598:609],
-	_ElementName[609:634],
-	_ElementName[634:642],
-	_ElementName[642:663],
-	_ElementName[663:689],
-	_ElementName[689:723],
-	_ElementName[723:733],
-	_ElementName[733:742],
-	_ElementName[742:759],
-	_ElementName[759:780],
-	_ElementName[780:794],
-	_ElementName[794:815],
-	_ElementName[815:838],
+	_ElementName[0:10],
+	_ElementName[10:17],
+	_ElementName[17:22],
+	_ElementName[22:31],
+	_ElementName[31:47],
+	_ElementName[47:54],
+	_ElementName[54:65],
+	_ElementName[65:69],
+	_ElementName[69:77],
+	_ElementName[77:90],
+	_ElementName[90:110],
+	_ElementName[110:128],
+	_ElementName[128:132],
+	_ElementName[132:138],
+	_ElementName[138:145],
+	_ElementName[145:151],
+	_ElementName[151:162],
+	_ElementName[162:174],
+	_ElementName[174:191],
+	_ElementName[191:203],
 }
 
 // ElementString retrieves an enum value from the enum constants string name.

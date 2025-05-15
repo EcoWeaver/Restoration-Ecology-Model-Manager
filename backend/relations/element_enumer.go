@@ -15,8 +15,9 @@ var _ElementIndex = [...]uint8{0, 15, 24, 33}
 const _ElementLowerName = "correlated-withincreasesdecreases"
 
 func (i Element) String() string {
+	i -= 1
 	if i < 0 || i >= Element(len(_ElementIndex)-1) {
-		return fmt.Sprintf("Element(%d)", i)
+		return fmt.Sprintf("Element(%d)", i+1)
 	}
 	return _ElementName[_ElementIndex[i]:_ElementIndex[i+1]]
 }
@@ -25,9 +26,9 @@ func (i Element) String() string {
 // Re-run the stringer command to generate them again.
 func _ElementNoOp() {
 	var x [1]struct{}
-	_ = x[CorrelatedWith-(0)]
-	_ = x[Increases-(1)]
-	_ = x[Decreases-(2)]
+	_ = x[CorrelatedWith-(1)]
+	_ = x[Increases-(2)]
+	_ = x[Decreases-(3)]
 }
 
 var _ElementValues = []Element{CorrelatedWith, Increases, Decreases}

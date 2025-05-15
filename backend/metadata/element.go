@@ -1,131 +1,44 @@
 package metadata
 
+import (
+	"fmt"
+)
+
 type Element int
 
 //go:generate go run github.com/dmarkham/enumer -json -transform=kebab -type=Element
 const (
-	Uuid Element = iota
-	ModelName
+	Identifier Element = iota + 1
+	Creator
+	Title
+	Publisher
+	PublicationYear
+	Subject
+	Contributor
+	Date
+	Language
+	ResourceType
+	AlternateIdentifier
+	RelatedIdentifier
+	Size
+	Format
 	Version
-	CreationDate
-	LastUpdateDate
-	AuthorsAndContributors
-	License
-	Abstract
-	Keywords
-	ModelType
-	EcologicalDomain
-	SpatialScale
-	TemporalScale
-	TargetSpeciesOrEcosystem
-	LanguageOrSoftware
-	DependenciesAndLibraries
-	HardwareRequirements
-	OSCompatibility
-	DataInputTypeFormat
-	DataOutputTypeFormat
-	DataSources
-	DataPreprocessing
-	Variables
-	VariableRelationships
-	Parameters
-	EquationsAndAlgorithms
-	CalibrationTechniques
-	ValidationTechniques
-	PerformanceMetrics
-	SensitivityAnalysis
-	InstallInstructions
-	ManualOrDocs
-	ExampleUseCases
-	LimitationsOrAssumptions
-	RelatedPublications
-	Citations
-	RepoLink
-	DockerInfo
-	ComputationalEnvironment
-	ApiDocs
-	DataExchangeFormats
-	ModelAndToolIntegration
-	UncertaintyQuantificationMethods
-	Robustness
-	Changelog
-	PreviousVersions
-	VersionCompatibility
-	UserCommunity
-	ForumsOrDiscussions
-	ContributionGuidelines
+	Rights
+	Description
+	GeoLocation
+	FundingReference
+	RelatedItem
 )
 
-func (self Element) SubCategory() SubCategory {
+func (self Element) Obligation() (Obligation, error) {
 	switch self {
-	case Uuid,
-		ModelName,
-		Version,
-		CreationDate,
-		LastUpdateDate,
-		AuthorsAndContributors,
-		License:
-		return ModelIdentification
-	case Abstract,
-		Keywords,
-		ModelType,
-		EcologicalDomain,
-		SpatialScale,
-		TemporalScale,
-		TargetSpeciesOrEcosystem:
-		return ModelDescription
-	case LanguageOrSoftware,
-		DependenciesAndLibraries,
-		HardwareRequirements,
-		OSCompatibility:
-		return Specifications
-	case DataInputTypeFormat,
-		DataOutputTypeFormat,
-		DataSources,
-		DataPreprocessing:
-		return DataRequirements
-	case Variables,
-		VariableRelationships,
-		Parameters,
-		EquationsAndAlgorithms:
-		return ModelComponents
-	case CalibrationTechniques,
-		ValidationTechniques,
-		PerformanceMetrics,
-		SensitivityAnalysis:
-		return ModelValidation
-	case InstallInstructions,
-		ManualOrDocs,
-		ExampleUseCases,
-		LimitationsOrAssumptions:
-		return Usage
-	case RelatedPublications,
-		Citations:
-		return References
-	case RepoLink,
-		DockerInfo,
-		ComputationalEnvironment:
-		return ModelReproducability
-	case ApiDocs,
-		DataExchangeFormats,
-		ModelAndToolIntegration:
-		return ModelInteroperability
-	case UncertaintyQuantificationMethods,
-		Robustness:
-		return UncertaintyAndSensitivity
-	case Changelog,
-		PreviousVersions,
-		VersionCompatibility:
-		return VersionControl
-	case UserCommunity,
-		ForumsOrDiscussions,
-		ContributionGuidelines:
-		return CommunityEngagement
+	case Identifier, Creator, Title, Publisher, PublicationYear, ResourceType:
+		return Mandatory, nil
+	case Subject, Contributor, Date, RelatedIdentifier, Description, GeoLocation:
+		return Recommended, nil
+	case Language, AlternateIdentifier, Size, Format, Version, Rights, FundingReference, RelatedItem:
+		return Optional, nil
 	default:
-		panic("unreachable")
+		return 0, fmt.Errorf("unknown metadata element %d encountered", self)
 	}
-}
-
-func (self Element) Category() Category {
-	return self.SubCategory().Category()
 }
