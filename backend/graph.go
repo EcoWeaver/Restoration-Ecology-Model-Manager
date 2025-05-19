@@ -12,8 +12,9 @@ type Graph struct {
 }
 
 type Metadata struct {
-	Kind  metadata.Element `json:"kind"`
-	Value string           `json:"value"`
+	Kind     metadata.Element `json:"kind"`
+	Value    string           `json:"value"`
+	Ontology string           `json:"ontology"`
 }
 
 type Node struct {
