@@ -5,8 +5,12 @@ import (
 	"backend/relations"
 )
 
+type GraphRequest struct {
+	Metadata []Metadata `json:"metadata"`
+	Graph    Graph      `json:"graph"`
+}
+
 type Graph struct {
-	Metadata  []Metadata `json:"metadata"`
 	Nodes     []Node     `json:"nodes"`
 	Relations []Relation `json:"relations"`
 }
