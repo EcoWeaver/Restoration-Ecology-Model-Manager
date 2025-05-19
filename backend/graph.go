@@ -1,19 +1,28 @@
 package main
 
-import "backend/relations"
+import (
+	"backend/metadata"
+	"backend/relations"
+)
 
 type Graph struct {
-	Nodes     []Node
-	Relations []Relation
+	Metadata  []Metadata `json:"metadata"`
+	Nodes     []Node     `json:"nodes"`
+	Relations []Relation `json:"relations"`
+}
+
+type Metadata struct {
+	Kind  metadata.Element `json:"kind"`
+	Value string           `json:"value"`
 }
 
 type Node struct {
-	Body  string
-	Color string
+	Body  string `json:"body"`
+	Color string `json:"color"`
 }
 
 type Relation struct {
-	From int
-	To   int
-	Kind relations.Element
+	From int               `json:"from"`
+	To   int               `json:"to"`
+	Kind relations.Element `json:"kind"`
 }
