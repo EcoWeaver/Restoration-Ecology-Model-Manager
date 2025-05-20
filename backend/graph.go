@@ -22,12 +22,18 @@ type Metadata struct {
 }
 
 type Node struct {
-	Body  string `json:"body"`
-	Color string `json:"color"`
+	Body     string `json:"body"`
+	Color    string `json:"color"`
+	Position Point  `json:"position"`
 }
 
 type Relation struct {
 	From int               `json:"from"`
 	To   int               `json:"to"`
 	Kind relations.Element `json:"kind"`
+}
+
+type Point struct {
+	X int `json:"x"`
+	Y int `json:"y"`
 }
