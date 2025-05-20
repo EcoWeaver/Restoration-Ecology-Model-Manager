@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: Swep25!
 
     volumes:
-      - ./postgreSQL:/docker-entrypoint-initdb.d
+      - ./postgreSQL:/docker-entrypoint-initdb.d:z
 
     ports:
       - "5432:5432"
