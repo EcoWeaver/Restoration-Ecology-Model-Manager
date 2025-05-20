@@ -1,23 +1,21 @@
 package relations
 
-import "fmt"
-
 type Element int
 
-//go:generate go run github.com/dmarkham/enumer -json -transform=kebab -type=Element
+//go:generate go run github.com/dmarkham/enumer -json -text -transform=kebab -type=Element
 const (
 	CorrelatedWith Element = iota + 1
 	Increases
 	Decreases
 )
 
-func (self Element) Category() (Category, error) {
+func (self Element) Category() Category {
 	switch self {
 	case CorrelatedWith:
-		return Causal, nil
+		return Causal
 	case Increases, Decreases:
-		return Noncausal, nil
+		return Noncausal
 	default:
-		return 0, fmt.Errorf("unknown relations element %d encountered", self)
+		panic("relations element " + self.String() + " doesn't have an assigned category")
 	}
 }

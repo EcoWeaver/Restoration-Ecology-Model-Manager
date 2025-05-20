@@ -1,12 +1,8 @@
 package metadata
 
-import (
-	"fmt"
-)
-
 type Element int
 
-//go:generate go run github.com/dmarkham/enumer -json -transform=kebab -type=Element
+//go:generate go run github.com/dmarkham/enumer -json -text -transform=kebab -type=Element
 const (
 	Identifier Element = iota + 1
 	Creator
@@ -30,15 +26,15 @@ const (
 	RelatedItem
 )
 
-func (self Element) Obligation() (Obligation, error) {
+func (self Element) Obligation() Obligation {
 	switch self {
 	case Identifier, Creator, Title, Publisher, PublicationYear, ResourceType:
-		return Mandatory, nil
+		return Mandatory
 	case Subject, Contributor, Date, RelatedIdentifier, Description, GeoLocation:
-		return Recommended, nil
+		return Recommended
 	case Language, AlternateIdentifier, Size, Format, Version, Rights, FundingReference, RelatedItem:
-		return Optional, nil
+		return Optional
 	default:
-		return 0, fmt.Errorf("unknown metadata element %d encountered", self)
+		panic("metadata element " + self.String() + " doesn't have an assigned obligation")
 	}
 }

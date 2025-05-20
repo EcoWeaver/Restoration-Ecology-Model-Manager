@@ -1,6 +1,8 @@
 package main
 
 import (
+	"backend/metadata"
+	"backend/relations"
 	"context"
 	"net/http"
 	"os"
@@ -30,6 +32,16 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		e.Logger.Fatal(err)
+	}
+
+	// check every metadata element has an assigned obligation
+	for _, element := range metadata.ElementValues() {
+		_ = element.Obligation()
+	}
+
+	// check every relations element has an assigned obligation
+	for _, element := range relations.ElementValues() {
+		_ = element.Category()
 	}
 
 	// acquire postgres pool

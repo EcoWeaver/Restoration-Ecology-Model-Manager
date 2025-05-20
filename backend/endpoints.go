@@ -12,30 +12,22 @@ import (
 )
 
 func GetMetadataElements(c echo.Context) error {
-	response := map[string][]string{}
+	response := map[metadata.Obligation][]metadata.Element{}
 
 	for _, element := range metadata.ElementValues() {
-		obligation, err := element.Obligation()
-		if err != nil {
-			return err
-		}
-		obligationS := obligation.String()
-		response[obligationS] = append(response[obligationS], element.String())
+		obligation := element.Obligation()
+		response[obligation] = append(response[obligation], element)
 	}
 
 	return c.JSON(http.StatusOK, response)
 }
 
 func GetRelationElements(c echo.Context) error {
-	response := map[string][]string{}
+	response := map[relations.Category][]relations.Element{}
 
 	for _, element := range relations.ElementValues() {
-		category, err := element.Category()
-		if err != nil {
-			return err
-		}
-		elementS := category.String()
-		response[elementS] = append(response[elementS], element.String())
+		category := element.Category()
+		response[category] = append(response[category], element)
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -57,11 +49,7 @@ func PutModel(c echo.Context) error {
 
 	neededMetadata := map[metadata.Element]struct{}{}
 	for _, element := range metadata.ElementValues() {
-		obligation, err := element.Obligation()
-		if err != nil {
-			return err
-		}
-		if obligation == metadata.Mandatory {
+		if element.Obligation() == metadata.Mandatory {
 			neededMetadata[element] = struct{}{}
 		}
 	}

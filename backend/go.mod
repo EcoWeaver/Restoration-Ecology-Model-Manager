@@ -3,7 +3,7 @@ module backend
 go 1.24.3
 
 require (
-	github.com/jackc/pgx/v5 v5.7.4
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/labstack/echo/v4 v4.13.3
 	golang.org/x/time v0.11.0
 )
