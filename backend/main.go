@@ -22,9 +22,10 @@ func main() {
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 
+	e.GET("/", TestConnection)
 	e.GET("/metadata-elements", GetMetadataElements)
 	e.GET("/relation-elements", GetRelationElements)
-	e.GET("/", TestConnection)
+	e.PUT("/model", PutModel)
 
 	err := godotenv.Load()
 	if err != nil {
