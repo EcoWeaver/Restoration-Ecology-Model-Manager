@@ -90,38 +90,9 @@ func PutModel(c echo.Context) error {
 		return err
 	}
 
-	// check all relation elements are valid
-	for _, relation := range graphRequest.Graph.Relations {
-		if !relation.Kind.IsAElement() {
-			return fmt.Errorf("encountered non-metadata element %s", relation.Kind.String())
-		}
-	}
-
-	// check all metadata elements are valid
-	for _, metadata := range graphRequest.Metadata {
-		if !metadata.Kind.IsAElement() {
-			return fmt.Errorf("encountered non-metadata element %s", metadata.Kind.String())
-		}
-	}
-
-	// check all mandatory metadata elements are present
-	neededMetadata := map[metadata.Element]struct{}{}
-	for _, element := range metadata.ElementValues() {
-		if element.Obligation() == metadata.Mandatory {
-			neededMetadata[element] = struct{}{}
-		}
-	}
-
-	for _, metadata := range graphRequest.Metadata {
-		delete(neededMetadata, metadata.Kind)
-	}
-
-	if len(neededMetadata) != 0 {
-		bytes, err := json.Marshal(neededMetadata)
-		if err != nil {
-			return err
-		}
-		return fmt.Errorf("missing mandatory metadata %s", bytes)
+	err = graphRequest.validate()
+	if err != nil {
+		return err
 	}
 
 	conn, err := dbPool.Begin(ctx)
@@ -149,4 +120,42 @@ func PutModel(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusCreated)
+}
+
+func (self GraphRequest) validate() error {
+	// check all relation elements are valid
+	for _, relation := range self.Graph.Relations {
+		if !relation.Kind.IsAElement() {
+			return fmt.Errorf("encountered non-relation element %s", relation.Kind.String())
+		}
+	}
+
+	// check all metadata elements are valid
+	for _, metadata := range self.Metadata {
+		if !metadata.Kind.IsAElement() {
+			return fmt.Errorf("encountered non-metadata element %s", metadata.Kind.String())
+		}
+	}
+
+	// check all mandatory metadata elements are present
+	neededMetadata := map[metadata.Element]struct{}{}
+	for _, element := range metadata.ElementValues() {
+		if element.Obligation() == metadata.Mandatory {
+			neededMetadata[element] = struct{}{}
+		}
+	}
+
+	for _, metadata := range self.Metadata {
+		delete(neededMetadata, metadata.Kind)
+	}
+
+	if len(neededMetadata) != 0 {
+		bytes, err := json.Marshal(neededMetadata)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("missing mandatory metadata %s", bytes)
+	}
+
+	return nil
 }
