@@ -1,15 +1,22 @@
 const apiBase = "http://localhost:8080";
 
-async function req<T>(path: string): Promise<T> {
-	const res = await fetch(`${apiBase}/${path}`);
+async function req<T>(method: string, path: string, body?: any | undefined): Promise<T> {
+	const res = await fetch(`${apiBase}/${path}`, {
+		method,
+		body: body === undefined ? undefined : JSON.stringify(body),
+	});
 	return res.json();
 }
 
-export const relationElements = req<RelationElements>("relation-elements");
+export const relationElements = req<RelationElements>("GET", "relation-elements");
 export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>;
 
-export const metadataElements = req<MetadataElements>("metadata-elements");
+export const metadataElements = req<MetadataElements>("GET", "metadata-elements");
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
+
+export function putModel(graph: GraphRequest) {
+	return req<number>("PUT", "model", graph);
+}
 
 export type GraphRequest = {
 	metadata: Metadata[]

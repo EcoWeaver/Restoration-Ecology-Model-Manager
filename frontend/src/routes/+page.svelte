@@ -5,6 +5,7 @@
 	import EdgeComponent, { type Edge } from '$lib/EdgeComponent.svelte';
 	import MetadataPanel from '$lib/MetadataPanel.svelte';
 	import {
+		putModel,
 		metadataElements,
 		type Node as ApiNode,
 		type Relation as ApiRelation,
@@ -56,7 +57,8 @@
 			metadata,
 			graph: { nodes: outNodes, relations: outRelations }
 		};
-		console.log(JSON.stringify(req, null, 2));
+
+		putModel(req);
 	}
 </script>
 
@@ -70,7 +72,7 @@
 	>
 		<Panel position="top-left">
 			<h1 class="text-2xl">Restoration Ecology Model Manager</h1>
-			<button onclick={save}>Save</button>
+			<button class="hover:bg-neutral-200" onclick={save}>Save</button>
 		</Panel>
 		<Panel position="top-right">
 			{#await metadataElements then elements}

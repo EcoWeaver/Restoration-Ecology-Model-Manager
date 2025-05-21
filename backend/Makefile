@@ -2,6 +2,7 @@ _default:
 	@echo "usage: make [up|down|psql|build|run]"
 
 up:
+	docker compose down
 	docker compose build
 	docker compose up
 

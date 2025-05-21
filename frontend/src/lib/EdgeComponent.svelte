@@ -40,7 +40,7 @@
 				id,
 				{
 					markerEnd: re.causal.includes(v) ? { type: MarkerType.ArrowClosed } : undefined,
-					data: { relation: value }
+					data: { kind: value }
 				},
 				{ replace: true }
 			);
