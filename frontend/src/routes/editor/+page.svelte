@@ -17,10 +17,19 @@
 
 	let nodes: Node[] = $state.raw([]);
 	let edges: Edge[] = $state.raw([]);
+	let relations = $state<Edge[]>([]);
 
+	let error = $state(false);
+	let identifier = $state("");
 	let metadata = $state<Metadata[]>([]);
 
 	function save() {
+		if (identifier == "") {
+			error = true;
+			return;
+		}
+		error = false;
+
 		const outNodes: ApiNode[] = nodes.map((n) => ({
 			...n.data,
 			position: {
@@ -28,7 +37,7 @@
 				y: Math.round(n.position.y),
 			},
 		}));
-		const outRelations: ApiRelation[] = edges.map((e) => {
+		const outRelations: ApiRelation[] = relations.map((e) => {
 			const from = nodes.findIndex((n) => n.id === e.source);
 			const to = nodes.findIndex((n) => n.id === e.target)!!;
 			return {
@@ -39,6 +48,7 @@
 		});
 
 		const req: GraphRequest = {
+			identifier,
 			metadata,
 			graph: { nodes: outNodes, relations: outRelations },
 		};
@@ -75,7 +85,7 @@
 					kind: "correlated-with",
 				},
 			};
-			edges = [...edges, edge];
+			relations.push(edge);
 		}}
 	>
 		<Panel position="top-left">
@@ -85,7 +95,7 @@
 		</Panel>
 		<Panel position="top-right">
 			{#await metadataElements then elements}
-				<MetadataPanel {elements} bind:metadata />
+				<MetadataPanel {elements} {error} bind:identifier bind:metadata />
 			{/await}
 		</Panel>
 		<Background variant={BackgroundVariant.Dots} />

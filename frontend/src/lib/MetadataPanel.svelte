@@ -1,8 +1,17 @@
 <script lang="ts">
 	import type { Metadata, MetadataElements } from "$lib/api";
 
-	let { elements, metadata = $bindable() }: { elements: MetadataElements; metadata: Metadata[] } =
-		$props();
+	let {
+		elements,
+		error,
+		identifier = $bindable(),
+		metadata = $bindable(),
+	}: {
+		elements: MetadataElements;
+		error: boolean;
+		identifier: string;
+		metadata: Metadata[];
+	} = $props();
 
 	$effect(() => {
 		metadata = elements.mandatory.map((kind) => ({
@@ -14,6 +23,8 @@
 </script>
 
 <h2 class="text-lg">Metadata</h2>
+<div>Identifier: <input class="border" class:border-red-500={error} bind:value={identifier} /></div>
+
 <table>
 	<thead>
 		<tr>

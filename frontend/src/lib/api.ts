@@ -19,6 +19,7 @@ export function putModel(graph: GraphRequest) {
 }
 
 export type GraphRequest = {
+	identifier: string,
 	metadata: Metadata[];
 	graph: Graph;
 };
