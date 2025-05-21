@@ -3,11 +3,15 @@
 </script>
 
 <script lang="ts">
-	import { type NodeProps, type Node as FlowNode, Position } from '@xyflow/svelte';
+	import { type NodeProps, type Node as FlowNode, Position, useSvelteFlow } from '@xyflow/svelte';
 	import type { Node as ApiNode } from '$lib/api';
 	import { Handle } from '@xyflow/svelte';
 
-	let { data }: NodeProps<Node> = $props();
+	let { id, data }: NodeProps<Node> = $props();
+	const { updateNodeData } = useSvelteFlow();
+
+	let body = $state(data.body);
+	$effect(() => updateNodeData(id, { body }));
 
 	function isLight(s: string) {
 		const rgb = parseInt(s.slice(1), 16);
@@ -25,7 +29,7 @@
 	class:text-white={!isLight(data.color)}
 	style:background-color={data.color}
 >
-	{data.body}
+	<span contenteditable bind:innerText={body}></span>
 </div>
 
 <Handle type="target" position={Position.Left} />

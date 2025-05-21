@@ -2,8 +2,8 @@ _default:
 	@echo "usage: make [up|down|psql|build|run]"
 
 up:
-	docker compose down
-	docker compose build
+	docker stop postgres
+	docker rm postgres
 	docker compose up
 
 down:

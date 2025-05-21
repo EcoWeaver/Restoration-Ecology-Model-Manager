@@ -14,35 +14,21 @@
 		type GraphRequest
 	} from '$lib/api';
 
-	let nodes: Node[] = $state.raw([
-		{
-			id: '1',
-			type: 'custom',
-			position: { x: 100, y: 100 },
-			data: { body: 'plant', color: '#ff0000' }
-		},
-		{
-			id: '2',
-			type: 'custom',
-			position: { x: 300, y: 200 },
-			data: { body: 'tree', color: '#00ff00' }
-		},
-		{
-			id: '3',
-			type: 'custom',
-			position: { x: 100, y: 300 },
-			data: { body: 'animal', color: '#0000ff' }
-		}
-	]);
+	let id = $state(0);
 
-	let edges: Edge[] = $state.raw([
-		{ id: '1', type: 'custom', source: '1', target: '2', data: { kind: 'correlated-with' } }
-	]);
+	let nodes: Node[] = $state.raw([]);
+	let edges: Edge[] = $state.raw([]);
 
 	let metadata = $state<Metadata[]>([]);
 
 	function save() {
-		const outNodes: ApiNode[] = nodes.map((n) => ({ ...n.data, position: n.position }));
+		const outNodes: ApiNode[] = nodes.map((n) => ({
+			...n.data,
+			position: {
+				x: Math.round(n.position.x),
+				y: Math.round(n.position.y)
+			}
+		}));
 		const outRelations: ApiRelation[] = edges.map((e) => {
 			const from = nodes.findIndex((n) => n.id === e.source);
 			const to = nodes.findIndex((n) => n.id === e.target)!!;
@@ -60,6 +46,17 @@
 
 		putModel(req);
 	}
+
+	function add() {
+		const i = id++;
+		const node: Node = {
+			id: i.toString(),
+			type: 'custom',
+			position: { x: 100, y: 100 },
+			data: { body: 'new', color: ['#ff0000', '#00ff00', '#0000ff'][i] }
+		};
+		nodes = [...nodes, node];
+	}
 </script>
 
 <div class="h-dvh w-dvw">
@@ -69,10 +66,23 @@
 		proOptions={{ hideAttribution: true }}
 		nodeTypes={{ custom: NodeComponent }}
 		edgeTypes={{ custom: EdgeComponent }}
+		onconnect={(c) => {
+			const edge: Edge = {
+				id: `${c.source}-${c.target}`,
+				type: 'custom',
+				source: c.source,
+				target: c.target,
+				data: {
+					kind: 'correlated-with'
+				}
+			};
+			edges = [...edges, edge];
+		}}
 	>
 		<Panel position="top-left">
 			<h1 class="text-2xl">Restoration Ecology Model Manager</h1>
 			<button class="hover:bg-neutral-200" onclick={save}>Save</button>
+			<button class="hover:bg-neutral-200" onclick={add}>Add</button>
 		</Panel>
 		<Panel position="top-right">
 			{#await metadataElements then elements}
