@@ -90,5 +90,6 @@ func PutModel(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusOK)
+	c.Response().Header().Set("Location", fmt.Sprint(model_id))
+	return c.NoContent(http.StatusCreated)
 }
