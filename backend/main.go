@@ -20,6 +20,7 @@ func main() {
 	ctx := context.Background()
 	e := echo.New()
 
+	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
