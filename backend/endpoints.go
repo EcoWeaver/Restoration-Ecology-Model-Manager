@@ -90,6 +90,21 @@ func PutModel(c echo.Context) error {
 		return err
 	}
 
+	// check all relation elements are valid
+	for _, relation := range graphRequest.Graph.Relations {
+		if !relation.Kind.IsAElement() {
+			return fmt.Errorf("encountered non-metadata element %s", relation.Kind.String())
+		}
+	}
+
+	// check all metadata elements are valid
+	for _, metadata := range graphRequest.Metadata {
+		if !metadata.Kind.IsAElement() {
+			return fmt.Errorf("encountered non-metadata element %s", metadata.Kind.String())
+		}
+	}
+
+	// check all mandatory metadata elements are present
 	neededMetadata := map[metadata.Element]struct{}{}
 	for _, element := range metadata.ElementValues() {
 		if element.Obligation() == metadata.Mandatory {
@@ -98,9 +113,6 @@ func PutModel(c echo.Context) error {
 	}
 
 	for _, metadata := range graphRequest.Metadata {
-		if !metadata.Kind.IsAElement() {
-			return fmt.Errorf("encountered non-metadata element %s", metadata.Kind.String())
-		}
 		delete(neededMetadata, metadata.Kind)
 	}
 
