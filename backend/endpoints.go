@@ -55,6 +55,9 @@ func PutModel(c echo.Context) error {
 	}
 
 	for _, metadata := range graphRequest.Metadata {
+		if !metadata.Kind.IsAElement() {
+			return fmt.Errorf("encountered non-metadata element %s", metadata.Kind.String())
+		}
 		delete(neededMetadata, metadata.Kind)
 	}
 
