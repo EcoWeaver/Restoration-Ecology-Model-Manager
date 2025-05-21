@@ -19,37 +19,36 @@ export function putModel(graph: GraphRequest) {
 }
 
 export type GraphRequest = {
-	metadata: Metadata[]
-	graph: Graph
-}
+	metadata: Metadata[];
+	graph: Graph;
+};
 
 export type Graph = {
-	nodes: Node[]
-	relations: Relation[]
-}
+	nodes: Node[];
+	relations: Relation[];
+};
 
 export type Metadata = {
-	kind: MetadataElement,
-	value: string
-	ontology: string
-}
+	kind: MetadataElement;
+	value: string;
+	ontology: string;
+};
 export type MetadataElement = string;
 
 export type Node = {
-	body: string
-	color: string
-	position: Point
-}
+	body: string;
+	color: string;
+	position: Point;
+};
 
 export type Relation = {
-	from: number
-	to: number
-	kind: RelationElement
-}
-export type RelationElement = string
+	from: number;
+	to: number;
+	kind: RelationElement;
+};
+export type RelationElement = string;
 
 export type Point = {
-	x: number
-	y: number
-}
-
+	x: number;
+	y: number;
+};

@@ -1,11 +1,11 @@
 <script lang="ts" module>
-	export type Node = FlowNode<Omit<ApiNode, 'position'>, 'custom'>;
+	export type Node = FlowNode<Omit<ApiNode, "position">, "custom">;
 </script>
 
 <script lang="ts">
-	import { type NodeProps, type Node as FlowNode, Position, useSvelteFlow } from '@xyflow/svelte';
-	import type { Node as ApiNode } from '$lib/api';
-	import { Handle } from '@xyflow/svelte';
+	import { type NodeProps, type Node as FlowNode, Position, useSvelteFlow } from "@xyflow/svelte";
+	import type { Node as ApiNode } from "$lib/api";
+	import { Handle } from "@xyflow/svelte";
 
 	let { id, data }: NodeProps<Node> = $props();
 	const { updateNodeData } = useSvelteFlow();

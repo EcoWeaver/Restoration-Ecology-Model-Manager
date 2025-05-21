@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Metadata, MetadataElements } from '$lib/api';
+	import type { Metadata, MetadataElements } from "$lib/api";
 
 	let { elements, metadata = $bindable() }: { elements: MetadataElements; metadata: Metadata[] } =
 		$props();
@@ -7,8 +7,8 @@
 	$effect(() => {
 		metadata = elements.mandatory.map((kind) => ({
 			kind,
-			value: '',
-			ontology: ''
+			value: "",
+			ontology: "",
 		}));
 	});
 </script>

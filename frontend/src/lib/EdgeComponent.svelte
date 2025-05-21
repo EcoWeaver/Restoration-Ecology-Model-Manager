@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	export type Edge = FlowEdge<Omit<Relation, 'from' | 'to'>, 'custom'>;
+	export type Edge = FlowEdge<Omit<Relation, "from" | "to">, "custom">;
 </script>
 
 <script lang="ts">
@@ -11,9 +11,9 @@
 		type Edge as FlowEdge,
 		Position,
 		useSvelteFlow,
-		type EdgeProps
-	} from '@xyflow/svelte';
-	import { relationElements, type Relation } from '$lib/api';
+		type EdgeProps,
+	} from "@xyflow/svelte";
+	import { relationElements, type Relation } from "$lib/api";
 
 	let { id, data, sourceX, sourceY, targetX, targetY, markerEnd }: EdgeProps<Edge> = $props();
 
@@ -24,8 +24,8 @@
 			sourcePosition: Position.Right,
 			targetX,
 			targetY,
-			targetPosition: Position.Left
-		})
+			targetPosition: Position.Left,
+		}),
 	);
 
 	const { updateEdge } = useSvelteFlow();
@@ -40,9 +40,9 @@
 				id,
 				{
 					markerEnd: re.causal.includes(v) ? { type: MarkerType.ArrowClosed } : undefined,
-					data: { kind: value }
+					data: { kind: value },
 				},
-				{ replace: true }
+				{ replace: true },
 			);
 		});
 	});
