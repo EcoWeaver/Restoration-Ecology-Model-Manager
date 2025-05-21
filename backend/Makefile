@@ -2,15 +2,15 @@ _default:
 	@echo "usage: make [up|down|psql|build|run]"
 
 up:
-	docker stop postgres
-	docker rm postgres
+	docker stop postgres || true
+	docker rm postgres || true
 	docker compose up
 
 down:
 	docker compose down
 
 psql:
-	psql -h localhost -U postgres -d postgres
+	docker exec -it postgres psql -U postgres -d postgres
 
 build:
 	go build .
