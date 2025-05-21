@@ -11,9 +11,9 @@ const (
 
 func (self Element) Category() Category {
 	switch self {
-	case CorrelatedWith:
-		return Causal
 	case Increases, Decreases:
+		return Causal
+	case CorrelatedWith:
 		return Noncausal
 	default:
 		panic("relations element " + self.String() + " doesn't have an assigned category")
