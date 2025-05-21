@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _ElementName = "identifiercreatortitlepublisherpublication-yearsubjectcontributordatelanguageresource-typealternate-identifierrelated-identifiersizeformatversionrightsdescriptiongeo-locationfunding-referencerelated-item"
+const _ElementName = "creatortitlepublisherpublication-yearsubjectcontributordatelanguageresource-typealternate-identifierrelated-identifiersizeformatversionrightsdescriptiongeo-locationfunding-referencerelated-item"
 
-var _ElementIndex = [...]uint8{0, 10, 17, 22, 31, 47, 54, 65, 69, 77, 90, 110, 128, 132, 138, 145, 151, 162, 174, 191, 203}
+var _ElementIndex = [...]uint8{0, 7, 12, 21, 37, 44, 55, 59, 67, 80, 100, 118, 122, 128, 135, 141, 152, 164, 181, 193}
 
-const _ElementLowerName = "identifiercreatortitlepublisherpublication-yearsubjectcontributordatelanguageresource-typealternate-identifierrelated-identifiersizeformatversionrightsdescriptiongeo-locationfunding-referencerelated-item"
+const _ElementLowerName = "creatortitlepublisherpublication-yearsubjectcontributordatelanguageresource-typealternate-identifierrelated-identifiersizeformatversionrightsdescriptiongeo-locationfunding-referencerelated-item"
 
 func (i Element) String() string {
 	i -= 1
@@ -26,94 +26,90 @@ func (i Element) String() string {
 // Re-run the stringer command to generate them again.
 func _ElementNoOp() {
 	var x [1]struct{}
-	_ = x[Identifier-(1)]
-	_ = x[Creator-(2)]
-	_ = x[Title-(3)]
-	_ = x[Publisher-(4)]
-	_ = x[PublicationYear-(5)]
-	_ = x[Subject-(6)]
-	_ = x[Contributor-(7)]
-	_ = x[Date-(8)]
-	_ = x[Language-(9)]
-	_ = x[ResourceType-(10)]
-	_ = x[AlternateIdentifier-(11)]
-	_ = x[RelatedIdentifier-(12)]
-	_ = x[Size-(13)]
-	_ = x[Format-(14)]
-	_ = x[Version-(15)]
-	_ = x[Rights-(16)]
-	_ = x[Description-(17)]
-	_ = x[GeoLocation-(18)]
-	_ = x[FundingReference-(19)]
-	_ = x[RelatedItem-(20)]
+	_ = x[Creator-(1)]
+	_ = x[Title-(2)]
+	_ = x[Publisher-(3)]
+	_ = x[PublicationYear-(4)]
+	_ = x[Subject-(5)]
+	_ = x[Contributor-(6)]
+	_ = x[Date-(7)]
+	_ = x[Language-(8)]
+	_ = x[ResourceType-(9)]
+	_ = x[AlternateIdentifier-(10)]
+	_ = x[RelatedIdentifier-(11)]
+	_ = x[Size-(12)]
+	_ = x[Format-(13)]
+	_ = x[Version-(14)]
+	_ = x[Rights-(15)]
+	_ = x[Description-(16)]
+	_ = x[GeoLocation-(17)]
+	_ = x[FundingReference-(18)]
+	_ = x[RelatedItem-(19)]
 }
 
-var _ElementValues = []Element{Identifier, Creator, Title, Publisher, PublicationYear, Subject, Contributor, Date, Language, ResourceType, AlternateIdentifier, RelatedIdentifier, Size, Format, Version, Rights, Description, GeoLocation, FundingReference, RelatedItem}
+var _ElementValues = []Element{Creator, Title, Publisher, PublicationYear, Subject, Contributor, Date, Language, ResourceType, AlternateIdentifier, RelatedIdentifier, Size, Format, Version, Rights, Description, GeoLocation, FundingReference, RelatedItem}
 
 var _ElementNameToValueMap = map[string]Element{
-	_ElementName[0:10]:         Identifier,
-	_ElementLowerName[0:10]:    Identifier,
-	_ElementName[10:17]:        Creator,
-	_ElementLowerName[10:17]:   Creator,
-	_ElementName[17:22]:        Title,
-	_ElementLowerName[17:22]:   Title,
-	_ElementName[22:31]:        Publisher,
-	_ElementLowerName[22:31]:   Publisher,
-	_ElementName[31:47]:        PublicationYear,
-	_ElementLowerName[31:47]:   PublicationYear,
-	_ElementName[47:54]:        Subject,
-	_ElementLowerName[47:54]:   Subject,
-	_ElementName[54:65]:        Contributor,
-	_ElementLowerName[54:65]:   Contributor,
-	_ElementName[65:69]:        Date,
-	_ElementLowerName[65:69]:   Date,
-	_ElementName[69:77]:        Language,
-	_ElementLowerName[69:77]:   Language,
-	_ElementName[77:90]:        ResourceType,
-	_ElementLowerName[77:90]:   ResourceType,
-	_ElementName[90:110]:       AlternateIdentifier,
-	_ElementLowerName[90:110]:  AlternateIdentifier,
-	_ElementName[110:128]:      RelatedIdentifier,
-	_ElementLowerName[110:128]: RelatedIdentifier,
-	_ElementName[128:132]:      Size,
-	_ElementLowerName[128:132]: Size,
-	_ElementName[132:138]:      Format,
-	_ElementLowerName[132:138]: Format,
-	_ElementName[138:145]:      Version,
-	_ElementLowerName[138:145]: Version,
-	_ElementName[145:151]:      Rights,
-	_ElementLowerName[145:151]: Rights,
-	_ElementName[151:162]:      Description,
-	_ElementLowerName[151:162]: Description,
-	_ElementName[162:174]:      GeoLocation,
-	_ElementLowerName[162:174]: GeoLocation,
-	_ElementName[174:191]:      FundingReference,
-	_ElementLowerName[174:191]: FundingReference,
-	_ElementName[191:203]:      RelatedItem,
-	_ElementLowerName[191:203]: RelatedItem,
+	_ElementName[0:7]:          Creator,
+	_ElementLowerName[0:7]:     Creator,
+	_ElementName[7:12]:         Title,
+	_ElementLowerName[7:12]:    Title,
+	_ElementName[12:21]:        Publisher,
+	_ElementLowerName[12:21]:   Publisher,
+	_ElementName[21:37]:        PublicationYear,
+	_ElementLowerName[21:37]:   PublicationYear,
+	_ElementName[37:44]:        Subject,
+	_ElementLowerName[37:44]:   Subject,
+	_ElementName[44:55]:        Contributor,
+	_ElementLowerName[44:55]:   Contributor,
+	_ElementName[55:59]:        Date,
+	_ElementLowerName[55:59]:   Date,
+	_ElementName[59:67]:        Language,
+	_ElementLowerName[59:67]:   Language,
+	_ElementName[67:80]:        ResourceType,
+	_ElementLowerName[67:80]:   ResourceType,
+	_ElementName[80:100]:       AlternateIdentifier,
+	_ElementLowerName[80:100]:  AlternateIdentifier,
+	_ElementName[100:118]:      RelatedIdentifier,
+	_ElementLowerName[100:118]: RelatedIdentifier,
+	_ElementName[118:122]:      Size,
+	_ElementLowerName[118:122]: Size,
+	_ElementName[122:128]:      Format,
+	_ElementLowerName[122:128]: Format,
+	_ElementName[128:135]:      Version,
+	_ElementLowerName[128:135]: Version,
+	_ElementName[135:141]:      Rights,
+	_ElementLowerName[135:141]: Rights,
+	_ElementName[141:152]:      Description,
+	_ElementLowerName[141:152]: Description,
+	_ElementName[152:164]:      GeoLocation,
+	_ElementLowerName[152:164]: GeoLocation,
+	_ElementName[164:181]:      FundingReference,
+	_ElementLowerName[164:181]: FundingReference,
+	_ElementName[181:193]:      RelatedItem,
+	_ElementLowerName[181:193]: RelatedItem,
 }
 
 var _ElementNames = []string{
-	_ElementName[0:10],
-	_ElementName[10:17],
-	_ElementName[17:22],
-	_ElementName[22:31],
-	_ElementName[31:47],
-	_ElementName[47:54],
-	_ElementName[54:65],
-	_ElementName[65:69],
-	_ElementName[69:77],
-	_ElementName[77:90],
-	_ElementName[90:110],
-	_ElementName[110:128],
-	_ElementName[128:132],
-	_ElementName[132:138],
-	_ElementName[138:145],
-	_ElementName[145:151],
-	_ElementName[151:162],
-	_ElementName[162:174],
-	_ElementName[174:191],
-	_ElementName[191:203],
+	_ElementName[0:7],
+	_ElementName[7:12],
+	_ElementName[12:21],
+	_ElementName[21:37],
+	_ElementName[37:44],
+	_ElementName[44:55],
+	_ElementName[55:59],
+	_ElementName[59:67],
+	_ElementName[67:80],
+	_ElementName[80:100],
+	_ElementName[100:118],
+	_ElementName[118:122],
+	_ElementName[122:128],
+	_ElementName[128:135],
+	_ElementName[135:141],
+	_ElementName[141:152],
+	_ElementName[152:164],
+	_ElementName[164:181],
+	_ElementName[181:193],
 }
 
 // ElementString retrieves an enum value from the enum constants string name.

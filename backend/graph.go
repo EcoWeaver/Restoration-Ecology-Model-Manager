@@ -6,8 +6,9 @@ import (
 )
 
 type GraphRequest struct {
-	Metadata []Metadata `json:"metadata"`
-	Graph    Graph      `json:"graph"`
+	Identifier string     `json:"identifier"`
+	Graph      Graph      `json:"graph"`
+	Metadata   []Metadata `json:"metadata"`
 }
 
 type Graph struct {
@@ -18,7 +19,7 @@ type Graph struct {
 type Metadata struct {
 	Kind     metadata.Element `json:"kind"`
 	Value    string           `json:"value"`
-	Ontology string           `json:"ontology"`
+	Ontology *string          `json:"ontology"`
 }
 
 type Node struct {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,6 +21,48 @@ func GetMetadataElements(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func GetModel(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	identifier := c.QueryParam("identifier")
+
+	conn, err := dbPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Rollback(ctx)
+
+	var graph Graph
+	var model_id int
+	err = conn.QueryRow(ctx, "SELECT model, model_id FROM models WHERE identifier = $1", identifier).Scan(&graph, &model_id)
+	if err == pgx.ErrNoRows {
+		return c.NoContent(http.StatusNotFound)
+	} else if err != nil {
+		return err
+	}
+
+	rows, err := conn.Query(ctx, "SELECT element_id, field_value, ontology FROM metadata_values WHERE model_id = $1", model_id)
+	if err != nil {
+		return err
+	}
+
+	var kind metadata.Element
+	var value string
+	var ontology *string
+	var metadata []Metadata
+	pgx.ForEachRow(rows, []any{&kind, &value, &ontology}, func() error {
+		metadata = append(metadata, Metadata{kind, value, ontology})
+		return nil
+	})
+
+	err = conn.Commit(ctx)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, GraphRequest{identifier, graph, metadata})
 }
 
 func GetRelationElements(c echo.Context) error {
@@ -76,7 +119,7 @@ func PutModel(c echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	var model_id int
-	err = conn.QueryRow(ctx, "INSERT INTO models (model) VALUES ($1) RETURNING model_id", graphRequest.Graph).Scan(&model_id)
+	err = conn.QueryRow(ctx, "INSERT INTO models (model, identifier) VALUES ($1, $2) RETURNING model_id", graphRequest.Graph, graphRequest.Identifier).Scan(&model_id)
 	if err != nil {
 		return err
 	}
@@ -93,5 +136,5 @@ func PutModel(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, model_id)
+	return c.NoContent(http.StatusCreated)
 }

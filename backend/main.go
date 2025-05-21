@@ -20,14 +20,18 @@ func main() {
 	ctx := context.Background()
 	e := echo.New()
 
+	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
-	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
+	e.Use(middleware.Recover())
+	e.Use(middleware.Secure())
 
 	e.GET("/", TestConnection)
 	e.GET("/metadata-elements", GetMetadataElements)
+	e.GET("/model", GetModel)
 	e.GET("/relation-elements", GetRelationElements)
+
 	e.PUT("/model", PutModel)
 
 	err := godotenv.Load()

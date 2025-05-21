@@ -4,8 +4,7 @@ type Element int
 
 //go:generate go run github.com/dmarkham/enumer -json -text -transform=kebab -type=Element
 const (
-	Identifier Element = iota + 1
-	Creator
+	Creator Element = iota + 1
 	Title
 	Publisher
 	PublicationYear
@@ -28,7 +27,7 @@ const (
 
 func (self Element) Obligation() Obligation {
 	switch self {
-	case Identifier, Creator, Title, Publisher, PublicationYear, ResourceType:
+	case Creator, Title, Publisher, PublicationYear, ResourceType:
 		return Mandatory
 	case Subject, Contributor, Date, RelatedIdentifier, Description, GeoLocation:
 		return Recommended
