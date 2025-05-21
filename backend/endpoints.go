@@ -73,7 +73,7 @@ func PutModel(c echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	var model_id int
-	err = conn.QueryRow(ctx, "INSERT INTO models (model) $1 RETURNING model_id", graphRequest.Graph, &model_id).Scan(&model_id)
+	err = conn.QueryRow(ctx, "INSERT INTO models (model) VALUES ($1) RETURNING model_id", graphRequest.Graph).Scan(&model_id)
 	if err != nil {
 		return err
 	}
@@ -90,6 +90,5 @@ func PutModel(c echo.Context) error {
 		return err
 	}
 
-	c.Response().Header().Set("Location", fmt.Sprint(model_id))
-	return c.NoContent(http.StatusCreated)
+	return c.JSON(http.StatusCreated, model_id)
 }
