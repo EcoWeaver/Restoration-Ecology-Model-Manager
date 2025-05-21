@@ -22,7 +22,9 @@ func main() {
 
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.CORS())
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "${time_rfc3339} ${method} ${status} ${uri} ${error}\n",
+	}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
