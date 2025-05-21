@@ -4,9 +4,10 @@ import (
 	"backend/metadata"
 	"backend/relations"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
@@ -87,12 +88,12 @@ func PutModel(c echo.Context) error {
 	var graphRequest GraphRequest
 	err = json.Unmarshal(body, &graphRequest)
 	if err != nil {
-		return err
+		return c.NoContent(http.StatusBadRequest)
 	}
 
 	err = graphRequest.validate()
 	if err != nil {
-		return err
+		return c.NoContent(http.StatusBadRequest)
 	}
 
 	conn, err := dbPool.Begin(ctx)
@@ -122,18 +123,45 @@ func PutModel(c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
-func (self GraphRequest) validate() error {
+var (
+	ErrEmptyIdentifier          = errors.New("encountered empty identifier")
+	ErrNonRelationElement       = errors.New("encountered non-relation element")
+	ErrNonMetadataElement       = errors.New("encountered non-metadata element")
+	ErrEmptyMetadataValue       = errors.New("encountered empty metadata value")
+	ErrMissingMandatoryMetadata = errors.New("missing mandatory metadata")
+)
+
+func (self *GraphRequest) validate() error {
+	// check identifier isn't empty
+	self.Identifier = strings.TrimSpace(self.Identifier)
+	if len(self.Identifier) == 0 {
+		return ErrEmptyIdentifier
+	}
+
 	// check all relation elements are valid
 	for _, relation := range self.Graph.Relations {
 		if !relation.Kind.IsAElement() {
-			return fmt.Errorf("encountered non-relation element %s", relation.Kind.String())
+			return ErrNonRelationElement
 		}
 	}
 
-	// check all metadata elements are valid
 	for _, metadata := range self.Metadata {
+		// check metadata element is valid
 		if !metadata.Kind.IsAElement() {
-			return fmt.Errorf("encountered non-metadata element %s", metadata.Kind.String())
+			return ErrMissingMandatoryMetadata
+		}
+		// check metadata value isn't empty
+		metadata.Value = strings.TrimSpace(metadata.Value)
+		if len(metadata.Value) == 0 {
+			return ErrEmptyMetadataValue
+		}
+		if metadata.Ontology != nil {
+			ontology := strings.TrimSpace(*metadata.Ontology)
+			if len(ontology) == 0 {
+				metadata.Ontology = nil
+			} else {
+				metadata.Ontology = &ontology
+			}
 		}
 	}
 
@@ -150,11 +178,7 @@ func (self GraphRequest) validate() error {
 	}
 
 	if len(neededMetadata) != 0 {
-		bytes, err := json.Marshal(neededMetadata)
-		if err != nil {
-			return err
-		}
-		return fmt.Errorf("missing mandatory metadata %s", bytes)
+		return ErrMissingMandatoryMetadata
 	}
 
 	return nil
