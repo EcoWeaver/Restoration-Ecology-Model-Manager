@@ -35,7 +35,6 @@
 	$effect(() => {
 		const v = value;
 		relationElements.then((re) => {
-			console.log(re.causal.includes(v));
 			updateEdge(
 				id,
 				{

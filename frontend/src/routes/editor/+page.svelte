@@ -17,7 +17,6 @@
 
 	let nodes: Node[] = $state.raw([]);
 	let edges: Edge[] = $state.raw([]);
-	let relations = $state<Edge[]>([]);
 
 	let error = $state(false);
 	let identifier = $state("");
@@ -37,15 +36,17 @@
 				y: Math.round(n.position.y),
 			},
 		}));
-		const outRelations: ApiRelation[] = relations.map((e) => {
-			const from = nodes.findIndex((n) => n.id === e.source);
-			const to = nodes.findIndex((n) => n.id === e.target)!!;
-			return {
-				...e.data!!,
-				from,
-				to,
-			};
-		});
+		const outRelations: ApiRelation[] = edges
+			.filter((e) => e.type == "custom")
+			.map((e) => {
+				const from = nodes.findIndex((n) => n.id === e.source);
+				const to = nodes.findIndex((n) => n.id === e.target)!!;
+				return {
+					...e.data!!,
+					from,
+					to,
+				};
+			});
 
 		const req: GraphRequest = {
 			identifier,
@@ -85,7 +86,7 @@
 					kind: "correlated-with",
 				},
 			};
-			relations.push(edge);
+			edges = [...edges, edge];
 		}}
 	>
 		<Panel position="top-left">
