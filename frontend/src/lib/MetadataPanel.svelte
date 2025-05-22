@@ -15,9 +15,8 @@
 
 	$effect(() => {
 		metadata = elements.mandatory.map((kind) => ({
-			kind,
+			kind: kind.name,
 			value: "",
-			ontology: "",
 		}));
 	});
 </script>
@@ -30,7 +29,6 @@
 		<tr>
 			<th>Kind</th>
 			<th>Value</th>
-			<th>Ontology</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -38,7 +36,6 @@
 			<tr>
 				<td>{m.kind}</td>
 				<td><input class="border" bind:value={m.value} /></td>
-				<td><input class="border" bind:value={m.ontology} /></td>
 			</tr>
 		{/each}
 	</tbody>

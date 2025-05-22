@@ -29,11 +29,15 @@ export type Model = {
 };
 
 export type Metadata = {
-	kind: MetadataElement;
+	kind: string;
 	value: string;
-	ontology: string;
 };
-export type MetadataElement = string;
+
+export type MetadataElement = {
+	name: string;
+	type?: string;
+	choices?: string[];
+};
 
 export type Node = {
 	body: string;
