@@ -36,10 +36,13 @@ func GetModel(c echo.Context) error {
 
 	var kind, value string
 	var metadata []Metadata
-	pgx.ForEachRow(rows, []any{&kind, &value}, func() error {
+	_, err = pgx.ForEachRow(rows, []any{&kind, &value}, func() error {
 		metadata = append(metadata, Metadata{kind, value})
 		return nil
 	})
+	if err != nil {
+		return err
+	}
 
 	err = conn.Commit(ctx)
 	if err != nil {
@@ -75,11 +78,18 @@ func PutModel(c echo.Context) error {
 		return err
 	}
 
+	var b pgx.Batch
 	for _, metadata := range graphRequest.Metadata {
-		_, err = conn.Exec(ctx, "INSERT INTO metadata_values (model_id, kind, value) VALUES ($1, $2, $3)", model_id, metadata.Kind, metadata.Value)
-		if err != nil {
-			return err
+		var qq pgx.QueuedQuery
+		qq.SQL = "INSERT INTO metadata_values (model_id, kind, value) VALUES ($1, $2, $3)"
+		qq.Arguments = []any{
+			model_id, metadata.Kind, metadata.Value,
 		}
+		b.QueuedQueries = append(b.QueuedQueries, &qq)
+	}
+	err = conn.SendBatch(ctx, &b).Close()
+	if err != nil {
+		return err
 	}
 
 	err = conn.Commit(ctx)
