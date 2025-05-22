@@ -20,27 +20,12 @@ func GetModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	var model_id int
 	var model Model
-	err = conn.QueryRow(ctx, "SELECT model_id, model FROM models WHERE identifier = $1", identifier).Scan(&model_id, &model)
+	var metadata []Metadata
+	err = conn.QueryRow(ctx, "SELECT m.model, COALESCE(jsonb_agg(jsonb_build_object('kind', mv.kind, 'value', mv.value)), '{}'::jsonb) AS metadata FROM models m LEFT JOIN metadata_values mv ON m.model_id = mv.model_id WHERE m.identifier = $1 GROUP BY m.model", identifier).Scan(&model, &metadata)
 	if err == pgx.ErrNoRows {
 		return c.NoContent(http.StatusNotFound)
 	} else if err != nil {
-		return err
-	}
-
-	rows, err := conn.Query(ctx, "SELECT kind, value FROM metadata_values WHERE model_id = $1", model_id)
-	if err != nil {
-		return err
-	}
-
-	var kind, value string
-	var metadata []Metadata
-	_, err = pgx.ForEachRow(rows, []any{&kind, &value}, func() error {
-		metadata = append(metadata, Metadata{kind, value})
-		return nil
-	})
-	if err != nil {
 		return err
 	}
 
