@@ -11,6 +11,7 @@ async function req<T>(method: string, path: string, body?: any | undefined): Pro
 export const relationElements = req<RelationElements>("GET", "relation-types");
 export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>;
 
+export const metadataElements = req<MetadataElements>("GET", "metadata-types");
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 
 export function putModel(graph: ModelRequest) {
