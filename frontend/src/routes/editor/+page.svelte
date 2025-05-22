@@ -1,4 +1,8 @@
 <script lang="ts">
+	import type { PageProps } from "./$types";
+	let { data }: PageProps = $props();
+	let { metadataElements } = data;
+
 	import { Background, BackgroundVariant, Panel, SvelteFlow } from "@xyflow/svelte";
 	import "@xyflow/svelte/dist/style.css";
 	import NodeComponent, { type Node } from "$lib/NodeComponent.svelte";
@@ -6,7 +10,6 @@
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import {
 		putModel,
-		metadataElements,
 		type Node as ApiNode,
 		type Relation as ApiRelation,
 		type Metadata,
@@ -95,9 +98,7 @@
 			<button class="hover:bg-neutral-200" onclick={add}>Add</button>
 		</Panel>
 		<Panel position="top-right">
-			{#await metadataElements then elements}
-				<MetadataPanel {elements} {error} bind:identifier bind:metadata />
-			{/await}
+			<MetadataPanel elements={metadataElements} {error} bind:identifier bind:metadata />
 		</Panel>
 		<Background variant={BackgroundVariant.Dots} />
 	</SvelteFlow>

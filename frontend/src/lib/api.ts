@@ -1,4 +1,4 @@
-const apiBase = "http://localhost:8080";
+export const apiBase = "http://localhost:8080";
 
 async function req<T>(method: string, path: string, body?: any | undefined): Promise<T> {
 	const res = await fetch(`${apiBase}/${path}`, {
@@ -11,7 +11,6 @@ async function req<T>(method: string, path: string, body?: any | undefined): Pro
 export const relationElements = req<RelationElements>("GET", "relation-elements");
 export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>;
 
-export const metadataElements = req<MetadataElements>("GET", "metadata-elements");
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 
 export function putModel(graph: GraphRequest) {
