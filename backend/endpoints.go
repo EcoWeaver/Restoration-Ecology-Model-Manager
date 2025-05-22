@@ -80,12 +80,7 @@ func PutModel(c echo.Context) error {
 
 	var b pgx.Batch
 	for _, metadata := range graphRequest.Metadata {
-		var qq pgx.QueuedQuery
-		qq.SQL = "INSERT INTO metadata_values (model_id, kind, value) VALUES ($1, $2, $3)"
-		qq.Arguments = []any{
-			model_id, metadata.Kind, metadata.Value,
-		}
-		b.QueuedQueries = append(b.QueuedQueries, &qq)
+		b.Queue("INSERT INTO metadata_values (model_id, kind, value) VALUES ($1, $2, $3)", model_id, metadata.Kind, metadata.Value)
 	}
 	err = conn.SendBatch(ctx, &b).Close()
 	if err != nil {
