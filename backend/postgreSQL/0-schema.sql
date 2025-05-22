@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS models (
     model_id SERIAL PRIMARY KEY,
     identifier TEXT UNIQUE NOT NULL,
+    related_identifier TEXT, 
     model JSONB NOT NULL
 );
 
