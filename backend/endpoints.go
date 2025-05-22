@@ -89,3 +89,44 @@ func PutModel(c echo.Context) error {
 
 	return c.NoContent(http.StatusCreated)
 }
+
+func SearchModel(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	query := c.QueryParams()
+	if len(query) == 0 {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	var key string
+	var val string
+	for k, v := range query {
+		key = k
+		val = v[0]
+	}
+
+	conn, err := dbPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Rollback(ctx)
+
+	var modelId int
+	err = conn.QueryRow(ctx, "SELECT model_id FROM metadata_values WHERE kind = $1 AND value ILIKE $2", key, val).Scan(&modelId)
+	if err != nil {
+		return err
+	}
+
+	var identifier string
+	err = conn.QueryRow(ctx, "SELECT identifier FROM models WHERE model_id = $1", modelId).Scan(&identifier)
+	if err != nil {
+		return err
+	}
+
+	err = conn.Commit(ctx)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, identifier)
+}

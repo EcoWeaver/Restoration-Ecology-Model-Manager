@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
 	import { metadataElements } from "./api";
 	import Thing from "./search/Thing.svelte";
 
@@ -18,6 +19,9 @@
 			if (thing === null && suggestions[0]) {
 				thing = suggestions[0];
 				input = "";
+			} else {
+				await goto(`/search?${thing}=${input}`);
+				thing = "";
 			}
 		}
 	}

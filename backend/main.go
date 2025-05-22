@@ -32,6 +32,8 @@ func main() {
 	e.GET("/model", GetModel)
 	e.PUT("/model", PutModel)
 
+	e.GET("/search", SearchModel)
+
 	err := godotenv.Load()
 	if err != nil {
 		e.Logger.Fatal(err)
