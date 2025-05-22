@@ -76,7 +76,7 @@ func PutModel(c echo.Context) error {
 	}
 
 	for _, metadata := range graphRequest.Metadata {
-		_, err = conn.Exec(ctx, "INSERT INTO metadata_values (model_id, type, value) VALUES ($1, $2, $3)", model_id, metadata.Kind, metadata.Value)
+		_, err = conn.Exec(ctx, "INSERT INTO metadata_values (model_id, kind, value) VALUES ($1, $2, $3)", model_id, metadata.Kind, metadata.Value)
 		if err != nil {
 			return err
 		}
