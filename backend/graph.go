@@ -1,25 +1,19 @@
 package main
 
-import (
-	"backend/metadata"
-	"backend/relations"
-)
-
-type GraphRequest struct {
+type ModelRequest struct {
 	Identifier string     `json:"identifier"`
-	Graph      Graph      `json:"graph"`
+	Model      Model      `json:"model"`
 	Metadata   []Metadata `json:"metadata"`
 }
 
-type Graph struct {
+type Model struct {
 	Nodes     []Node     `json:"nodes"`
 	Relations []Relation `json:"relations"`
 }
 
 type Metadata struct {
-	Kind     metadata.Element `json:"kind"`
-	Value    string           `json:"value"`
-	Ontology *string          `json:"ontology"`
+	Kind  string `json:"kind"`
+	Value string `json:"value"`
 }
 
 type Node struct {
@@ -29,9 +23,9 @@ type Node struct {
 }
 
 type Relation struct {
-	From int               `json:"from"`
-	To   int               `json:"to"`
-	Kind relations.Element `json:"kind"`
+	Kind string `json:"kind"`
+	From int    `json:"from"`
+	To   int    `json:"to"`
 }
 
 type Point struct {

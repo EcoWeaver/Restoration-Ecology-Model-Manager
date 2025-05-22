@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 INSERT INTO models (model, identifier, related_identifier) VALUES ('{}', 'M01', 'https://doi.org/10.1016/j.ecolmodel.2022.110262');
 INSERT INTO metadata_values (model_id, element_id, field_value, ontology) VALUES
 (1, 1, 'Veronique Dubos', 'https://orcid.org/0000-0001-6699-1845'),
@@ -21,3 +22,29 @@ INSERT INTO metadata_values (model_id, element_id, field_value, ontology) VALUES
 (1, 27, 'Cohen''s Kappa', NULL), 
 (1, 27, 'Sensitivity', NULL), 
 (1, 27, 'Specificity', NULL); 
+=======
+INSERT INTO models (model, identifier) VALUES ('{}', 'M01');
+INSERT INTO metadata_values (model_id, kind, value) VALUES
+(1, 'alternate-identifier', 'https://doi.org/10.1016/j.ecolmodel.2022.110262'),
+(1, 'creator', 'Veronique Dubos'),
+(1, 'title', 'ArcticCharSpawningHabitatSuitability'),
+(1, 'publisher', 'André St.-Hilaire'),
+(1, 'publisher', 'Normand E. Bergeron'),
+(1, 'publication-year', '2022'),
+(1, 'subject', 'Reproduction habitatArctic char habitatExpert systemsIndigenous knowledgeInuit QaujimajatuqangitFish habitat modelArctic fish'),
+(1, 'date', '2022-12-20'),
+(1, 'language', 'en'),
+(1, 'resource-type', 'Rule-based Fuzzy Logic Model'),
+(1, 'related-identifier', 'Freshwater Biome'),
+(1, 'format', 'XLSX'),
+(1, 'version', '1.0'),
+(1, 'description', 'Anadromous Arctic char (Salvelinus alpinus, Iqaluppik) and their freshwater habitats are vulnerable to the effects of climate change. Spawning habitats are critical to ensure the propagation of populations and the fisheries they support. However, detailed descriptions for river systems in the Canadian Arctic are limited, especially in the Nunavik region. As Arctic char is a traditionally important species for culture and subsistence of Inuit, some harvesters have a deep knowledge pertaining to habitat use, including optimal habitat conditions for spawning. Interviews of Inuit knowledge holders on Arctic char, were conducted in three communities of Nunavik, Canada: Kangiqsualujjuaq, Tasiujaq and Kangirsuk. From the knowledge of Inuit experts, the most suitable spawning habitats were located in rivers, at depths between 0.6 m and 1.5 m with velocities > 0.1 m/s. A large range of riverbed substrate was deemed suitable as long as the smaller substrate size class showed some presence of gravel or coarse sand, depending on the local geomorphology. We used fuzzy logic to code natural language description provided by Inuit experts into a numerical value representing the Habitat Suitability Index for spawning sites. The model was able to predict the spawning habitat suitability or unsuitability of 14 out of 15 sites, given values of depth, velocity, and substrate. The methodology presented is well-suited to build quantitative model based on the description of local observations and could be applied for other animal or plant species for which local and/or traditional knowledge exists.'),
+(1, 'spatial-scale', 'regional'),
+(1, 'target-species', 'Salvelinus Alpinus'),
+(1, 'programming-language', 'Matlab'),
+(1, 'input-data', 'Interview Data'),
+(1, 'output-data', 'Habitat suitability indices'),
+(1, 'performance-metric', 'Cohen''s Kappa'),
+(1, 'performance-metric', 'Sensitivity'),
+(1, 'performance-metric', 'Specificity');
+>>>>>>> Stashed changes

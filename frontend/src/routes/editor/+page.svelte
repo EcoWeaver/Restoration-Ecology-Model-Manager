@@ -13,7 +13,7 @@
 		type Node as ApiNode,
 		type Relation as ApiRelation,
 		type Metadata,
-		type GraphRequest,
+		type ModelRequest,
 	} from "$lib/api";
 
 	let id = $state(0);
@@ -51,10 +51,10 @@
 				};
 			});
 
-		const req: GraphRequest = {
+		const req: ModelRequest = {
 			identifier,
 			metadata,
-			graph: { nodes: outNodes, relations: outRelations },
+			model: { nodes: outNodes, relations: outRelations },
 		};
 
 		putModel(req);

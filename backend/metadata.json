@@ -1,0 +1,147 @@
+{
+  "mandatory": [
+    {
+      "name": "creator",
+      "type": "orcid"
+    },
+    {
+      "name": "title"
+    },
+    {
+      "name": "publisher",
+      "type": "orcid"
+    },
+    {
+      "name": "publication-year",
+      "type": "year"
+    },
+    {
+      "name": "resource-type",
+      "type": "choice",
+      "choices": [
+        "Generalized Linear Model",
+        "Generalized Additive Model",
+        "Structural Equation Model",
+        "Linear Regression Model",
+        "Matrix Model",
+        "Differential Equation",
+        "Causal Graph",
+        "Conceptual Causal Network Graphs",
+        "Fuzzy Cognitive Map",
+        "Rule-based Fuzzy Logic Model",
+        "Markov Chain",
+        "Extended Fuzzy Cognitive Map",
+        "Global Circulation Model",
+        "Structural Conceptual Model",
+        "Knowledge Graph",
+        "Species Distribution Model",
+        "Gradient Forest Model",
+        "Bayesian Networks",
+        "Random Forest Model",
+        "Non-metric Multidimensional Scale",
+        "Influence Diagram"
+      ]
+    }
+  ],
+  "recommended": [
+    {
+      "name": "subject"
+    },
+    {
+      "name": "contributor",
+      "type": "orcid"
+    },
+    {
+      "name": "date",
+      "type": "date"
+    },
+    {
+      "name": "ecological-domain",
+      "type": "choice",
+      "choices": [
+        "Terrestrial biome",
+        "Aquatic biome",
+        "Marine biome",
+        "Freshwater biome",
+        "Urban biome"
+      ]
+    },
+    {
+      "name": "description"
+    },
+    {
+      "name": "geolocation",
+      "type": "location"
+    },
+    {
+      "name": "spatial-scale",
+      "type": "choice",
+      "choices": ["Local", "Regional", "Global"]
+    },
+    {
+      "name": "target-species"
+    }
+  ],
+  "optional": [
+    {
+      "name": "alternate-identifier",
+      "type": "url"
+    },
+    {
+      "name": "language",
+      "type": "ietf-bcp-47"
+    },
+    {
+      "name": "size",
+      "type": "bytes-unit"
+    },
+    {
+      "name": "format"
+    },
+    {
+      "name": "version"
+    },
+    {
+      "name": "rights"
+    },
+    {
+      "name": "funding-reference",
+      "type": "url"
+    },
+    {
+      "name": "related-item",
+      "type": "url"
+    },
+    {
+      "name": "temporal-scale",
+      "type": "choice",
+      "choices": ["Short-Term", "Long-Term", "Seasonal", "Event-Based"]
+    },
+    {
+      "name": "programming-language"
+    },
+    {
+      "name": "dependency"
+    },
+    {
+      "name": "input-data"
+    },
+    {
+      "name": "output-data"
+    },
+    {
+      "name": "performance-metric"
+    },
+    {
+      "name": "repository",
+      "type": "url"
+    },
+    {
+      "name": "computational-environment-details"
+    },
+    {
+      "name": "discussion-platform",
+      "type": "url"
+    }
+  ]
+}

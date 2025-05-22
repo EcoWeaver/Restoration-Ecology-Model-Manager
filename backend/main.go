@@ -1,10 +1,7 @@
 package main
 
 import (
-	"backend/metadata"
-	"backend/relations"
 	"context"
-	"net/http"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -29,26 +26,15 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 
-	e.GET("/", TestConnection)
-	e.GET("/metadata-elements", GetMetadataElements)
-	e.GET("/model", GetModel)
-	e.GET("/relation-elements", GetRelationElements)
+	e.File("metadata-types", "metadata.json")
+	e.File("relation-types", "relations.json")
 
+	e.GET("/model", GetModel)
 	e.PUT("/model", PutModel)
 
 	err := godotenv.Load()
 	if err != nil {
 		e.Logger.Fatal(err)
-	}
-
-	// check every metadata element has an assigned obligation
-	for _, element := range metadata.ElementValues() {
-		_ = element.Obligation()
-	}
-
-	// check every relations element has an assigned obligation
-	for _, element := range relations.ElementValues() {
-		_ = element.Category()
 	}
 
 	// acquire postgres pool
@@ -69,22 +55,4 @@ func main() {
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
-}
-
-func TestConnection(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	conn, err := dbPool.Acquire(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Release()
-
-	var version string
-	err = conn.QueryRow(context.Background(), "SELECT version()").Scan(&version)
-	if err != nil {
-		return err
-	}
-
-	return c.String(http.StatusOK, "Successful connection with: "+version)
 }
