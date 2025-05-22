@@ -12,10 +12,3 @@ CREATE TABLE IF NOT EXISTS metadata_values (
     field_value TEXT NOT NULL,
     ontology TEXT
 );
-
-CREATE TABLE IF NOT EXISTS controlled_terms (
-    controlled_terms_id SERIAL PRIMARY KEY, 
-    element_id INT NOT NULL, 
-    value TEXT NOT NULL, 
-    ontology_URI TEXT 
-); 
