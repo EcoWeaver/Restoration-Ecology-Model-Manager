@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS models (
     identifier TEXT UNIQUE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS metadata_values (
-    value_id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS metadata (
+    metadata_id SERIAL PRIMARY KEY,
     model_id INT NOT NULL REFERENCES models (model_id),
     kind TEXT NOT NULL,
     value TEXT NOT NULL

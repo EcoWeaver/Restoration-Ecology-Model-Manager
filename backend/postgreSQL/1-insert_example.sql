@@ -1,5 +1,5 @@
 INSERT INTO models (model, identifier) VALUES ('{}', 'M01');
-INSERT INTO metadata_values (model_id, kind, value) VALUES
+INSERT INTO metadata (model_id, kind, value) VALUES
 (1, 'alternate-identifier', 'https://doi.org/10.1016/j.ecolmodel.2022.110262'),
 (1, 'creator', 'Veronique Dubos'),
 (1, 'title', 'ArcticCharSpawningHabitatSuitability'),

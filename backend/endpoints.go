@@ -22,7 +22,7 @@ func GetModel(c echo.Context) error {
 
 	var model Model
 	var metadata []Metadata
-	err = conn.QueryRow(ctx, "SELECT m.model, COALESCE(jsonb_agg(jsonb_build_object('kind', mv.kind, 'value', mv.value)), '{}'::jsonb) AS metadata FROM models m LEFT JOIN metadata_values mv ON m.model_id = mv.model_id WHERE m.identifier = $1 GROUP BY m.model", identifier).Scan(&model, &metadata)
+	err = conn.QueryRow(ctx, "SELECT models.model, COALESCE(jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)), '{}') FROM models INNER JOIN metadata ON models.model_id = metadata.model_id WHERE models.identifier = $1 GROUP BY models.model", identifier).Scan(&model, &metadata)
 	if err == pgx.ErrNoRows {
 		return c.NoContent(http.StatusNotFound)
 	} else if err != nil {
@@ -65,7 +65,7 @@ func PutModel(c echo.Context) error {
 
 	var b pgx.Batch
 	for _, metadata := range graphRequest.Metadata {
-		b.Queue("INSERT INTO metadata_values (model_id, kind, value) VALUES ($1, $2, $3)", model_id, metadata.Kind, metadata.Value)
+		b.Queue("INSERT INTO metadata (model_id, kind, value) VALUES ($1, $2, $3)", model_id, metadata.Kind, metadata.Value)
 	}
 	err = conn.SendBatch(ctx, &b).Close()
 	if err != nil {
@@ -102,7 +102,7 @@ func SearchModel(c echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	var modelId int
-	err = conn.QueryRow(ctx, "SELECT model_id FROM metadata_values WHERE kind = $1 AND value ILIKE $2", key, val).Scan(&modelId)
+	err = conn.QueryRow(ctx, "SELECT model_id FROM metadata WHERE kind = $1 AND value ILIKE $2", key, val).Scan(&modelId)
 	if err != nil {
 		return err
 	}
