@@ -13,7 +13,7 @@
     },
     {
       "name": "publication-year",
-      "type": "year"
+      "type": "ietf-rfc-3339"
     },
     {
       "name": "resource-type",
@@ -21,128 +21,129 @@
       "choices": [
         {
           "label": "ComputationalNotebook",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "ConferencePaper",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "DataPaper",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "Dataset",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "Model",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "Software",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "Other",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "Text",
-          "ontology_uri": null
+          "ontology-uri": null
         },
         {
           "label": "Service",
-          "ontology_uri": null
+          "ontology-uri": null
         }
       ]
     },
     {
-      "name": "model_type",
+      "name": "model-type",
       "type": "choice",
       "choices": [
-        { 
-          "label": "Generalized Linear Model", 
-          "ontology_uri": null 
+        {
+          "label": "Generalized Linear Model",
+          "ontology-uri": null
         },
-        { 
+        {
           "label": "Generalized Additive Model",
-          "ontology_uri": null 
+          "ontology-uri": null
         },
-        { 
+        {
           "label": "Structural Equation Model",
-          "ontology_uri": null 
+          "ontology-uri": null
         },
         {
           "label": "Linear Regression Model",
-          "ontology_uri": null 
+          "ontology-uri": null
         },
-        { 
-          "label": "Matrix Model", 
-          "ontology_uri": null 
+        {
+          "label": "Matrix Model",
+          "ontology-uri": null
         },
-        { 
+        {
           "label": "Differential Equation",
-          "ontology_uri": null 
+          "ontology-uri": null
         },
-        { 
-          "label": "Causal Graph", 
-          "ontology_uri": null 
+        {
+          "label": "Causal Graph",
+          "ontology-uri": null
         },
-        { 
-          "label": "Conceptual Causal Network Graphs", 
-          "ontology_uri": null },
-        { 
-          "label": "Fuzzy Cognitive Map", 
-          "ontology_uri": null 
+        {
+          "label": "Conceptual Causal Network Graphs",
+          "ontology-uri": null
         },
-        { 
+        {
+          "label": "Fuzzy Cognitive Map",
+          "ontology-uri": null
+        },
+        {
           "label": "Rule-based Fuzzy Logic Model",
-          "ontology_uri": null 
+          "ontology-uri": null
         },
-        { 
+        {
           "label": "Markov Chain",
-           "ontology_uri": null 
+          "ontology-uri": null
         },
-        { 
-          "label": "Extended Fuzzy Cognitive Map", 
-          "ontology_uri": null 
+        {
+          "label": "Extended Fuzzy Cognitive Map",
+          "ontology-uri": null
         },
-        { 
-          "label": "Global Circulation Model", 
-          "ontology_uri": null 
+        {
+          "label": "Global Circulation Model",
+          "ontology-uri": null
         },
-        { 
-          "label": "Structural Conceptual Model", 
-          "ontology_uri": null 
+        {
+          "label": "Structural Conceptual Model",
+          "ontology-uri": null
         },
-        { 
-          "label": "Knowledge Graph", 
-          "ontology_uri": null 
+        {
+          "label": "Knowledge Graph",
+          "ontology-uri": null
         },
-        { 
-          "label": "Species Distribution Model", 
-          "ontology_uri": null 
+        {
+          "label": "Species Distribution Model",
+          "ontology-uri": null
         },
-        { 
-          "label": "Gradient Forest Model", 
-          "ontology_uri": null 
+        {
+          "label": "Gradient Forest Model",
+          "ontology-uri": null
         },
-        { 
-          "label": "Bayesian Networks", 
-          "ontology_uri": null 
+        {
+          "label": "Bayesian Networks",
+          "ontology-uri": null
         },
-        { 
-          "label": "Random Forest Model", 
-          "ontology_uri": null 
+        {
+          "label": "Random Forest Model",
+          "ontology-uri": null
         },
-        { 
-          "label": "Non-metric Multidimensional Scale", 
-          "ontology_uri": null 
+        {
+          "label": "Non-metric Multidimensional Scale",
+          "ontology-uri": null
         },
-        { 
-          "label": "Influence Diagram", 
-          "ontology_uri": null 
+        {
+          "label": "Influence Diagram",
+          "ontology-uri": null
         }
       ]
     }
@@ -157,31 +158,31 @@
     },
     {
       "name": "date",
-      "type": "date"
+      "type": "ietf-rfc-3339"
     },
     {
       "name": "ecological-domain",
       "type": "choice",
       "choices": [
         {
-          "label": "Terrestrial biome", 
-          "ontology_uri": "http://purl.obolibrary.org/obo/ENVO_00000446"
-        }, 
+          "label": "Terrestrial biome",
+          "ontology-uri": "http://purl.obolibrary.org/obo/ENVO_00000446"
+        },
         {
           "label": "Aquatic biome",
-          "ontology_uri": "http://purl.obolibrary.org/obo/ENVO_00002030"
-        }, 
+          "ontology-uri": "http://purl.obolibrary.org/obo/ENVO_00002030"
+        },
         {
-          "label": "Marine biome", 
-          "ontology_uri": "http://purl.obolibrary.org/obo/ENVO_00000447"
-        }, 
+          "label": "Marine biome",
+          "ontology-uri": "http://purl.obolibrary.org/obo/ENVO_00000447"
+        },
         {
           "label": "Freshwater biome",
-          "ontology_uri": "http://purl.obolibrary.org/obo/ENVO_00000873"
-        }, 
+          "ontology-uri": "http://purl.obolibrary.org/obo/ENVO_00000873"
+        },
         {
-          "label": "Urban biome", 
-          "ontology_uri": "http://purl.obolibrary.org/obo/ENVO_01000249"
+          "label": "Urban biome",
+          "ontology-uri": "http://purl.obolibrary.org/obo/ENVO_01000249"
         }
       ]
     },
@@ -190,23 +191,23 @@
     },
     {
       "name": "geolocation",
-      "type": "location"
+      "type": "string"
     },
     {
       "name": "spatial-scale",
       "type": "choice",
       "choices": [
         {
-          "label": "Local", 
-          "ontology_uri": null
-        }, 
+          "label": "Local",
+          "ontology-uri": null
+        },
         {
-          "label": "Regional", 
-          "ontology_uri": null
-        }, 
+          "label": "Regional",
+          "ontology-uri": null
+        },
         {
-          "label": "Global", 
-          "ontology_uri": null
+          "label": "Global",
+          "ontology-uri": null
         }
       ]
     },
@@ -225,79 +226,79 @@
     },
     {
       "name": "size",
-      "type": "bytes-unit"
+      "type": "bytes-size"
     },
     {
-      "name": "format", 
-      "type": "choice", 
+      "name": "format",
+      "type": "choice",
       "choices": [
         {
-          "label": "CSV", 
-          "ontology_uri": "http://edamontology.org/format_3752"
-        }, 
-        {
-          "label": "TSV", 
-          "ontology_uri": "http://edamontology.org/format_3475"
+          "label": "CSV",
+          "ontology-uri": "http://edamontology.org/format_3752"
         },
         {
-          "label": "XLSX", 
-          "ontology_uri": "http://edamontology.org/format_3620"
+          "label": "TSV",
+          "ontology-uri": "http://edamontology.org/format_3475"
         },
         {
-          "label": "XLS", 
-          "ontology_uri": "http://edamontology.org/format_3468"
-        }, 
+          "label": "XLSX",
+          "ontology-uri": "http://edamontology.org/format_3620"
+        },
         {
-          "label": "JSON", 
-          "ontology_uri": "http://edamontology.org/format_3464"
-        }, 
+          "label": "XLS",
+          "ontology-uri": "http://edamontology.org/format_3468"
+        },
         {
-          "label": "XML", 
-          "ontology_uri": "http://edamontology.org/format_2332"
-        }, 
+          "label": "JSON",
+          "ontology-uri": "http://edamontology.org/format_3464"
+        },
         {
-          "label": "NetCDF", 
-          "ontology_uri": "http://edamontology.org/format_3650"
-        }, 
+          "label": "XML",
+          "ontology-uri": "http://edamontology.org/format_2332"
+        },
+        {
+          "label": "NetCDF",
+          "ontology-uri": "http://edamontology.org/format_3650"
+        },
         {
           "label": "TXT",
-          "ontology_uri": "http://edamontology.org/format_1964"
-        }, 
+          "ontology-uri": "http://edamontology.org/format_1964"
+        },
         {
-          "label": "HDF5", 
-          "ontology_uri": "http://edamontology.org/format_3590"
-        }, 
+          "label": "HDF5",
+          "ontology-uri": "http://edamontology.org/format_3590"
+        },
         {
-          "label": "MATLAB", 
-          "ontology_uri": "http://edamontology.org/format_4007"
-        }, 
+          "label": "MATLAB",
+          "ontology-uri": "http://edamontology.org/format_4007"
+        },
         {
-          "label": "R", 
-          "ontology_uri": "http://edamontology.org/format_3554" 
-        }, 
+          "label": "R",
+          "ontology-uri": "http://edamontology.org/format_3554"
+        },
         {
           "label": "PY",
-          "ontology_uri": "http://edamontology.org/format_3996"
-        }, 
+          "ontology-uri": "http://edamontology.org/format_3996"
+        },
         {
-          "label": "RDF", 
-          "ontology_uri": "http://edamontology.org/format_3261"
-        }, 
+          "label": "RDF",
+          "ontology-uri": "http://edamontology.org/format_3261"
+        },
         {
-          "label": "TURTLE", 
-          "ontology_uri": "http://edamontology.org/format_3255"
-        }, 
+          "label": "TURTLE",
+          "ontology-uri": "http://edamontology.org/format_3255"
+        },
         {
-          "label": "JSON-LD", 
-          "ontology_uri": "http://edamontology.org/format_3784" 
-        }, 
+          "label": "JSON-LD",
+          "ontology-uri": "http://edamontology.org/format_3784"
+        },
         {
-          "label": "YAML", 
-          "ontology_uri": "http://edamontology.org/format_3750"
-        }, 
+          "label": "YAML",
+          "ontology-uri": "http://edamontology.org/format_3750"
+        },
         {
-          "label": "ZIP", 
-          "ontology_uri": "http://edamontology.org/format_3987"
+          "label": "ZIP",
+          "ontology-uri": "http://edamontology.org/format_3987"
         }
       ]
     },
@@ -320,20 +321,20 @@
       "type": "choice",
       "choices": [
         {
-          "label": "Short-Term", 
-          "ontology_uri": null 
-        }, 
+          "label": "Short-Term",
+          "ontology-uri": null
+        },
         {
-          "label": "Long-Term", 
-          "ontology_uri": null
-        }, 
+          "label": "Long-Term",
+          "ontology-uri": null
+        },
         {
-          "label": "Seasonal", 
-          "ontology_uri": null
-        }, 
+          "label": "Seasonal",
+          "ontology-uri": null
+        },
         {
-          "label": "Event-based", 
-          "ontology_uri": null
+          "label": "Event-based",
+          "ontology-uri": null
         }
       ]
     },
