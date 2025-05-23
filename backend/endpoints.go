@@ -22,7 +22,7 @@ func GetModel(c echo.Context) error {
 
 	var model Model
 	var metadata []Metadata
-	err = conn.QueryRow(ctx, "SELECT models.model, COALESCE(jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)), '{}') FROM models INNER JOIN metadata ON models.model_id = metadata.model_id WHERE models.identifier = $1 GROUP BY models.model", identifier).Scan(&model, &metadata)
+	err = conn.QueryRow(ctx, "SELECT models.model, jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)) FROM models INNER JOIN metadata ON models.model_id = metadata.model_id WHERE models.identifier = $1 GROUP BY models.model", identifier).Scan(&model, &metadata)
 	if err == pgx.ErrNoRows {
 		return c.NoContent(http.StatusNotFound)
 	} else if err != nil {
