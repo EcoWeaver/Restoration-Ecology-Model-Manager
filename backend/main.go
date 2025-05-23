@@ -34,21 +34,15 @@ func main() {
 	}
 	defer dbPool.Close()
 
-	conn, err := dbPool.Acquire(ctx)
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
-	conn.Release()
+	cc := Context{DbPool: dbPool}
 
 	e.Logger.SetLevel(log.WARN)
 	e.Logger.SetHeader("${time_rfc3339}")
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &Context{}
 			cc.Context = c
-			cc.DbPool = dbPool
-			return next(cc)
+			return next(&cc)
 		}
 	})
 

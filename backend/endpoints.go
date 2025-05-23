@@ -84,15 +84,15 @@ func PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	var model_id int
-	err = conn.QueryRow(ctx, "INSERT INTO models (model, identifier) VALUES ($1, $2) RETURNING model_id", modelRequest.Model, modelRequest.Identifier).Scan(&model_id)
+	var modelId int
+	err = conn.QueryRow(ctx, "INSERT INTO models (model, identifier) VALUES ($1, $2) RETURNING model_id", modelRequest.Model, modelRequest.Identifier).Scan(&modelId)
 	if err != nil {
 		return err
 	}
 
 	var b pgx.Batch
 	for _, metadata := range modelRequest.Metadata {
-		b.Queue("INSERT INTO metadata (model_id, kind, value) VALUES ($1, $2, $3)", model_id, metadata.Kind, metadata.Value)
+		b.Queue("INSERT INTO metadata (model_id, kind, value) VALUES ($1, $2, $3)", modelId, metadata.Kind, metadata.Value)
 	}
 	err = conn.SendBatch(ctx, &b).Close()
 	if err != nil {
