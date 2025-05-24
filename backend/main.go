@@ -56,8 +56,8 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 
-	e.GET("/metadata-types", GetMetadata)
-	e.GET("/relation-types", GetRelations)
+	e.GET("/metadata", GetMetadata)
+	e.GET("/relations", GetRelations)
 
 	e.GET("/model", GetModel)
 	e.PUT("/model", PutModel)

@@ -51,7 +51,7 @@ func (self ModelRequest) verify(c *Context) error {
 		return err
 	}
 
-	m, err := c.Metadata.Get()
+	m, err := c.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}

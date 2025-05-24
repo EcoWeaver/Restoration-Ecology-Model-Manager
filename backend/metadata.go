@@ -6,6 +6,8 @@ import (
 	"os"
 	"sync"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type LiveMetadataConfig struct {
@@ -22,16 +24,16 @@ type MetadataConfig struct {
 
 type MetadataEntry struct {
 	Name    string    `json:"name"`
-	Type    *string   `json:"type"`
-	Choices *[]Choice `json:"choices"`
+	Type    *string   `json:"type,omitempty"`
+	Choices *[]Choice `json:"choices,omitempty"`
 }
 
 type Choice struct {
 	Label       string  `json:"label"`
-	OntologyUri *string `json:"ontology-uri"`
+	OntologyUri *string `json:"ontology-uri,omitempty"`
 }
 
-func (self *LiveMetadataConfig) Get() (MetadataConfig, error) {
+func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 	fi, err := os.Stat("metadata.json")
 	if err != nil {
 		return MetadataConfig{}, err
@@ -60,10 +62,14 @@ func (self *LiveMetadataConfig) Get() (MetadataConfig, error) {
 
 	for me := range chain(m.Mandatory, m.Recommended, m.Optional) {
 		if _, ok := e[me.Name]; ok {
-			return MetadataConfig{}, fmt.Errorf("encountered duplicate metadata entry %s", me.Name)
+			if me.Type == nil {
+				l.Warnf("ignoring duplicate metadata kind '%s' of type 'string'", me.Name)
+			} else {
+				l.Warnf("ignoring duplicate metadata kind '%s' of type '%s'", me.Name, *me.Type)
+			}
 		}
 		e[me.Name] = struct{}{}
-		err = me.verify()
+		err = me.verify(l)
 		if err != nil {
 			return MetadataConfig{}, err
 		}
@@ -75,16 +81,19 @@ func (self *LiveMetadataConfig) Get() (MetadataConfig, error) {
 	return m, nil
 }
 
-func (self MetadataEntry) verify() error {
+func (self *MetadataEntry) verify(l echo.Logger) error {
 	needsChoices := self.Type != nil && *self.Type == "choice"
 	hasChoices := self.Choices != nil && len(*self.Choices) != 0
 
-	if !needsChoices && hasChoices {
-		return fmt.Errorf("metadata kind '%s' unexpectedly provides choices", self.Name)
-	}
-
-	if needsChoices && !hasChoices {
-		return fmt.Errorf("metadata kind '%s' is missing choices", self.Name)
+	if needsChoices {
+		if !hasChoices {
+			return fmt.Errorf("metadata kind '%s' is missing choices", self.Name)
+		}
+	} else {
+		self.Choices = nil
+		if hasChoices {
+			l.Warnf("ignoring unnecessary choices for metadata kind '%s'", self.Name)
+		}
 	}
 
 	return nil

@@ -20,7 +20,7 @@ func GetRelations(c echo.Context) error {
 
 func GetMetadata(c echo.Context) error {
 	cc := c.(*Context)
-	metadata, err := cc.Metadata.Get()
+	metadata, err := cc.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}
