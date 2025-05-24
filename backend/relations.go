@@ -5,6 +5,8 @@ import (
 	"os"
 	"sync"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type LiveRelationsConfig struct {
@@ -18,7 +20,7 @@ type RelationsConfig struct {
 	Noncausal []string `json:"noncausal"`
 }
 
-func (self *LiveRelationsConfig) Get() (RelationsConfig, error) {
+func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
 	fi, err := os.Stat("relations.json")
 	if err != nil {
 		return RelationsConfig{}, err
@@ -37,10 +39,22 @@ func (self *LiveRelationsConfig) Get() (RelationsConfig, error) {
 		return RelationsConfig{}, err
 	}
 
-	err = json.Unmarshal(data, &self.config)
+	var r RelationsConfig
+	err = json.Unmarshal(data, &r)
 	if err != nil {
 		return RelationsConfig{}, err
 	}
+
+	e := map[string]struct{}{}
+
+	for re := range chain(r.Causal, r.Noncausal) {
+		if _, ok := e[re]; ok {
+			l.Warnf("ignoring duplicate relation kind '%s'", re)
+		}
+		e[re] = struct{}{}
+	}
+
+	self.config = r
 	self.lastMtime = mtime
 
 	return self.config, nil

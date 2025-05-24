@@ -73,17 +73,17 @@ func (self Model) verify(c *Context) error {
 	}
 
 	relations := map[Relation]struct{}{}
-	r, err := c.Relations.Get()
+	r, err := c.Relations.Get(c.Logger())
 	if err != nil {
 		return err
 	}
 
 	for _, relation := range self.Relations {
 		if relation.From >= len(self.Nodes) {
-			return fmt.Errorf("encountered invalid relation connection from %d", relation.From)
+			return fmt.Errorf("encountered invalid relation from %d", relation.From)
 		}
 		if relation.To >= len(self.Nodes) {
-			return fmt.Errorf("encountered invalid relation connection to %d", relation.To)
+			return fmt.Errorf("encountered invalid relation to %d", relation.To)
 		}
 		pair := Relation{relation.From, relation.To}
 		if _, ok := relations[pair]; ok {

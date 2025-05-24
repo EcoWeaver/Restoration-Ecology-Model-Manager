@@ -11,7 +11,7 @@ import (
 
 func GetRelations(c echo.Context) error {
 	cc := c.(*Context)
-	relations, err := cc.Relations.Get()
+	relations, err := cc.Relations.Get(c.Logger())
 	if err != nil {
 		return err
 	}
