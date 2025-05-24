@@ -58,7 +58,7 @@ func (self *LiveMetadataConfig) Get() (MetadataConfig, error) {
 
 	e := map[string]struct{}{}
 
-	for _, me := range concat(m.Mandatory, m.Recommended, m.Optional) {
+	for me := range chain(m.Mandatory, m.Recommended, m.Optional) {
 		if _, ok := e[me.Name]; ok {
 			return MetadataConfig{}, fmt.Errorf("encountered duplicate metadata entry %s", me.Name)
 		}

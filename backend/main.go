@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"iter"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -69,10 +70,14 @@ func main() {
 	}
 }
 
-func concat[T any](elems ...[]T) []T {
-	s := []T{}
-	for _, e := range elems {
-		s = append(s, e...)
+func chain[T any](elems ...[]T) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for _, e := range elems {
+			for _, i := range e {
+				if !yield(i) {
+					return
+				}
+			}
+		}
 	}
-	return s
 }

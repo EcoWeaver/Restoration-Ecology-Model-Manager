@@ -102,7 +102,7 @@ func (self Model) verify(c *Context) error {
 var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{4}`)
 
 func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
-	for _, me := range concat(m.Mandatory, m.Recommended, m.Optional) {
+	for me := range chain(m.Mandatory, m.Recommended, m.Optional) {
 		if me.Name != self.Kind {
 			continue
 		}
