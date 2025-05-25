@@ -129,7 +129,7 @@ func SearchModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	rows, err := conn.Query(ctx, "SELECT MODEL.IDENTIFIER FROM METADATA INNER JOIN MODELS AS MODEL ON METADATA.MODEL_ID = MODEL.MODEL_ID WHERE METADATA.KIND ILIKE $1 AND METADATA.VALUE = $2", key, val)
+	rows, err := conn.Query(ctx, "SELECT model.identifier FROM metadata INNER JOIN models AS model ON metadata.model_id = model.model_id WHERE metadata.kind = $1 AND metadata.value ILIKE $2", key, val)
 	if err != nil {
 		return err
 	}
