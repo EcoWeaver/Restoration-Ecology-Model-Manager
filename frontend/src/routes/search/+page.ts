@@ -3,7 +3,7 @@ import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, url }) => {
 	const res = await fetch(`${apiBase}/search${url.search}`);
-	const item = await res.json();
+	const identifiers: string[] = await res.json();
 
-	return { item };
+	return { identifiers };
 };
