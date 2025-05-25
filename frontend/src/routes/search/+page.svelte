@@ -5,4 +5,4 @@
 	console.log(item);
 </script>
 
-<div>{item}</div>
+<div>{JSON.stringify(item)}</div>

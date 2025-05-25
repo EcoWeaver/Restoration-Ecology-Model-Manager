@@ -129,14 +129,17 @@ func SearchModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	var modelId int
-	err = conn.QueryRow(ctx, "SELECT model_id FROM metadata WHERE kind = $1 AND value ILIKE $2", key, val).Scan(&modelId)
+	rows, err := conn.Query(ctx, "SELECT MODEL.IDENTIFIER FROM METADATA INNER JOIN MODELS AS MODEL ON METADATA.MODEL_ID = MODEL.MODEL_ID WHERE METADATA.KIND ILIKE $1 AND METADATA.VALUE = $2", key, val)
 	if err != nil {
 		return err
 	}
 
-	var identifier string
-	err = conn.QueryRow(ctx, "SELECT identifier FROM models WHERE model_id = $1", modelId).Scan(&identifier)
+	var ident string
+	var idents []string
+	_, err = pgx.ForEachRow(rows, []any{&ident}, func() error {
+		idents = append(idents, ident)
+		return nil
+	})
 	if err != nil {
 		return err
 	}
@@ -146,5 +149,5 @@ func SearchModel(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, identifier)
+	return c.JSON(http.StatusOK, idents)
 }
