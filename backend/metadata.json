@@ -53,67 +53,83 @@
       "type": "choice",
       "choices": [
         {
-          "label": "Generalized Linear Model"
+          "label": "Generalized Linear Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q1501882"
         },
         {
-          "label": "Generalized Additive Model"
+          "label": "Generalized Additive Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q3318054"
         },
         {
-          "label": "Structural Equation Model"
+          "label": "Structural Equation Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q1476639"
         },
         {
-          "label": "Linear Regression Model"
+          "label": "Linear Regression Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q3339222"
         },
         {
           "label": "Matrix Model"
         },
         {
-          "label": "Differential Equation"
+          "label": "Differential Equation", 
+          "ontology": "https://www.wikidata.org/wiki/Q11214"
         },
         {
-          "label": "Causal Graph"
+          "label": "Causal Graph", 
+          "ontology": "https://www.wikidata.org/wiki/Q25048149"
         },
         {
           "label": "Conceptual Causal Network Graphs"
         },
         {
-          "label": "Fuzzy Cognitive Map"
+          "label": "Fuzzy Cognitive Map", 
+          "ontology": "https://www.wikidata.org/wiki/Q5511107"
         },
         {
           "label": "Rule-based Fuzzy Logic Model"
         },
         {
-          "label": "Markov Chain"
+          "label": "Markov Chain", 
+          "ontology": "https://www.wikidata.org/wiki/Q176645"
         },
         {
-          "label": "Extended Fuzzy Cognitive Map"
+          "label": "Extended Fuzzy Cognitive Map", 
+          "ontology": "https://www.wikidata.org/wiki/Q131436844"
         },
         {
-          "label": "Global Circulation Model"
+          "label": "Global Circulation Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q650994"
         },
         {
-          "label": "Structural Conceptual Model"
+          "label": "Structural Conceptual Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q2623243"
         },
         {
-          "label": "Knowledge Graph"
+          "label": "Knowledge Graph", 
+          "ontology": "https://www.wikidata.org/wiki/Q33002955"
         },
         {
-          "label": "Species Distribution Model"
+          "label": "Species Distribution Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q122175981"
         },
         {
           "label": "Gradient Forest Model"
         },
         {
-          "label": "Bayesian Networks"
+          "label": "Bayesian Networks", 
+          "ontology": "https://www.wikidata.org/wiki/Q812540"
         },
         {
-          "label": "Random Forest Model"
+          "label": "Random Forest Model", 
+          "ontology": "https://www.wikidata.org/wiki/Q245748"
         },
         {
           "label": "Non-metric Multidimensional Scale"
         },
         {
-          "label": "Influence Diagram"
+          "label": "Influence Diagram", 
+          "ontology": "https://www.wikidata.org/wiki/Q623966"
         }
       ]
     }
@@ -273,7 +289,53 @@
       "name": "version"
     },
     {
-      "name": "rights"
+      "name": "rights", 
+      "type": "choice", 
+      "choices": [
+        {
+          "label": "MIT License", 
+          "ontology": "https://spdx.org/licenses/MIT.html"
+        }, 
+        {
+          "label": "Apache License 2.0", 
+          "ontology": "https://spdx.org/licenses/Apache-2.0.html"
+        }, 
+        {
+          "label": "GNU General Public License v3.0 or later", 
+          "ontology": "https://spdx.org/licenses/GPL-3.0-or-later.html"
+        }, 
+        {
+          "label": "BSD 3-Clause 'New' or 'Revised' License", 
+          "ontology": "https://spdx.org/licenses/BSD-3-Clause.html"
+        }, 
+        {
+          "label": "GNU General Public License v3.0 or later", 
+          "ontology": "https://spdx.org/licenses/GPL-3.0-or-later.html"
+        }, 
+        {
+          "label": "Mozilla Public License 2.0", 
+          "ontology": "https://spdx.org/licenses/MPL-2.0.html"
+        }, 
+        {
+          "label": "Eclipse Public License 2.0", 
+          "ontology": "https://spdx.org/licenses/EPL-2.0.html"
+        }, 
+        {
+          "label": "GNU Lesser General Public License v3.0 or later", 
+          "ontology": "https://spdx.org/licenses/LGPL-3.0-or-later.html"
+        }, 
+        {
+          "label": "Creative Commons Zero v1.0 Universal", 
+          "ontology": "https://spdx.org/licenses/CC0-1.0.html"
+        }, 
+        {
+          "label": "Unlicense", 
+          "ontology": "https://spdx.org/licenses/Unlicense.html"
+        }, 
+        {
+          "label": "No License"
+        }
+      ]
     },
     {
       "name": "funding-reference",
@@ -302,7 +364,55 @@
       ]
     },
     {
-      "name": "programming-language"
+      "name": "programming-language", 
+      "type": "choice", 
+      "choices": [
+        {
+          "label": "MATLAB", 
+          "ontology": "https://www.wikidata.org/wiki/Q169478"
+        }, 
+        {
+          "label": "Python", 
+          "ontology": "https://www.wikidata.org/wiki/Q28865"
+        }, 
+        {
+          "label": "R", 
+          "ontology": "https://www.wikidata.org/wiki/Q206904"
+        }, 
+        {
+          "label": "Julia", 
+          "ontology": "https://www.wikidata.org/wiki/Q2613697"
+        }, 
+        {
+          "label": "Fortran", 
+          "ontology":  "https://www.wikidata.org/wiki/Q83303"
+        }, 
+        {
+          "label": "C++", 
+          "ontology": "https://www.wikidata.org/wiki/Q2407"
+        }, 
+        {
+          "label": "Java", 
+          "ontology": "https://www.wikidata.org/wiki/Q251"
+        }, 
+        {
+          "label": "Scala", 
+          "ontology": "https://www.wikidata.org/wiki/Q460584"
+        }, 
+        {
+          "label": "GNU Octave", 
+          "ontology": "https://www.wikidata.org/wiki/Q223679"
+
+        }, 
+        {
+          "label": "JavaScript", 
+          "ontology": "https://www.wikidata.org/wiki/Q2005"
+        }, 
+        {
+          "label": "TypeScript", 
+          "ontology": "https://www.wikidata.org/wiki/Q978185"
+        }
+      ]
     },
     {
       "name": "dependency"
@@ -314,7 +424,118 @@
       "name": "output-data"
     },
     {
-      "name": "performance-metric"
+      "name": "performance-metric", 
+      "type": "choice", 
+      "choices": [
+          { 
+            "label": "Accuracy", 
+            "ontology": "https://www.wikidata.org/wiki/Q272035"
+          },
+          { 
+            "label": "Precision",
+            "ontology": "https://www.wikidata.org/wiki/Q272035"
+          },
+          { 
+            "label": "Recall",
+            "ontology": "https://www.wikidata.org/wiki/Q6842789"
+          },
+          { 
+            "label": "Specificity",
+            "ontology": "https://www.wikidata.org/wiki/Q3494375"
+          },
+          { 
+            "label": "F1 Score",
+            "ontology": "https://www.wikidata.org/wiki/Q6975395"
+          },
+          { 
+            "label": "AUC",
+            "ontology": "https://www.wikidata.org/wiki/Q16833590"
+          },
+          { 
+            "label": "RMSE",
+            "ontology": "https://www.wikidata.org/wiki/Q29037"
+          },
+          { 
+            "label": "MAE", 
+            "ontology": "https://www.wikidata.org/wiki/Q6803609"
+          },
+          {
+            "label": "MSE", 
+            "ontology": "https://www.wikidata.org/wiki/Q1940696"
+          },
+          { 
+            "label": "R²",
+            "ontology": "https://www.wikidata.org/wiki/Q192830"
+           },
+          { 
+            "label": "Cross-Entropy Loss (Log-Loss)", 
+            "ontology":"https://www.wikidata.org/wiki/Q22667762"
+          },
+          { 
+            "label": "AIC", 
+            "ontology": "https://www.wikidata.org/wiki/Q1662573"
+          }, 
+          {
+            "label": "Residual Error", 
+            "ontology": "https://www.wikidata.org/wiki/Q1502698"
+          }, 
+          {
+            "label": "False Positive Rate", 
+            "ontology": "https://www.wikidata.org/wiki/Q5432725"
+          }, 
+          {
+            "label": "False Negative Rate", 
+            "ontology": "https://www.wikidata.org/wiki/Q57771243"
+          }, 
+          {
+            "label": "Bias", 
+            "ontology": "https://www.wikidata.org/wiki/Q742736"
+          }, 
+          {
+            "label": "Variance", 
+            "ontology": "https://www.wikidata.org/wiki/Q175199"
+          }, 
+          {
+            "label": "Mean", 
+            "ontology": "https://www.wikidata.org/wiki/Q2796622"
+          }, 
+          {
+            "label": "Median", 
+            "ontology": "https://www.wikidata.org/wiki/Q226995"
+          }, 
+          {
+            "label": "Mode", 
+            "ontology": "https://www.wikidata.org/wiki/Q188224"
+          }, 
+          {
+            "label": "Geometric Mean", 
+            "ontology": "https://www.wikidata.org/wiki/Q185049"
+          }, 
+          {
+            "label": "Cohen''s Kappa", 
+            "ontology": "https://www.wikidata.org/wiki/Q1107106"
+          }, 
+          {
+            "label": "Gini Coefficient", 
+            "ontology": "https://www.wikidata.org/wiki/Q162455"
+          }, 
+          {
+            "label": "Information Entropy", 
+            "ontology": "https://www.wikidata.org/wiki/Q204570"
+          }, 
+          {
+            "label": "Deviance", 
+            "ontology": "https://www.wikidata.org/wiki/Q3706279"
+          }, 
+          {
+            "label": "Hosmer-Lemeshow Test", 
+            "ontology": "https://www.wikidata.org/wiki/Q5908162"
+          }, 
+          {
+            "label": "Matthews Correlation Coefficient", 
+            "ontology": "https://www.wikidata.org/wiki/Q6791500"
+          }
+      ]
     },
     {
       "name": "repository",

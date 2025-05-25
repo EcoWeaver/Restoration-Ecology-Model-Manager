@@ -20,7 +20,7 @@ INSERT INTO metadata (model_id, kind, value) VALUES
 (1, 'input-data', 'Interview Data'),
 (1, 'output-data', 'Habitat suitability indices'),
 (1, 'performance-metric', 'Cohen''s Kappa'),
-(1, 'performance-metric', 'Sensitivity'),
+(1, 'performance-metric', 'Recall'),
 (1, 'performance-metric', 'Specificity'), 
 (1, 'model_type', 'Rule-based Fuzzy Logic Model'); 
 
