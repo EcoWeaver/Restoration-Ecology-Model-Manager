@@ -159,17 +159,17 @@ func SearchModel(c echo.Context) error {
 	var vs []any
 	params := c.QueryParams()
 
-	if len(params) == 0 {
-		query = `
-			SELECT
-				models.identifier,
-				metadata.value
-			FROM
-				models
-				JOIN metadata ON models.model_id = metadata.model_id
-			WHERE
-				metadata.kind = 'title'`
-	} else {
+	query = `
+		SELECT
+			models.identifier,
+			metadata.value
+		FROM
+			models
+			JOIN metadata ON models.model_id = metadata.model_id
+		WHERE
+			metadata.kind = 'title'`
+
+	if len(params) != 0 {
 		i := 1
 		q := []string{}
 		for k, v := range params {
@@ -179,30 +179,29 @@ func SearchModel(c echo.Context) error {
 				i += 2
 			}
 		}
-		vs = append(vs, len(params))
 
-		query = fmt.Sprintf(`
+		innerQuery := `
 			SELECT
-				models.identifier,
-				metadata.value
+				models.model_id
 			FROM
 				models
 				JOIN metadata ON models.model_id = metadata.model_id
 			WHERE
-				metadata.kind = 'title'
-				AND models.model_id IN (
-					SELECT
-						models.model_id
-					FROM
-						models
-						JOIN metadata ON models.model_id = metadata.model_id
-					WHERE
-						%s
-					GROUP BY
-						models.model_id
-					HAVING
-						COUNT(DISTINCT metadata.kind) = $%d
-				)`, strings.Join(q, " OR "), i)
+				` + strings.Join(q, " OR ")
+
+		if len(params) != 1 {
+			vs = append(vs, len(params))
+
+			innerQuery += fmt.Sprintf(`
+				GROUP BY
+					models.model_id
+				HAVING
+					COUNT(DISTINCT metadata.kind) = $%d`, i)
+		}
+
+		query += `
+			AND models.model_id IN (` + innerQuery + `
+			)`
 	}
 
 	conn, err := cc.DbPool.Begin(ctx)
