@@ -155,11 +155,12 @@ func SearchModel(c echo.Context) error {
 	cc := c.(*Context)
 	ctx := c.Request().Context()
 
-	var query string
-	var vs []any
-	params := c.QueryParams()
+	metadata, err := cc.Metadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
 
-	query = `
+	query := `
 		SELECT
 			models.identifier,
 			metadata.value
@@ -168,11 +169,19 @@ func SearchModel(c echo.Context) error {
 			JOIN metadata ON models.model_id = metadata.model_id
 		WHERE
 			metadata.kind = 'title'`
+	var vs []any
 
+	params := c.QueryParams()
 	if len(params) != 0 {
 		i := 1
 		q := []string{}
 		for k, v := range params {
+			if !metadata.IsMetadataKind(k) {
+				err = fmt.Errorf("encountered invalid metadata kind '%s'", k)
+				c.Logger().Warn(err)
+				return c.String(http.StatusBadRequest, err.Error())
+			}
+
 			for _, ve := range v {
 				vs = append(vs, k, "%"+ve+"%")
 				q = append(q, fmt.Sprintf("(metadata.kind = $%d AND metadata.value ILIKE $%d)", i, i+1))

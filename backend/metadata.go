@@ -111,3 +111,15 @@ func (self *MetadataEntry) verify(l echo.Logger) error {
 
 	return nil
 }
+
+func (self *MetadataConfig) IsMetadataKind(k string) bool {
+	for _, s := range []*[]MetadataEntry{&self.Mandatory, &self.Recommended, &self.Optional} {
+		for _, se := range *s {
+			if k == se.Name {
+				return true
+			}
+		}
+	}
+
+	return false
+}
