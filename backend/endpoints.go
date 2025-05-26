@@ -43,9 +43,23 @@ func GetModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
+	query := `
+		SELECT
+			models.model,
+			jsonb_agg(
+				jsonb_build_object('kind', metadata.kind, 'value', metadata.value)
+			)
+		FROM
+			models
+			JOIN metadata ON models.model_id = metadata.model_id
+		WHERE
+			models.identifier = $1
+		GROUP BY
+			models.model`
+
 	var model Model
 	var metadata []Metadata
-	err = conn.QueryRow(ctx, "SELECT models.model, jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)) FROM models JOIN metadata ON models.model_id = metadata.model_id WHERE models.identifier = $1 GROUP BY models.model", identifier).Scan(&model, &metadata)
+	err = conn.QueryRow(ctx, query, identifier).Scan(&model, &metadata)
 	if err == pgx.ErrNoRows {
 		return c.NoContent(http.StatusNotFound)
 	} else if err != nil {
@@ -94,8 +108,16 @@ func PutModel(c echo.Context) error {
 
 	const ERR_UNIQUE_VIOLATION = "23505"
 
+	query := `
+		INSERT INTO
+			models (model, identifier)
+		VALUES
+			($1, $2)
+		RETURNING
+			model_id`
+
 	var modelId int
-	err = conn.QueryRow(ctx, "INSERT INTO models (model, identifier) VALUES ($1, $2) RETURNING model_id", modelRequest.Model, modelRequest.Identifier).Scan(&modelId)
+	err = conn.QueryRow(ctx, query, modelRequest.Model, modelRequest.Identifier).Scan(&modelId)
 	if err != nil {
 		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == ERR_UNIQUE_VIOLATION {
 			err = errors.New("encountered non-unique model identifier")
@@ -106,9 +128,15 @@ func PutModel(c echo.Context) error {
 		}
 	}
 
+	query = `
+		INSERT INTO
+			metadata (model_id, kind, value)
+		VALUES
+			($1, $2, $3)`
+
 	var b pgx.Batch
 	for _, metadata := range modelRequest.Metadata {
-		b.Queue("INSERT INTO metadata (model_id, kind, value) VALUES ($1, $2, $3)", modelId, metadata.Kind, metadata.Value)
+		b.Queue(query, modelId, metadata.Kind, metadata.Value)
 	}
 	err = conn.SendBatch(ctx, &b).Close()
 	if err != nil {
@@ -127,24 +155,43 @@ func SearchModel(c echo.Context) error {
 	cc := c.(*Context)
 	ctx := c.Request().Context()
 
-	query := c.QueryParams()
-	if len(query) == 0 {
-		return c.NoContent(http.StatusBadRequest)
-	}
+	var query string
+	var vs []any
+	params := c.QueryParams()
 
-	e := map[string]struct{}{}
-	vs := []any{}
-	i := 1
-	q := []string{}
-	for k, v := range query {
-		e[k] = struct{}{}
-		for _, ve := range v {
-			vs = append(vs, k, "%"+ve+"%")
-			q = append(q, "(metadata.kind = $"+fmt.Sprint(i)+" AND metadata.value ILIKE $"+fmt.Sprint(i+1)+")")
-			i += 2
+	if len(params) == 0 {
+		query = `
+			SELECT
+				models.identifier
+			FROM
+				models`
+	} else {
+		e := map[string]struct{}{}
+		i := 1
+		q := []string{}
+		for k, v := range params {
+			e[k] = struct{}{}
+			for _, ve := range v {
+				vs = append(vs, k, "%"+ve+"%")
+				q = append(q, fmt.Sprint("(metadata.kind = $", i, " AND metadata.value ILIKE $", i+1, ")"))
+				i += 2
+			}
 		}
+		vs = append(vs, len(e))
+
+		query = fmt.Sprint(`
+			SELECT
+				models.identifier
+			FROM
+				models
+				JOIN metadata ON models.model_id = metadata.model_id
+			WHERE`,
+			strings.Join(q, " OR "), `
+			GROUP BY
+				models.model_id
+			HAVING
+				COUNT(DISTINCT metadata.kind) = $`, i)
 	}
-	vs = append(vs, len(e))
 
 	conn, err := cc.DbPool.Begin(ctx)
 	if err != nil {
@@ -152,7 +199,7 @@ func SearchModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	rows, err := conn.Query(ctx, "SELECT models.identifier FROM models JOIN metadata ON models.model_id = metadata.model_id WHERE "+strings.Join(q, " OR ")+" GROUP BY models.model_id HAVING COUNT(DISTINCT metadata.kind) = $"+fmt.Sprint(i), vs...)
+	rows, err := conn.Query(ctx, query, vs...)
 	if err != nil {
 		return err
 	}
