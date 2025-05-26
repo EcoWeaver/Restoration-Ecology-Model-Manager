@@ -170,18 +170,16 @@ func SearchModel(c echo.Context) error {
 			WHERE
 				metadata.kind = 'title'`
 	} else {
-		e := map[string]struct{}{}
 		i := 1
 		q := []string{}
 		for k, v := range params {
-			e[k] = struct{}{}
 			for _, ve := range v {
 				vs = append(vs, k, "%"+ve+"%")
 				q = append(q, fmt.Sprintf("(metadata.kind = $%d AND metadata.value ILIKE $%d)", i, i+1))
 				i += 2
 			}
 		}
-		vs = append(vs, len(e))
+		vs = append(vs, len(params))
 
 		query = fmt.Sprintf(`
 			SELECT
