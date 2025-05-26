@@ -162,9 +162,13 @@ func SearchModel(c echo.Context) error {
 	if len(params) == 0 {
 		query = `
 			SELECT
-				models.identifier
+				models.identifier,
+				metadata.value
 			FROM
-				models`
+				models
+				JOIN metadata ON models.model_id = metadata.model_id
+			WHERE
+				metadata.kind = 'title'`
 	} else {
 		e := map[string]struct{}{}
 		i := 1
@@ -173,24 +177,34 @@ func SearchModel(c echo.Context) error {
 			e[k] = struct{}{}
 			for _, ve := range v {
 				vs = append(vs, k, "%"+ve+"%")
-				q = append(q, fmt.Sprint("(metadata.kind = $", i, " AND metadata.value ILIKE $", i+1, ")"))
+				q = append(q, fmt.Sprintf("(metadata.kind = $%d AND metadata.value ILIKE $%d)", i, i+1))
 				i += 2
 			}
 		}
 		vs = append(vs, len(e))
 
-		query = fmt.Sprint(`
+		query = fmt.Sprintf(`
 			SELECT
-				models.identifier
+				models.identifier,
+				metadata.value
 			FROM
 				models
 				JOIN metadata ON models.model_id = metadata.model_id
-			WHERE`,
-			strings.Join(q, " OR "), `
-			GROUP BY
-				models.model_id
-			HAVING
-				COUNT(DISTINCT metadata.kind) = $`, i)
+			WHERE
+				metadata.kind = 'title'
+				AND models.model_id IN (
+					SELECT
+						models.model_id
+					FROM
+						models
+						JOIN metadata ON models.model_id = metadata.model_id
+					WHERE
+						%s
+					GROUP BY
+						models.model_id
+					HAVING
+						COUNT(DISTINCT metadata.kind) = $%d
+				)`, strings.Join(q, " OR "), i)
 	}
 
 	conn, err := cc.DbPool.Begin(ctx)
@@ -204,10 +218,15 @@ func SearchModel(c echo.Context) error {
 		return err
 	}
 
-	var ident string
-	var idents []string
-	_, err = pgx.ForEachRow(rows, []any{&ident}, func() error {
-		idents = append(idents, ident)
+	type SearchResult struct {
+		Identifier string `json:"identifier"`
+		Title      string `json:"title"`
+	}
+
+	var identifier, title string
+	var idents []SearchResult
+	_, err = pgx.ForEachRow(rows, []any{&identifier, &title}, func() error {
+		idents = append(idents, SearchResult{identifier, title})
 		return nil
 	})
 	if err != nil {
