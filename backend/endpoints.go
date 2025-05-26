@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/labstack/echo/v4"
 )
 
@@ -74,9 +76,9 @@ func PutModel(c echo.Context) error {
 
 	err = modelRequest.verify(cc)
 	if err != nil {
-		if gve, ok := err.(GraphVerifyError); ok {
-			c.Logger().Warn(gve)
-			return cc.String(http.StatusBadRequest, gve.Error())
+		if e, ok := err.(GraphVerifyError); ok {
+			c.Logger().Warn(e)
+			return cc.String(http.StatusBadRequest, e.Error())
 		} else {
 			return err
 		}
@@ -88,10 +90,18 @@ func PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
+	const ERR_UNIQUE_VIOLATION = "23505"
+
 	var modelId int
 	err = conn.QueryRow(ctx, "INSERT INTO models (model, identifier) VALUES ($1, $2) RETURNING model_id", modelRequest.Model, modelRequest.Identifier).Scan(&modelId)
 	if err != nil {
-		return err
+		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == ERR_UNIQUE_VIOLATION {
+			err = errors.New("encountered non-unique model identifier")
+			c.Logger().Warn(err)
+			return c.String(http.StatusBadRequest, err.Error())
+		} else {
+			return err
+		}
 	}
 
 	var b pgx.Batch
