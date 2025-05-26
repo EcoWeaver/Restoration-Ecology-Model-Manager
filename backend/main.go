@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -18,12 +17,6 @@ type Context struct {
 	Metadata  LiveMetadataConfig
 	Relations LiveRelationsConfig
 	echo.Context
-}
-
-func (self *Context) BadRequest(err error) error {
-	return self.JSON(http.StatusBadRequest, struct {
-		Error string `json:"error"`
-	}{err.Error()})
 }
 
 func main() {

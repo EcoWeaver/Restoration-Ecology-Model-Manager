@@ -69,13 +69,13 @@ func PutModel(c echo.Context) error {
 	err = json.Unmarshal(body, &modelRequest)
 	if err != nil {
 		c.Logger().Warn(err)
-		return cc.BadRequest(err)
+		return cc.String(http.StatusBadRequest, err.Error())
 	}
 
 	err = modelRequest.verify(cc)
 	if err != nil {
 		c.Logger().Warn(err)
-		return cc.BadRequest(err)
+		return cc.String(http.StatusBadRequest, err.Error())
 	}
 
 	conn, err := cc.DbPool.Begin(ctx)
