@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -43,7 +45,7 @@ func GetModel(c echo.Context) error {
 
 	var model Model
 	var metadata []Metadata
-	err = conn.QueryRow(ctx, "SELECT models.model, jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)) FROM models INNER JOIN metadata ON models.model_id = metadata.model_id WHERE models.identifier = $1 GROUP BY models.model", identifier).Scan(&model, &metadata)
+	err = conn.QueryRow(ctx, "SELECT models.model, jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)) FROM models JOIN metadata ON models.model_id = metadata.model_id WHERE models.identifier = $1 GROUP BY models.model", identifier).Scan(&model, &metadata)
 	if err == pgx.ErrNoRows {
 		return c.NoContent(http.StatusNotFound)
 	} else if err != nil {
@@ -130,12 +132,20 @@ func SearchModel(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	var key string
-	var val string
+	e := map[string]struct{}{}
+	var vs []any
+	i := 1
+	var q strings.Builder
 	for k, v := range query {
-		key = k
-		val = v[0]
+		vs = append(vs, k, "%"+v[0]+"%")
+		e[k] = struct{}{}
+		if q.Len() != 0 {
+			q.WriteString(" OR ")
+		}
+		q.WriteString("(metadata.kind = $" + fmt.Sprint(i) + " AND metadata.value ILIKE $" + fmt.Sprint(i+1) + ")")
+		i += 2
 	}
+	vs = append(vs, len(e))
 
 	conn, err := cc.DbPool.Begin(ctx)
 	if err != nil {
@@ -143,7 +153,7 @@ func SearchModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	rows, err := conn.Query(ctx, "SELECT model.identifier FROM metadata INNER JOIN models AS model ON metadata.model_id = model.model_id WHERE metadata.kind = $1 AND metadata.value ILIKE $2", key, val)
+	rows, err := conn.Query(ctx, "SELECT models.identifier FROM models JOIN metadata ON models.model_id = metadata.model_id WHERE "+q.String()+" GROUP BY models.model_id HAVING COUNT(DISTINCT metadata.kind) = $"+fmt.Sprint(i), vs...)
 	if err != nil {
 		return err
 	}
