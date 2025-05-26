@@ -169,12 +169,12 @@ func SearchModel(c echo.Context) error {
 			JOIN metadata ON models.model_id = metadata.model_id
 		WHERE
 			metadata.kind = 'title'`
-	var vs []any
+	var args []any
 
 	params := c.QueryParams()
 	if len(params) != 0 {
 		i := 1
-		q := []string{}
+		conds := []string{}
 		for k, v := range params {
 			if !metadata.IsMetadataKind(k) {
 				err = fmt.Errorf("encountered invalid metadata kind '%s'", k)
@@ -182,11 +182,18 @@ func SearchModel(c echo.Context) error {
 				return c.String(http.StatusBadRequest, err.Error())
 			}
 
+			args = append(args, k)
+			conj := fmt.Sprintf("(metadata.kind = $%d AND (", i)
+			i += 1
+
+			disj := []string{}
 			for _, ve := range v {
-				vs = append(vs, k, "%"+ve+"%")
-				q = append(q, fmt.Sprintf("(metadata.kind = $%d AND metadata.value ILIKE $%d)", i, i+1))
-				i += 2
+				args = append(args, "%"+ve+"%")
+				disj = append(disj, fmt.Sprintf("metadata.value ILIKE $%d", i))
+				i += 1
 			}
+
+			conds = append(conds, conj+strings.Join(disj, " OR ")+"))")
 		}
 
 		innerQuery := `
@@ -196,21 +203,21 @@ func SearchModel(c echo.Context) error {
 					models
 					JOIN metadata ON models.model_id = metadata.model_id
 				WHERE
-					` + strings.Join(q, " OR ")
+					` + strings.Join(conds, " OR ")
 
 		if len(params) != 1 {
-			vs = append(vs, len(params))
+			args = append(args, len(params))
 
 			innerQuery += fmt.Sprintf(`
-					GROUP BY
-						models.model_id
-					HAVING
-						COUNT(DISTINCT metadata.kind) = $%d`, i)
+				GROUP BY
+					models.model_id
+				HAVING
+					COUNT(DISTINCT metadata.kind) = $%d`, i)
 		}
 
 		query += `
-			AND models.model_id IN (` + innerQuery + `
-			)`
+		AND models.model_id IN (` + innerQuery + `
+		)`
 	}
 
 	conn, err := cc.DbPool.Begin(ctx)
@@ -219,7 +226,7 @@ func SearchModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	rows, err := conn.Query(ctx, query, vs...)
+	rows, err := conn.Query(ctx, query, args...)
 	if err != nil {
 		return err
 	}
