@@ -45,6 +45,12 @@ type Point struct {
 	Y int `json:"y"`
 }
 
+type GraphVerifyError struct{ err error }
+
+func (err GraphVerifyError) Error() string {
+	return err.err.Error()
+}
+
 func (self ModelRequest) verify(c *Context) error {
 	err := self.Model.verify(c)
 	if err != nil {
@@ -80,14 +86,14 @@ func (self Model) verify(c *Context) error {
 
 	for _, relation := range self.Relations {
 		if relation.From >= len(self.Nodes) {
-			return fmt.Errorf("encountered invalid relation from %d", relation.From)
+			return GraphVerifyError{fmt.Errorf("encountered invalid relation from %d", relation.From)}
 		}
 		if relation.To >= len(self.Nodes) {
-			return fmt.Errorf("encountered invalid relation to %d", relation.To)
+			return GraphVerifyError{fmt.Errorf("encountered invalid relation to %d", relation.To)}
 		}
 		pair := Relation{relation.From, relation.To}
 		if _, ok := relations[pair]; ok {
-			return fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)
+			return GraphVerifyError{fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)}
 		}
 		relations[pair] = struct{}{}
 		err := relation.verify(&r)
@@ -141,10 +147,10 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			return nil
 		}
 
-		return fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)
+		return GraphVerifyError{fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
 	}
 
-	return fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)
+	return GraphVerifyError{fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
 }
 
 func (self Relation) verify(r *RelationsConfig) error {
@@ -152,5 +158,5 @@ func (self Relation) verify(r *RelationsConfig) error {
 		return nil
 	}
 
-	return fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)
+	return GraphVerifyError{fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
 }

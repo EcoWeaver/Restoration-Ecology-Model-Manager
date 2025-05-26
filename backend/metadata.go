@@ -61,12 +61,18 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 
 	e := map[string]struct{}{}
 
-	for _, me := range slices.Concat(m.Mandatory, m.Recommended, m.Optional) {
-		if _, ok := e[me.Name]; ok {
-			l.Warnf("ignoring duplicate metadata kind '%s' of type '%s'", me.Name, me.Type)
-		}
-		e[me.Name] = struct{}{}
-		err = me.verify(l)
+	for _, s := range []*[]MetadataEntry{&m.Mandatory, &m.Recommended, &m.Optional} {
+		*s = slices.DeleteFunc(*s, func(me MetadataEntry) bool {
+			_, ok := e[me.Name]
+			e[me.Name] = struct{}{}
+			if ok {
+				l.Warnf("ignoring duplicate relation kind '%s'", me)
+			}
+			if err == nil {
+				err = me.verify(l)
+			}
+			return ok
+		})
 		if err != nil {
 			return MetadataConfig{}, err
 		}

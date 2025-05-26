@@ -48,11 +48,15 @@ func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
 
 	e := map[string]struct{}{}
 
-	for _, re := range slices.Concat(r.Causal, r.Noncausal) {
-		if _, ok := e[re]; ok {
-			l.Warnf("ignoring duplicate relation kind '%s'", re)
-		}
-		e[re] = struct{}{}
+	for _, s := range []*[]string{&r.Causal, &r.Noncausal} {
+		*s = slices.DeleteFunc(*s, func(re string) bool {
+			_, ok := e[re]
+			e[re] = struct{}{}
+			if ok {
+				l.Warnf("ignoring duplicate relation kind '%s'", re)
+			}
+			return ok
+		})
 	}
 
 	self.config = r

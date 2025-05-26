@@ -74,8 +74,12 @@ func PutModel(c echo.Context) error {
 
 	err = modelRequest.verify(cc)
 	if err != nil {
-		c.Logger().Warn(err)
-		return cc.String(http.StatusBadRequest, err.Error())
+		if gve, ok := err.(GraphVerifyError); ok {
+			c.Logger().Warn(gve)
+			return cc.String(http.StatusBadRequest, gve.Error())
+		} else {
+			return err
+		}
 	}
 
 	conn, err := cc.DbPool.Begin(ctx)
