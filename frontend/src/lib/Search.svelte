@@ -18,6 +18,16 @@
 	let chips = $state<ChipElement[]>([]);
 	let chip = $state<ChipElement | undefined>(undefined);
 
+	let inputElement: HTMLInputElement;
+	function select(event: MouseEvent, selected: number) {
+		inputElement.focus();
+		event.preventDefault();
+
+		chip = { kind: suggestions[selected] };
+		input = "";
+		selected = -1;
+	}
+
 	async function key(key: KeyboardEvent) {
 		if (key.code === "Enter") {
 			if (chip) {
@@ -91,8 +101,10 @@
 		<input
 			class="block grow px-2 py-1 focus-within:outline-none"
 			onkeydown={key}
-			bind:focused
 			bind:value={input}
+			bind:this={inputElement}
+			onfocus={() => (focused = true)}
+			onblur={() => setTimeout(() => (focused = document.activeElement === inputElement), 200)}
 		/>
 	</span>
 
@@ -100,9 +112,20 @@
 		<div class="absolute mt-px max-h-96 min-w-64 overflow-y-scroll bg-white p-2 shadow-xl">
 			{#each suggestions as suggestion, idx}
 				{#if idx === selected}
-					<p class="my-1 rounded bg-neutral-300 p-2" bind:this={element}>{suggestion}</p>
+					<button
+						onclick={(event) => select(event, idx)}
+						class="my-1 block w-full cursor-pointer rounded bg-neutral-200 p-2 text-left ring-2 ring-blue-500 hover:bg-neutral-200"
+						bind:this={element}
+					>
+						{suggestion}
+					</button>
 				{:else}
-					<p class="my-1 rounded p-2">{suggestion}</p>
+					<button
+						onclick={(event) => select(event, idx)}
+						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-200"
+					>
+						{suggestion}
+					</button>
 				{/if}
 			{/each}
 		</div>
