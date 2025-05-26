@@ -1,11 +1,18 @@
 export const apiBase = "http://localhost:8080";
 
-async function req<T>(method: string, path: string, body?: any | undefined): Promise<T> {
+async function req<T>(method: string, path: string, body?: any | undefined): Promise<T>  {
 	const res = await fetch(`${apiBase}/${path}`, {
 		method,
 		body: body === undefined ? undefined : JSON.stringify(body),
 	});
-	return res.json();
+
+	if (res.status == 200) {
+		return res.json();
+	} else if (res.ok) {
+		return undefined as T;
+	} else {
+		throw await res.text();
+	}
 }
 
 export const relationElements = req<RelationElements>("GET", "relations");
@@ -15,7 +22,7 @@ export const metadataElements = req<MetadataElements>("GET", "metadata");
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 
 export function putModel(graph: ModelRequest) {
-	return req<number>("PUT", "model", graph);
+	return req<undefined>("PUT", "model", graph);
 }
 
 export type ModelRequest = {

@@ -3,12 +3,10 @@
 
 	let {
 		elements,
-		error,
 		identifier = $bindable(),
 		metadata = $bindable(),
 	}: {
 		elements: MetadataElements;
-		error: boolean;
 		identifier: string;
 		metadata: Metadata[];
 	} = $props();
@@ -22,7 +20,7 @@
 </script>
 
 <h2 class="text-lg">Metadata</h2>
-<div>Identifier: <input class="border" class:border-red-500={error} bind:value={identifier} /></div>
+<div>Identifier: <input class="border" bind:value={identifier} /></div>
 
 <table>
 	<thead>

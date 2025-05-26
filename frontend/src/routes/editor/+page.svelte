@@ -21,16 +21,16 @@
 	let nodes: Node[] = $state.raw([]);
 	let edges: Edge[] = $state.raw([]);
 
-	let error = $state(false);
+	let error = $state<string | undefined>(undefined);
 	let identifier = $state("");
 	let metadata = $state<Metadata[]>([]);
 
 	function save() {
 		if (identifier == "") {
-			error = true;
+			error = "field 'identifier' is not set";
 			return;
 		}
-		error = false;
+		error = undefined;
 
 		const outNodes: ApiNode[] = nodes.map((n) => ({
 			...n.data,
@@ -57,7 +57,7 @@
 			model: { nodes: outNodes, relations: outRelations },
 		};
 
-		putModel(req);
+		putModel(req).catch((e) => (error = e));
 	}
 
 	function add() {
@@ -71,6 +71,21 @@
 		nodes = [...nodes, node];
 	}
 </script>
+
+{#if error}
+	<div
+		class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+		role="alert"
+	>
+		<span class="block sm:inline">{error}</span>
+		<button
+			onclick={() => (error = undefined)}
+			class="absolute top-0 right-0 bottom-0 cursor-pointer px-5 py-3 font-extrabold"
+		>
+			X
+		</button>
+	</div>
+{/if}
 
 <div class="h-dvh w-dvw">
 	<SvelteFlow
@@ -98,7 +113,7 @@
 			<button class="hover:bg-neutral-200" onclick={add}>Add</button>
 		</Panel>
 		<Panel position="top-right">
-			<MetadataPanel elements={metadataElements} {error} bind:identifier bind:metadata />
+			<MetadataPanel elements={metadataElements} bind:identifier bind:metadata />
 		</Panel>
 		<Background variant={BackgroundVariant.Dots} />
 	</SvelteFlow>
