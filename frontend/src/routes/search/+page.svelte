@@ -7,8 +7,8 @@
 
 <Search />
 
-<div class="p-2">
-	{#each identifiers as item}
-		<a class="block text-blue-500 hover:underline" href="/view/{item}">{item}</a>
+<div class="px-4">
+	{#each identifiers as { identifier, title }}
+		<a class="block text-xl text-blue-500 hover:underline" href="/view/{identifier}">{title}</a>
 	{/each}
 </div>
