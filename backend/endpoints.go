@@ -133,17 +133,14 @@ func SearchModel(c echo.Context) error {
 	}
 
 	e := map[string]struct{}{}
-	var vs []any
+	vs := []any{}
 	i := 1
-	var q strings.Builder
+	q := []string{}
 	for k, v := range query {
 		e[k] = struct{}{}
 		for _, ve := range v {
 			vs = append(vs, k, "%"+ve+"%")
-			if q.Len() != 0 {
-				q.WriteString(" OR ")
-			}
-			q.WriteString("(metadata.kind = $" + fmt.Sprint(i) + " AND metadata.value ILIKE $" + fmt.Sprint(i+1) + ")")
+			q = append(q, "(metadata.kind = $"+fmt.Sprint(i)+" AND metadata.value ILIKE $"+fmt.Sprint(i+1)+")")
 			i += 2
 		}
 	}
@@ -155,7 +152,7 @@ func SearchModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	rows, err := conn.Query(ctx, "SELECT models.identifier FROM models JOIN metadata ON models.model_id = metadata.model_id WHERE "+q.String()+" GROUP BY models.model_id HAVING COUNT(DISTINCT metadata.kind) = $"+fmt.Sprint(i), vs...)
+	rows, err := conn.Query(ctx, "SELECT models.identifier FROM models JOIN metadata ON models.model_id = metadata.model_id WHERE "+strings.Join(q, " OR ")+" GROUP BY models.model_id HAVING COUNT(DISTINCT metadata.kind) = $"+fmt.Sprint(i), vs...)
 	if err != nil {
 		return err
 	}
