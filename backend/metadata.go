@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"slices"
 	"sync"
 	"time"
 
@@ -23,9 +24,9 @@ type MetadataConfig struct {
 }
 
 type MetadataEntry struct {
-	Name    string    `json:"name"`
-	Type    *string   `json:"type,omitempty"`
-	Choices *[]Choice `json:"choices,omitempty"`
+	Name    string   `json:"name"`
+	Type    string   `json:"type,omitempty"`
+	Choices []Choice `json:"choices,omitempty"`
 }
 
 type Choice struct {
@@ -60,13 +61,9 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 
 	e := map[string]struct{}{}
 
-	for me := range chain(m.Mandatory, m.Recommended, m.Optional) {
+	for _, me := range slices.Concat(m.Mandatory, m.Recommended, m.Optional) {
 		if _, ok := e[me.Name]; ok {
-			if me.Type == nil {
-				l.Warnf("ignoring duplicate metadata kind '%s' of type 'string'", me.Name)
-			} else {
-				l.Warnf("ignoring duplicate metadata kind '%s' of type '%s'", me.Name, *me.Type)
-			}
+			l.Warnf("ignoring duplicate metadata kind '%s' of type '%s'", me.Name, me.Type)
 		}
 		e[me.Name] = struct{}{}
 		err = me.verify(l)
@@ -82,18 +79,28 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 }
 
 func (self *MetadataEntry) verify(l echo.Logger) error {
-	needsChoices := self.Type != nil && *self.Type == "choice"
-	hasChoices := self.Choices != nil && len(*self.Choices) != 0
+	// type "choice" needs choices
+	// type "" can have choices
+	// all other types can't have choices
 
-	if needsChoices {
-		if !hasChoices {
-			return fmt.Errorf("metadata kind '%s' is missing choices", self.Name)
-		}
-	} else {
-		self.Choices = nil
-		if hasChoices {
+	if len(self.Choices) != 0 {
+		if self.Type == "" || self.Type == "choice" {
+			e := map[string]struct{}{}
+
+			self.Choices = slices.DeleteFunc(self.Choices, func(ce Choice) bool {
+				_, ok := e[ce.Label]
+				e[ce.Label] = struct{}{}
+				if ok {
+					l.Warnf("ignoring duplicate choice '%s' for metadata kind '%s'", ce.Label, self.Name)
+				}
+				return ok
+			})
+		} else {
 			l.Warnf("ignoring unnecessary choices for metadata kind '%s'", self.Name)
+			self.Choices = []Choice{}
 		}
+	} else if self.Type == "choice" {
+		return fmt.Errorf("missing choices for metadata kind '%s'", self.Name)
 	}
 
 	return nil

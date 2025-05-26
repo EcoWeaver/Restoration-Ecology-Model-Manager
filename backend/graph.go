@@ -102,18 +102,16 @@ func (self Model) verify(c *Context) error {
 var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{4}`)
 
 func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
-	for me := range chain(m.Mandatory, m.Recommended, m.Optional) {
+	for _, me := range slices.Concat(m.Mandatory, m.Recommended, m.Optional) {
 		if me.Name != self.Kind {
 			continue
 		}
 
-		if me.Type == nil {
+		switch me.Type {
+		case "":
 			return nil
-		}
-
-		switch *me.Type {
 		case "choice":
-			for _, ch := range *me.Choices {
+			for _, ch := range me.Choices {
 				if ch.Label == self.Value {
 					return nil
 				}

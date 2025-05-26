@@ -213,7 +213,6 @@
     },
     {
       "name": "format",
-      "type": "choice",
       "choices": [
         {
           "label": "CSV",
@@ -290,7 +289,6 @@
     },
     {
       "name": "rights",
-      "type": "choice",
       "choices": [
         {
           "label": "MIT License",
@@ -398,7 +396,6 @@
     },
     {
       "name": "programming-language",
-      "type": "choice",
       "choices": [
         {
           "label": "MATLAB",

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"iter"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -67,17 +66,5 @@ func main() {
 	err = e.Start(":8080")
 	if err != nil {
 		e.Logger.Fatal(err)
-	}
-}
-
-func chain[T any](elems ...[]T) iter.Seq[T] {
-	return func(yield func(T) bool) {
-		for _, e := range elems {
-			for _, i := range e {
-				if !yield(i) {
-					return
-				}
-			}
-		}
 	}
 }

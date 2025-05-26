@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"slices"
 	"sync"
 	"time"
 
@@ -47,7 +48,7 @@ func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
 
 	e := map[string]struct{}{}
 
-	for re := range chain(r.Causal, r.Noncausal) {
+	for _, re := range slices.Concat(r.Causal, r.Noncausal) {
 		if _, ok := e[re]; ok {
 			l.Warnf("ignoring duplicate relation kind '%s'", re)
 		}
