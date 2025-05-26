@@ -1,6 +1,6 @@
 export const apiBase = "http://localhost:8080";
 
-async function req<T>(method: string, path: string, body?: any | undefined): Promise<T>  {
+async function req<T>(method: string, path: string, body?: any | undefined): Promise<T> {
 	const res = await fetch(`${apiBase}/${path}`, {
 		method,
 		body: body === undefined ? undefined : JSON.stringify(body),

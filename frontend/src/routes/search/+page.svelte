@@ -1,9 +1,11 @@
 <script lang="ts">
 	let { data } = $props();
-	let { identifiers } = data;
+	let { identifiers } = $derived(data);
 
-	console.log(identifiers);
+	import Search from "$lib/Search.svelte";
 </script>
+
+<Search />
 
 <div class="p-2">
 	{#each identifiers as item}
