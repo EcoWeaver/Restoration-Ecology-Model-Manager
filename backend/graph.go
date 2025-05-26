@@ -141,7 +141,7 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			return nil
 		}
 
-		return fmt.Errorf("encountered invalid value '%s' of metadata kind '%s'", self.Value, self.Kind)
+		return fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)
 	}
 
 	return fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)
