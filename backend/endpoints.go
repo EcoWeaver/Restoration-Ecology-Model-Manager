@@ -137,13 +137,15 @@ func SearchModel(c echo.Context) error {
 	i := 1
 	var q strings.Builder
 	for k, v := range query {
-		vs = append(vs, k, "%"+v[0]+"%")
 		e[k] = struct{}{}
-		if q.Len() != 0 {
-			q.WriteString(" OR ")
+		for _, ve := range v {
+			vs = append(vs, k, "%"+ve+"%")
+			if q.Len() != 0 {
+				q.WriteString(" OR ")
+			}
+			q.WriteString("(metadata.kind = $" + fmt.Sprint(i) + " AND metadata.value ILIKE $" + fmt.Sprint(i+1) + ")")
+			i += 2
 		}
-		q.WriteString("(metadata.kind = $" + fmt.Sprint(i) + " AND metadata.value ILIKE $" + fmt.Sprint(i+1) + ")")
-		i += 2
 	}
 	vs = append(vs, len(e))
 
