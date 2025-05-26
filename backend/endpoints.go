@@ -181,22 +181,22 @@ func SearchModel(c echo.Context) error {
 		}
 
 		innerQuery := `
-			SELECT
-				models.model_id
-			FROM
-				models
-				JOIN metadata ON models.model_id = metadata.model_id
-			WHERE
-				` + strings.Join(q, " OR ")
+				SELECT
+					models.model_id
+				FROM
+					models
+					JOIN metadata ON models.model_id = metadata.model_id
+				WHERE
+					` + strings.Join(q, " OR ")
 
 		if len(params) != 1 {
 			vs = append(vs, len(params))
 
 			innerQuery += fmt.Sprintf(`
-				GROUP BY
-					models.model_id
-				HAVING
-					COUNT(DISTINCT metadata.kind) = $%d`, i)
+					GROUP BY
+						models.model_id
+					HAVING
+						COUNT(DISTINCT metadata.kind) = $%d`, i)
 		}
 
 		query += `
