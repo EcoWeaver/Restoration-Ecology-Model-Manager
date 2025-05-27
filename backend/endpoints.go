@@ -10,8 +10,15 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 )
+
+type State struct {
+	DbPool    *pgxpool.Pool
+	Metadata  LiveMetadataConfig
+	Relations LiveRelationsConfig
+}
 
 func (self *State) GetRelations(c echo.Context) error {
 	relations, err := self.Relations.Get(c.Logger())

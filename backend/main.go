@@ -12,12 +12,6 @@ import (
 	"golang.org/x/time/rate"
 )
 
-type State struct {
-	DbPool    *pgxpool.Pool
-	Metadata  LiveMetadataConfig
-	Relations LiveRelationsConfig
-}
-
 func main() {
 	ctx := context.Background()
 	e := echo.New()
