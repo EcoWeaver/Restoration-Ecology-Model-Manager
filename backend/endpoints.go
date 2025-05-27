@@ -65,7 +65,9 @@ func (self *State) GetModel(c echo.Context) error {
 	var metadata []Metadata
 	err = conn.QueryRow(ctx, query, identifier).Scan(&model, &metadata)
 	if err == pgx.ErrNoRows {
-		return c.NoContent(http.StatusNotFound)
+		err = fmt.Errorf("model with identifier '%s' not found", identifier)
+		c.Logger().Warn(err)
+		return c.String(http.StatusNotFound, err.Error())
 	} else if err != nil {
 		return err
 	}
