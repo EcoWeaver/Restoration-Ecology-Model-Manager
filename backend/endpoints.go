@@ -135,13 +135,18 @@ func (self *State) PutModel(c echo.Context) error {
 		INSERT INTO
 			metadata (model_id, kind, value)
 		VALUES
-			($1, $2, $3)`
+			`
 
-	var b pgx.Batch
-	for _, metadata := range modelRequest.Metadata {
-		b.Queue(query, modelId, metadata.Kind, metadata.Value)
+	args := []any{modelId}
+	ins := []string{}
+	for _, me := range modelRequest.Metadata {
+		args = append(args, me.Kind, me.Value)
+		ins = append(ins, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
 	}
-	err = conn.SendBatch(ctx, &b).Close()
+	query += strings.Join(ins, `,
+			`)
+
+	_, err = conn.Exec(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -175,7 +180,6 @@ func (self *State) SearchModel(c echo.Context) error {
 
 	params := c.QueryParams()
 	if len(params) != 0 {
-		i := 1
 		conds := []string{}
 		for k, v := range params {
 			if !metadata.IsMetadataKind(k) {
@@ -185,14 +189,12 @@ func (self *State) SearchModel(c echo.Context) error {
 			}
 
 			args = append(args, k)
-			conj := fmt.Sprintf("(metadata.kind = $%d AND (", i)
-			i += 1
+			conj := fmt.Sprintf("(metadata.kind = $%d AND (", len(args))
 
 			disj := []string{}
 			for _, ve := range v {
 				args = append(args, "%"+ve+"%")
-				disj = append(disj, fmt.Sprintf("metadata.value ILIKE $%d", i))
-				i += 1
+				disj = append(disj, fmt.Sprintf("metadata.value ILIKE $%d", len(args)))
 			}
 
 			conds = append(conds, conj+strings.Join(disj, " OR ")+"))")
@@ -215,7 +217,7 @@ func (self *State) SearchModel(c echo.Context) error {
 				GROUP BY
 					models.model_id
 				HAVING
-					COUNT(DISTINCT metadata.kind) = $%d`, i)
+					COUNT(DISTINCT metadata.kind) = $%d`, len(args))
 		}
 
 		query += `
