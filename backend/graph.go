@@ -115,6 +115,10 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			continue
 		}
 
+		if len(self.Value) == 0 {
+			return GraphVerifyError{fmt.Errorf("encountered unset value of metadata kind '%s', expected type '%s'", self.Kind, me.Type)}
+		}
+
 		switch me.Type {
 		case "":
 			return nil
