@@ -8,7 +8,6 @@ import (
 	"slices"
 	"time"
 
-	"github.com/docker/go-units"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/language"
 )
@@ -158,10 +157,6 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			fallthrough
 		case "year":
 			if _, err := time.Parse(YearOnly, self.Value); err == nil {
-				return nil
-			}
-		case "bytes-size":
-			if _, err := units.RAMInBytes(self.Value); err == nil {
 				return nil
 			}
 		default:

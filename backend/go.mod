@@ -3,7 +3,6 @@ module backend
 go 1.24.3
 
 require (
-	github.com/docker/go-units v0.5.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/labstack/echo/v4 v4.13.4
 	golang.org/x/time v0.11.0

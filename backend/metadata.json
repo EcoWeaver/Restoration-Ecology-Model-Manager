@@ -208,8 +208,7 @@
       "type": "ietf-bcp-47"
     },
     {
-      "name": "size",
-      "type": "bytes-size"
+      "name": "size"
     },
     {
       "name": "format",
