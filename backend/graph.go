@@ -51,19 +51,19 @@ func (err GraphVerifyError) Error() string {
 	return err.err.Error()
 }
 
-func (self ModelRequest) verify(c *Context) error {
-	err := self.Model.verify(c)
+func (self ModelRequest) verify(s *State, l echo.Logger) error {
+	err := self.Model.verify(s, l)
 	if err != nil {
 		return err
 	}
 
-	m, err := c.Metadata.Get(c.Logger())
+	m, err := s.Metadata.Get(l)
 	if err != nil {
 		return err
 	}
 
 	for _, me := range self.Metadata {
-		err = me.verify(&m, c.Logger())
+		err = me.verify(&m, l)
 		if err != nil {
 			return err
 		}
@@ -72,14 +72,14 @@ func (self ModelRequest) verify(c *Context) error {
 	return nil
 }
 
-func (self Model) verify(c *Context) error {
+func (self Model) verify(s *State, l echo.Logger) error {
 	type Relation struct {
 		From int
 		To   int
 	}
 
 	relations := map[Relation]struct{}{}
-	r, err := c.Relations.Get(c.Logger())
+	r, err := s.Relations.Get(l)
 	if err != nil {
 		return err
 	}

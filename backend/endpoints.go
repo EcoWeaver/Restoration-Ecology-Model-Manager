@@ -13,31 +13,28 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func GetRelations(c echo.Context) error {
-	cc := c.(*Context)
-	relations, err := cc.Relations.Get(c.Logger())
+func (self *State) GetRelations(c echo.Context) error {
+	relations, err := self.Relations.Get(c.Logger())
 	if err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, relations)
 }
 
-func GetMetadata(c echo.Context) error {
-	cc := c.(*Context)
-	metadata, err := cc.Metadata.Get(c.Logger())
+func (self *State) GetMetadata(c echo.Context) error {
+	metadata, err := self.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}
 	return c.JSON(http.StatusOK, metadata)
 }
 
-func GetModel(c echo.Context) error {
-	cc := c.(*Context)
+func (self *State) GetModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	identifier := c.QueryParam("identifier")
 
-	conn, err := cc.DbPool.Begin(ctx)
+	conn, err := self.DbPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
@@ -74,8 +71,7 @@ func GetModel(c echo.Context) error {
 	return c.JSON(http.StatusOK, ModelRequest{identifier, model, metadata})
 }
 
-func PutModel(c echo.Context) error {
-	cc := c.(*Context)
+func (self *State) PutModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	body, err := io.ReadAll(c.Request().Body)
@@ -87,20 +83,20 @@ func PutModel(c echo.Context) error {
 	err = json.Unmarshal(body, &modelRequest)
 	if err != nil {
 		c.Logger().Warn(err)
-		return cc.String(http.StatusBadRequest, err.Error())
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = modelRequest.verify(cc)
+	err = modelRequest.verify(self, c.Logger())
 	if err != nil {
 		if e, ok := err.(GraphVerifyError); ok {
 			c.Logger().Warn(e)
-			return cc.String(http.StatusBadRequest, e.Error())
+			return c.String(http.StatusBadRequest, e.Error())
 		} else {
 			return err
 		}
 	}
 
-	conn, err := cc.DbPool.Begin(ctx)
+	conn, err := self.DbPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
@@ -151,11 +147,10 @@ func PutModel(c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
-func SearchModel(c echo.Context) error {
-	cc := c.(*Context)
+func (self *State) SearchModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	metadata, err := cc.Metadata.Get(c.Logger())
+	metadata, err := self.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}
@@ -220,7 +215,7 @@ func SearchModel(c echo.Context) error {
 		)`
 	}
 
-	conn, err := cc.DbPool.Begin(ctx)
+	conn, err := self.DbPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
