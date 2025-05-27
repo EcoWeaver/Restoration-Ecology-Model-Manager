@@ -10,5 +10,6 @@ export const load: PageLoad = async ({ fetch, url }) => {
 	const res = await fetch(`${apiBase}/search${url.search}`);
 	const identifiers: Item[] = await res.json();
 
-	return { identifiers };
+	let params = Array.from(url.searchParams.entries());
+	return { identifiers, params };
 };

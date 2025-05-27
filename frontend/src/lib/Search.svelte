@@ -3,6 +3,8 @@
 	import { metadataElements } from "./api";
 	import Chip, { type ChipElement } from "./search/Chip.svelte";
 
+	let { params = [] }: { params?: ChipElement[] } = $props();
+
 	const elements = metadataElements.then((e) =>
 		Object.values(e)
 			.flat()
@@ -15,7 +17,7 @@
 
 	let focused = $state(false);
 
-	let chips = $state<ChipElement[]>([]);
+	let chips = $state<ChipElement[]>(params);
 	let chip = $state<ChipElement | undefined>(undefined);
 
 	let inputElement: HTMLInputElement;

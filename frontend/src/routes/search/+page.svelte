@@ -1,11 +1,14 @@
 <script lang="ts">
-	let { data } = $props();
-	let { identifiers } = $derived(data);
-
 	import Search from "$lib/Search.svelte";
+	import type { ChipElement } from "$lib/search/Chip.svelte";
+
+	let { data } = $props();
+	let { identifiers, params: searchParams } = $derived(data);
+
+	let params = $derived<ChipElement[]>(searchParams.map(([kind, value]) => ({ kind, value })));
 </script>
 
-<Search />
+<Search {params} />
 
 <div class="px-4">
 	{#each identifiers as { identifier, title }}
