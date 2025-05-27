@@ -205,7 +205,8 @@ func (self *State) SearchModel(c echo.Context) error {
 					models
 					JOIN metadata ON models.model_id = metadata.model_id
 				WHERE
-					` + strings.Join(conds, " OR ")
+					` + strings.Join(conds, `
+					OR `)
 
 		if len(params) != 1 {
 			args = append(args, len(params))
@@ -218,8 +219,8 @@ func (self *State) SearchModel(c echo.Context) error {
 		}
 
 		query += `
-		AND models.model_id IN (` + innerQuery + `
-		)`
+			AND models.model_id IN (` + innerQuery + `
+			)`
 	}
 
 	conn, err := self.DbPool.Begin(ctx)
