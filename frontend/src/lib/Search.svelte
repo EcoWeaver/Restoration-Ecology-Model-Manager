@@ -50,10 +50,23 @@
 					}
 
 					await goto(`/search?${query}`, { invalidateAll: true });
+					focused = false;
 				}
 			}
 
 			key.preventDefault();
+		} else if (key.code === "Backspace" && input === "") {
+			key.preventDefault();
+
+			if (chip) {
+				input = chip.kind;
+				chip = undefined;
+			} else if (chips.length > 0) {
+				chip = chips.pop()!;
+
+				input = chip.value ?? "";
+				chip.value = undefined;
+			}
 		} else if (key.code === "ArrowDown") {
 			if (!chip && selected < suggestions.length - 1) selected += 1;
 			key.preventDefault();
