@@ -30,8 +30,8 @@ type MetadataEntry struct {
 }
 
 type Choice struct {
-	Label       string  `json:"label"`
-	OntologyUri *string `json:"ontology-uri,omitempty"`
+	Label    string  `json:"label"`
+	Ontology *string `json:"ontology,omitempty"`
 }
 
 func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
