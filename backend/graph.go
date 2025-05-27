@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -52,6 +53,10 @@ func (err GraphVerifyError) Error() string {
 }
 
 func (self ModelRequest) verify(s *State, l echo.Logger) error {
+	if len(self.Identifier) == 0 {
+		return GraphVerifyError{errors.New("expected non-empty 'identifier'")}
+	}
+
 	err := self.Model.verify(s, l)
 	if err != nil {
 		return err
