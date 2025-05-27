@@ -26,10 +26,6 @@
 	let metadata = $state<Metadata[]>([]);
 
 	function save() {
-		if (identifier == "") {
-			error = "field 'identifier' is not set";
-			return;
-		}
 		error = undefined;
 
 		const outNodes: ApiNode[] = nodes.map((n) => ({
