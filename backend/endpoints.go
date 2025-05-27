@@ -95,9 +95,9 @@ func (self *State) PutModel(c echo.Context) error {
 
 	err = modelRequest.verify(self, c.Logger())
 	if err != nil {
-		if e, ok := err.(GraphVerifyError); ok {
-			c.Logger().Warn(e)
-			return c.String(http.StatusBadRequest, e.Error())
+		if _, ok := err.(GraphVerifyError); ok {
+			c.Logger().Warn(err)
+			return c.String(http.StatusBadRequest, err.Error())
 		} else {
 			return err
 		}
