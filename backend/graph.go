@@ -105,6 +105,8 @@ func (self Model) verify(s *State, l echo.Logger) error {
 	return nil
 }
 
+const YearOnly = "2006"
+
 var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{4}`)
 
 func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
@@ -134,8 +136,13 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			if _, err := language.Parse(self.Value); err == nil {
 				return nil
 			}
-		case "ietf-rfc-3339":
-			if _, err := time.Parse(time.RFC3339, self.Value); err == nil {
+		case "date":
+			if _, err := time.Parse(time.DateOnly, self.Value); err == nil {
+				return nil
+			}
+			fallthrough
+		case "year":
+			if _, err := time.Parse(YearOnly, self.Value); err == nil {
 				return nil
 			}
 		case "bytes-size":

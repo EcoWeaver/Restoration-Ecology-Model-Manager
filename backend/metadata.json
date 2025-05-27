@@ -13,7 +13,7 @@
     },
     {
       "name": "publication-year",
-      "type": "ietf-rfc-3339"
+      "type": "year"
     },
     {
       "name": "resource-type",
@@ -144,7 +144,7 @@
     },
     {
       "name": "date",
-      "type": "ietf-rfc-3339"
+      "type": "date"
     },
     {
       "name": "ecological-domain",
