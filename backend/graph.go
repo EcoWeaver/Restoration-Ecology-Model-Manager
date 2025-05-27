@@ -52,9 +52,15 @@ func (err GraphVerifyError) Error() string {
 	return err.err.Error()
 }
 
+var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
+
 func (self ModelRequest) verify(s *State, l echo.Logger) error {
 	if len(self.Identifier) == 0 {
 		return GraphVerifyError{errors.New("expected non-empty 'identifier'")}
+	}
+
+	if !doiRegexp.MatchString(self.Identifier) {
+		return GraphVerifyError{fmt.Errorf("encountered invalid identifier '%s', expected type 'doi'", self.Identifier)}
 	}
 
 	err := self.Model.verify(s, l)
