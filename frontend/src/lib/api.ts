@@ -41,10 +41,17 @@ export type Metadata = {
 	value: string;
 };
 
+export type Choice = {
+	label: string;
+	ontology?: string;
+};
+
+export type MetadataType = "choice" | "date" | "ietf-bcp-47" | "orcid" | "url" | "year";
+
 export type MetadataElement = {
 	name: string;
-	type?: string;
-	choices?: string[];
+	type?: MetadataType;
+	choices?: Choice[];
 };
 
 export type Node = {
