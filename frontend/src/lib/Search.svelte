@@ -15,6 +15,7 @@
 	let selected = $state<number>(-1);
 	let suggestions = $state<string[]>([]);
 
+	let dontUnfocus = $state(false);
 	let focused = $state(false);
 
 	let chips = $state<ChipElement[]>(params);
@@ -22,6 +23,8 @@
 
 	let inputElement: HTMLInputElement;
 	function select(event: MouseEvent, selected: number) {
+		dontUnfocus = false;
+
 		inputElement.focus();
 		event.preventDefault();
 
@@ -119,7 +122,11 @@
 			bind:value={input}
 			bind:this={inputElement}
 			onfocus={() => (focused = true)}
-			onblur={() => setTimeout(() => (focused = document.activeElement === inputElement), 200)}
+			onblur={() => {
+				if (!dontUnfocus) {
+					focused = false;
+				}
+			}}
 		/>
 	</span>
 
@@ -128,7 +135,14 @@
 			{#each suggestions as suggestion, idx}
 				{#if idx === selected}
 					<button
+						onmousedown={() => (dontUnfocus = true)}
 						onclick={(event) => select(event, idx)}
+						onmouseleave={() => {
+							if (dontUnfocus) {
+								focused = false;
+								dontUnfocus = false;
+							}
+						}}
 						class="my-1 block w-full cursor-pointer rounded bg-neutral-200 p-2 text-left ring-2 ring-blue-500 hover:bg-neutral-200"
 						bind:this={element}
 					>
@@ -136,7 +150,14 @@
 					</button>
 				{:else}
 					<button
+						onmousedown={() => (dontUnfocus = true)}
 						onclick={(event) => select(event, idx)}
+						onmouseleave={() => {
+							if (dontUnfocus) {
+								focused = false;
+								dontUnfocus = false;
+							}
+						}}
 						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-200"
 					>
 						{suggestion}
