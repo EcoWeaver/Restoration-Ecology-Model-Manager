@@ -79,8 +79,17 @@
 					<input
 						placeholder={type}
 						class="h-6 w-full outline"
-						bind:value={() => parseInt(m.value), (v) => (m.value = v?.toString())}
-						type="number"
+						bind:value={
+							() => m.value,
+							(v) => {
+								if (v === undefined) {
+									m.value = "";
+								} else if (!isNaN(+v)) {
+									m.value = v;
+								}
+							}
+						}
+						type="text"
 					/>
 				{:else if type == "url"}
 					<input placeholder={type} class="h-6 w-full outline" bind:value={m.value} type="url" />
