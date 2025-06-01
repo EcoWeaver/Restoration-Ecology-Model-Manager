@@ -15,6 +15,6 @@ export const load: PageLoad = async ({ fetch, url }) => {
 
 	const identifiers: Item[] = await res.json();
 
-	let params = Array.from(url.searchParams.entries());
+	const params = Array.from(url.searchParams.entries());
 	return { identifiers, params };
 };

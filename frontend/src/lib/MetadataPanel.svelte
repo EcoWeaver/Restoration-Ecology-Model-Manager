@@ -1,10 +1,5 @@
 <script lang="ts">
-	import {
-		metadataElements,
-		type Metadata,
-		type MetadataElements,
-		type MetadataType,
-	} from "$lib/api";
+	import { type Metadata, type MetadataElements, type MetadataType } from "$lib/api";
 
 	let {
 		elements,

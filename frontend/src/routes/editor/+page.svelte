@@ -39,9 +39,9 @@
 			.filter((e) => e.type == "custom")
 			.map((e) => {
 				const from = nodes.findIndex((n) => n.id === e.source);
-				const to = nodes.findIndex((n) => n.id === e.target)!!;
+				const to = nodes.findIndex((n) => n.id === e.target)!;
 				return {
-					...e.data!!,
+					...e.data!,
 					from,
 					to,
 				};
