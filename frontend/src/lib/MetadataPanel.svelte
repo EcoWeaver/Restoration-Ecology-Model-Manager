@@ -59,7 +59,7 @@
 					<input
 						placeholder={type}
 						class="h-6 w-full outline"
-						bind:value={() => parseInt(m.value), (v) => (m.value = v.toString())}
+						bind:value={() => parseInt(m.value), (v) => (m.value = v?.toString())}
 						type="number"
 					/>
 				{:else if type == "url"}
