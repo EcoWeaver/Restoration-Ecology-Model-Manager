@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { type Metadata, type MetadataElements, type MetadataType } from "$lib/api";
+	import YearInput from "./metadata-panel/YearInput.svelte";
+	import DateInput from "./metadata-panel/DateInput.svelte";
+	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
 
 	let {
 		elements,
@@ -70,29 +73,24 @@
 
 			<span class="table-cell pl-2">
 				{#if type == "choice"}
-					<select required class="h-6 w-full outline" bind:value={m.value}>
+					<select
+						required
+						class="picker-icon:text-black h-6 w-full outline outline-black"
+						bind:value={m.value}
+					>
+						<option class="hidden" value="" disabled selected>-- select an option --</option>
 						{#each choices! as choice}
 							<option value={choice}>{choice}</option>
 						{/each}
 					</select>
-				{:else if type === "year"}
-					<input
-						placeholder={type}
-						class="h-6 w-full outline"
-						bind:value={
-							() => m.value,
-							(v) => {
-								if (v === undefined) {
-									m.value = "";
-								} else if (!isNaN(+v)) {
-									m.value = v;
-								}
-							}
-						}
-						type="text"
-					/>
+				{:else if type === "date"}
+					<DateInput bind:value={m.value} />
+				{:else if type === "orcid"}
+					<OrcidInput bind:value={m.value} />
 				{:else if type == "url"}
 					<input placeholder={type} class="h-6 w-full outline" bind:value={m.value} type="url" />
+				{:else if type === "year"}
+					<YearInput {type} bind:value={m.value} />
 				{:else}
 					<input placeholder={type || m.kind} class="h-6 w-full outline" bind:value={m.value} />
 				{/if}
