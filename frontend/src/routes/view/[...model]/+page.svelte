@@ -36,6 +36,12 @@
 					<div class="table-cell text-center font-bold">kind</div>
 					<div class="table-cell text-center font-bold">value</div>
 				</div>
+				<div class="table-row">
+					<div class="table-cell">identifier</div>
+					<a class="text-blue-700 hover:underline" href={`https://doi.org/${model.identifier}`}>
+						{model.identifier}
+					</a>
+				</div>
 				{#each model.metadata as { kind, value }}
 					<div class="table-row">
 						<div class="table-cell">{kind}</div>
