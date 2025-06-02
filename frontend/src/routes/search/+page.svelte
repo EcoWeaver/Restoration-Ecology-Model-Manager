@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Search from "$lib/Search.svelte";
+	import Header from "$lib/Header.svelte";
 	import type { ChipElement } from "$lib/search/Chip.svelte";
 
 	let { data } = $props();
@@ -8,7 +8,7 @@
 	let params = $derived<ChipElement[]>(searchParams.map(([kind, value]) => ({ kind, value })));
 </script>
 
-<Search {params} />
+<Header {params} />
 
 <div class="m-4 mt-2 table min-w-128 border-collapse p-2 text-lg">
 	<div class="mb-2 table-row border-b-1 border-neutral-300">

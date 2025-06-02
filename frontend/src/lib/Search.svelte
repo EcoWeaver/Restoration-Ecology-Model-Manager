@@ -33,6 +33,16 @@
 		selected = -1;
 	}
 
+	async function submit() {
+		let query = new URLSearchParams();
+		for (let { kind, value } of chips) {
+			query.set(kind, value!);
+		}
+
+		await goto(`/search?${query}`, { invalidateAll: true });
+		focused = false;
+	}
+
 	async function key(key: KeyboardEvent) {
 		if (key.code === "Enter") {
 			if (chip) {
@@ -49,13 +59,7 @@
 					input = "";
 					selected = -1;
 				} else if (selected === -1 && input.length === 0) {
-					let query = new URLSearchParams();
-					for (let { kind, value } of chips) {
-						query.set(kind, value!);
-					}
-
-					await goto(`/search?${query}`, { invalidateAll: true });
-					focused = false;
+					await submit();
 				}
 			}
 
@@ -168,3 +172,10 @@
 		</div>
 	{/if}
 </div>
+
+<button
+	onclick={submit}
+	class="m-4 ml-0 flex h-10 cursor-pointer place-items-center rounded bg-indigo-300 px-4 hover:bg-indigo-400"
+>
+	<span class="font-medium">search</span>
+</button>
