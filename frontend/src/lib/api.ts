@@ -65,6 +65,7 @@ export type Relation = {
 	from: number;
 	to: number;
 };
+
 export type RelationElement = string;
 
 export type Point = {
