@@ -1,9 +1,10 @@
 <script lang="ts" module>
-	export type Node = FlowNode<Omit<ApiNode, "position">, "custom">;
+	import type { Node as FlowNode } from "@xyflow/svelte";
+	export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom">;
 </script>
 
 <script lang="ts">
-	import { type NodeProps, type Node as FlowNode, Position, useSvelteFlow } from "@xyflow/svelte";
+	import { type NodeProps, Position, useSvelteFlow } from "@xyflow/svelte";
 	import type { Node as ApiNode } from "$lib/api";
 	import { Handle } from "@xyflow/svelte";
 
@@ -29,7 +30,11 @@
 	class:text-white={!isLight(data.color)}
 	style:background-color={data.color}
 >
-	<span contenteditable bind:innerText={body}></span>
+	{#if data.editable}
+		<span class="cursor-text" contenteditable bind:innerText={body}></span>
+	{:else}
+		<span>{body}</span>
+	{/if}
 </div>
 
 <Handle type="target" position={Position.Left} />

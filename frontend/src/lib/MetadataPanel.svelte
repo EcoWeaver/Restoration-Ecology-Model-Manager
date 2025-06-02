@@ -46,7 +46,7 @@
 	<div class="table-row">
 		<span class="table-cell pr-2">identifier</span>
 		<span class="table-cell pl-2">
-			<input class="h-6 w-full outline" placeholder="identifier" bind:value={identifier} />
+			<input class="h-6 w-full outline" placeholder="doi" bind:value={identifier} />
 		</span>
 	</div>
 

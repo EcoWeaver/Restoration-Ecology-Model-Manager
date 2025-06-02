@@ -1,23 +1,18 @@
 <script lang="ts">
-	import {
-		Background,
-		SvelteFlow,
-		Panel,
-		type Node,
-		type Edge,
-		BackgroundVariant,
-	} from "@xyflow/svelte";
-	import "@xyflow/svelte/dist/style.css";
+	import Model from "$lib/Model.svelte";
+	import type { Node } from "$lib/model/NodeComponent.svelte";
+	import type { Edge } from "$lib/model/EdgeComponent.svelte";
 
 	let { data } = $props();
 	let { model } = $derived(data);
 
 	let nodes: Node[] = $derived(
 		Array.from(
-			model.model.nodes?.entries().map(([id, { position, color }]) => ({
+			model.model.nodes?.entries().map(([id, { body, position, color }]) => ({
 				position,
-				data: { color },
+				type: "custom",
 				id: id.toString(),
+				data: { body, color, editable: false },
 			})) || [],
 		),
 	);
@@ -26,39 +21,28 @@
 		model.model.relations?.map(({ from, to, kind }) => ({
 			source: from.toString(),
 			target: to.toString(),
-			data: { kind },
+			type: "custom",
 			id: `${from}-${to}`,
+			data: { kind, editable: false },
 		})) || [],
 	);
 </script>
 
 <div class="h-dvh w-dvw">
-	<SvelteFlow
-		{nodes}
-		{edges}
-		nodesConnectable={false}
-		nodesDraggable={false}
-		elementsSelectable={false}
-	>
-		<Panel position="top-right">
-			<table>
-				<thead>
-					<tr>
-						<th>kind</th>
-						<th>value</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each model.metadata as { kind, value }}
-						<tr>
-							<td>{kind}</td>
-							<td class="max-w-128">{value}</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</Panel>
-
-		<Background variant={BackgroundVariant.Dots} />
-	</SvelteFlow>
+	<Model {nodes} {edges} interactive={false}>
+		{#snippet panel()}
+			<div class="table">
+				<div class="table-row">
+					<div class="table-cell text-center font-bold">kind</div>
+					<div class="table-cell text-center font-bold">value</div>
+				</div>
+				{#each model.metadata as { kind, value }}
+					<div class="table-row">
+						<div class="table-cell">{kind}</div>
+						<div class="table-cell max-w-128">{value}</div>
+					</div>
+				{/each}
+			</div>
+		{/snippet}
+	</Model>
 </div>

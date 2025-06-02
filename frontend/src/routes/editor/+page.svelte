@@ -1,12 +1,8 @@
 <script lang="ts">
 	import type { PageProps } from "./$types";
-	let { data }: PageProps = $props();
-	let { metadataElements } = data;
 
-	import { Background, BackgroundVariant, Panel, SvelteFlow } from "@xyflow/svelte";
-	import "@xyflow/svelte/dist/style.css";
-	import NodeComponent, { type Node } from "$lib/NodeComponent.svelte";
-	import EdgeComponent, { type Edge } from "$lib/EdgeComponent.svelte";
+	import { type Node } from "$lib/model/NodeComponent.svelte";
+	import { type Edge } from "$lib/model/EdgeComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import {
 		putModel,
@@ -15,6 +11,10 @@
 		type Metadata,
 		type ModelRequest,
 	} from "$lib/api";
+	import Model from "$lib/Model.svelte";
+
+	let { data }: PageProps = $props();
+	let { metadataElements } = data;
 
 	let id = $state(0);
 
@@ -28,23 +28,25 @@
 	function save() {
 		error = undefined;
 
-		const outNodes: ApiNode[] = nodes.map((n) => ({
-			...n.data,
-			position: {
-				x: Math.round(n.position.x),
-				y: Math.round(n.position.y),
-			},
-		}));
+		const outNodes: ApiNode[] = nodes.map((n) => {
+			let { body, color } = n.data;
+			return {
+				body,
+				color,
+				position: {
+					x: Math.round(n.position.x),
+					y: Math.round(n.position.y),
+				},
+			};
+		});
 		const outRelations: ApiRelation[] = edges
 			.filter((e) => e.type == "custom")
 			.map((e) => {
 				const from = nodes.findIndex((n) => n.id === e.source);
 				const to = nodes.findIndex((n) => n.id === e.target)!;
-				return {
-					...e.data!,
-					from,
-					to,
-				};
+
+				let { kind } = e.data!;
+				return { kind, from, to };
 			});
 
 		const req: ModelRequest = {
@@ -62,7 +64,7 @@
 			id: i.toString(),
 			type: "custom",
 			position: { x: 100, y: 100 },
-			data: { body: "new", color: ["#ff0000", "#00ff00", "#0000ff"][i] },
+			data: { body: "new", color: ["#ff0000", "#00ff00", "#0000ff"][i % 3], editable: true },
 		};
 		nodes = [...nodes, node];
 	}
@@ -84,12 +86,10 @@
 {/if}
 
 <div class="h-dvh w-dvw">
-	<SvelteFlow
+	<Model
 		bind:nodes
 		bind:edges
-		proOptions={{ hideAttribution: true }}
-		nodeTypes={{ custom: NodeComponent }}
-		edgeTypes={{ custom: EdgeComponent }}
+		interactive={true}
 		onconnect={(c) => {
 			const edge: Edge = {
 				id: `${c.source}-${c.target}`,
@@ -98,19 +98,20 @@
 				target: c.target,
 				data: {
 					kind: "correlated-with",
+					editable: true,
 				},
 			};
 			edges = [...edges, edge];
 		}}
 	>
-		<Panel position="top-left">
+		{#snippet info()}
 			<h1 class="text-2xl">Restoration Ecology Model Manager</h1>
 			<button class="hover:bg-neutral-200" onclick={save}>Save</button>
 			<button class="hover:bg-neutral-200" onclick={add}>Add</button>
-		</Panel>
-		<Panel position="top-right">
+		{/snippet}
+
+		{#snippet panel()}
 			<MetadataPanel elements={metadataElements} bind:identifier bind:metadata />
-		</Panel>
-		<Background variant={BackgroundVariant.Dots} />
-	</SvelteFlow>
+		{/snippet}
+	</Model>
 </div>

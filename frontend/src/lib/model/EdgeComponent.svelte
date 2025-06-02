@@ -1,5 +1,6 @@
 <script lang="ts" module>
-	export type Edge = FlowEdge<Omit<Relation, "from" | "to">, "custom">;
+	import type { Edge as FlowEdge } from "@xyflow/svelte";
+	export type Edge = FlowEdge<Omit<Relation, "from" | "to"> & { editable: boolean }, "custom">;
 </script>
 
 <script lang="ts">
@@ -8,7 +9,6 @@
 		EdgeLabel,
 		getBezierPath,
 		MarkerType,
-		type Edge as FlowEdge,
 		Position,
 		useSvelteFlow,
 		type EdgeProps,
@@ -39,7 +39,7 @@
 				id,
 				{
 					markerEnd: re.causal.includes(v) ? { type: MarkerType.ArrowClosed } : undefined,
-					data: { kind: value },
+					data: { kind: value, editable: data.editable },
 				},
 				{ replace: true },
 			);
@@ -49,15 +49,19 @@
 
 <BaseEdge {id} {path} {markerEnd} />
 <EdgeLabel x={labelX} y={labelY}>
-	<select bind:value>
-		{#await relationElements then es}
-			{#each Object.entries(es) as [key, values]}
-				<optgroup label={key}>
-					{#each values as value}
-						<option {value}>{value}</option>
-					{/each}
-				</optgroup>
-			{/each}
-		{/await}
-	</select>
+	{#if data.editable}
+		<select bind:value>
+			{#await relationElements then es}
+				{#each Object.entries(es) as [key, values]}
+					<optgroup label={key}>
+						{#each values as value}
+							<option {value}>{value}</option>
+						{/each}
+					</optgroup>
+				{/each}
+			{/await}
+		</select>
+	{:else}
+		<p>{data.kind}</p>
+	{/if}
 </EdgeLabel>
