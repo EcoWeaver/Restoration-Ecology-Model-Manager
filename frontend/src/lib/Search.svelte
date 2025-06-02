@@ -117,6 +117,7 @@
 		{/if}
 
 		<input
+			placeholder={chips.length === 0 && !chip ? "search metadata" : undefined}
 			class="block grow px-2 py-1 focus-within:outline-none"
 			onkeydown={key}
 			bind:value={input}
