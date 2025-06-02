@@ -145,7 +145,7 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 				return nil
 			}
 		case "url":
-			if _, err := url.Parse(self.Value); err == nil {
+			if _, err := url.ParseRequestURI(self.Value); err == nil {
 				return nil
 			}
 		case "ietf-bcp-47":
