@@ -115,7 +115,9 @@ func (self Model) verify(s *State, l echo.Logger) error {
 	return nil
 }
 
-const YearOnly = "2006"
+const Year = "2006"
+const YearMonth = "2006-01"
+const YearMonthDay = "2006-01-02"
 
 var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{4}`)
 
@@ -151,12 +153,15 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 				return nil
 			}
 		case "date":
-			if _, err := time.Parse(time.DateOnly, self.Value); err == nil {
+			if _, err := time.Parse(YearMonthDay, self.Value); err == nil {
+				return nil
+			}
+			if _, err := time.Parse(YearMonth, self.Value); err == nil {
 				return nil
 			}
 			fallthrough
 		case "year":
-			if _, err := time.Parse(YearOnly, self.Value); err == nil {
+			if _, err := time.Parse(Year, self.Value); err == nil {
 				return nil
 			}
 		default:
