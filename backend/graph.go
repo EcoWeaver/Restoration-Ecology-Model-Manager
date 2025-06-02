@@ -95,10 +95,10 @@ func (self Model) verify(s *State, l echo.Logger) error {
 	}
 
 	for _, relation := range self.Relations {
-		if relation.From >= len(self.Nodes) {
+		if relation.From < 0 || relation.From >= len(self.Nodes) {
 			return GraphVerifyError{fmt.Errorf("encountered invalid relation from %d", relation.From)}
 		}
-		if relation.To >= len(self.Nodes) {
+		if relation.To < 0 || relation.To >= len(self.Nodes) {
 			return GraphVerifyError{fmt.Errorf("encountered invalid relation to %d", relation.To)}
 		}
 		pair := Relation{relation.From, relation.To}
