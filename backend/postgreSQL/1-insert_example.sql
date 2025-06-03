@@ -1,10 +1,10 @@
 INSERT INTO models (model, identifier) VALUES ('{}', 'M01');
 INSERT INTO metadata (model_id, kind, value) VALUES
 (1, 'alternate-identifier', 'https://doi.org/10.1016/j.ecolmodel.2022.110262'),
-(1, 'creator', 'Veronique Dubos'),
+(1, 'creator', 'https://orcid.org/0000-0001-6699-1845'),
 (1, 'title', 'ArcticCharSpawningHabitatSuitability'),
-(1, 'publisher', 'André St.-Hilaire'),
-(1, 'publisher', 'Normand E. Bergeron'),
+(1, 'publisher', 'https://orcid.org/0000-0001-9161-4742'),
+(1, 'publisher', 'https://orcid.org/0000-0003-2413-6810'),
 (1, 'publication-year', '2022'),
 (1, 'subject', 'Reproduction habitatArctic char habitatExpert systemsIndigenous knowledgeInuit QaujimajatuqangitFish habitat modelArctic fish'),
 (1, 'date', '2022-12-20'),
