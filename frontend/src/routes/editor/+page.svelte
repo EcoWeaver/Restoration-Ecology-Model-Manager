@@ -52,7 +52,7 @@
 		const req: ModelRequest = {
 			identifier,
 			metadata,
-			model: { nodes: outNodes, relations: outRelations },
+			graph: { nodes: outNodes, relations: outRelations },
 		};
 
 		putModel(req).catch((e) => (error = e));

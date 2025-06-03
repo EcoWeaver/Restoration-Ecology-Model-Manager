@@ -14,11 +14,11 @@ import (
 
 type ModelRequest struct {
 	Identifier string     `json:"identifier"`
-	Model      Model      `json:"model"`
+	Graph      Graph      `json:"graph"`
 	Metadata   []Metadata `json:"metadata"`
 }
 
-type Model struct {
+type Graph struct {
 	Nodes     []Node     `json:"nodes"`
 	Relations []Relation `json:"relations"`
 }
@@ -45,9 +45,9 @@ type Point struct {
 	Y int `json:"y"`
 }
 
-type GraphVerifyError struct{ err error }
+type ModelVerifyError struct{ err error }
 
-func (err GraphVerifyError) Error() string {
+func (err ModelVerifyError) Error() string {
 	return err.err.Error()
 }
 
@@ -55,14 +55,14 @@ var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
 
 func (self ModelRequest) verify(s *State, l echo.Logger) error {
 	if len(self.Identifier) == 0 {
-		return GraphVerifyError{errors.New("expected non-empty identifier")}
+		return ModelVerifyError{errors.New("expected non-empty identifier")}
 	}
 
 	if !doiRegexp.MatchString(self.Identifier) {
-		return GraphVerifyError{fmt.Errorf("encountered invalid identifier '%s', expected type 'doi'", self.Identifier)}
+		return ModelVerifyError{fmt.Errorf("encountered invalid identifier '%s', expected type 'doi'", self.Identifier)}
 	}
 
-	err := self.Model.verify(s, l)
+	err := self.Graph.verify(s, l)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func (self ModelRequest) verify(s *State, l echo.Logger) error {
 	return nil
 }
 
-func (self Model) verify(s *State, l echo.Logger) error {
+func (self Graph) verify(s *State, l echo.Logger) error {
 	type Relation struct {
 		From int
 		To   int
@@ -96,14 +96,14 @@ func (self Model) verify(s *State, l echo.Logger) error {
 
 	for _, relation := range self.Relations {
 		if relation.From < 0 || relation.From >= len(self.Nodes) {
-			return GraphVerifyError{fmt.Errorf("encountered invalid relation from %d", relation.From)}
+			return ModelVerifyError{fmt.Errorf("encountered invalid relation from %d", relation.From)}
 		}
 		if relation.To < 0 || relation.To >= len(self.Nodes) {
-			return GraphVerifyError{fmt.Errorf("encountered invalid relation to %d", relation.To)}
+			return ModelVerifyError{fmt.Errorf("encountered invalid relation to %d", relation.To)}
 		}
 		pair := Relation{relation.From, relation.To}
 		if _, ok := relations[pair]; ok {
-			return GraphVerifyError{fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)}
+			return ModelVerifyError{fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)}
 		}
 		relations[pair] = struct{}{}
 		err := relation.verify(&r)
@@ -128,7 +128,7 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 		}
 
 		if len(self.Value) == 0 {
-			return GraphVerifyError{fmt.Errorf("encountered unset value of metadata kind '%s', expected type '%s'", self.Kind, me.Type)}
+			return ModelVerifyError{fmt.Errorf("encountered unset value of metadata kind '%s', expected type '%s'", self.Kind, me.Type)}
 		}
 
 		switch me.Type {
@@ -169,10 +169,10 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			return nil
 		}
 
-		return GraphVerifyError{fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
+		return ModelVerifyError{fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
 	}
 
-	return GraphVerifyError{fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
+	return ModelVerifyError{fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
 }
 
 func (self Relation) verify(r *RelationsConfig) error {
@@ -180,5 +180,5 @@ func (self Relation) verify(r *RelationsConfig) error {
 		return nil
 	}
 
-	return GraphVerifyError{fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
+	return ModelVerifyError{fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
 }

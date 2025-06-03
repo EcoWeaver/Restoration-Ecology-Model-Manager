@@ -451,7 +451,6 @@
     },
     {
       "name": "performance-metric",
-      "type": "choice",
       "choices": [
         {
           "label": "Accuracy",

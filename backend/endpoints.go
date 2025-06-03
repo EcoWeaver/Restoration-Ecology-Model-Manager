@@ -49,7 +49,7 @@ func (self *State) GetModel(c echo.Context) error {
 
 	query := `
 		SELECT
-			models.model,
+			models.graph,
 			jsonb_agg(
 				jsonb_build_object('kind', metadata.kind, 'value', metadata.value)
 			)
@@ -59,11 +59,11 @@ func (self *State) GetModel(c echo.Context) error {
 		WHERE
 			models.identifier = $1
 		GROUP BY
-			models.model`
+			models.graph`
 
-	var model Model
+	var graph Graph
 	var metadata []Metadata
-	err = conn.QueryRow(ctx, query, identifier).Scan(&model, &metadata)
+	err = conn.QueryRow(ctx, query, identifier).Scan(&graph, &metadata)
 	if err == pgx.ErrNoRows {
 		err = fmt.Errorf("model with identifier '%s' not found", identifier)
 		c.Logger().Warn(err)
@@ -77,7 +77,18 @@ func (self *State) GetModel(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, ModelRequest{identifier, model, metadata})
+	r := ModelRequest{identifier, graph, metadata}
+	err = r.verify(self, c.Logger())
+	if err != nil {
+		if _, ok := err.(ModelVerifyError); ok {
+			err = fmt.Errorf("encountered error while verifying model with identifier '%s': %s", identifier, err.Error())
+			c.Logger().Warn(err)
+		} else {
+			return err
+		}
+	}
+
+	return c.JSON(http.StatusOK, r)
 }
 
 func (self *State) PutModel(c echo.Context) error {
@@ -88,16 +99,16 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	var modelRequest ModelRequest
-	err = json.Unmarshal(body, &modelRequest)
+	var r ModelRequest
+	err = json.Unmarshal(body, &r)
 	if err != nil {
 		c.Logger().Warn(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	err = modelRequest.verify(self, c.Logger())
+	err = r.verify(self, c.Logger())
 	if err != nil {
-		if _, ok := err.(GraphVerifyError); ok {
+		if _, ok := err.(ModelVerifyError); ok {
 			c.Logger().Warn(err)
 			return c.String(http.StatusBadRequest, err.Error())
 		} else {
@@ -115,14 +126,14 @@ func (self *State) PutModel(c echo.Context) error {
 
 	query := `
 		INSERT INTO
-			models (model, identifier)
+			models (graph, identifier)
 		VALUES
 			($1, $2)
 		RETURNING
 			model_id`
 
 	var modelId int
-	err = conn.QueryRow(ctx, query, modelRequest.Model, modelRequest.Identifier).Scan(&modelId)
+	err = conn.QueryRow(ctx, query, r.Graph, r.Identifier).Scan(&modelId)
 	if err != nil {
 		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == ERR_UNIQUE_VIOLATION {
 			err = errors.New("encountered non-unique model identifier")
@@ -141,7 +152,7 @@ func (self *State) PutModel(c echo.Context) error {
 
 	args := []any{modelId}
 	ins := []string{}
-	for _, me := range modelRequest.Metadata {
+	for _, me := range r.Metadata {
 		args = append(args, me.Kind, me.Value)
 		ins = append(ins, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
 	}

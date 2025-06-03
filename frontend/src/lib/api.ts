@@ -21,17 +21,17 @@ export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>
 export const metadataElements = req<MetadataElements>("GET", "metadata");
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 
-export function putModel(graph: ModelRequest) {
-	return req<undefined>("PUT", "model", graph);
+export function putModel(model: ModelRequest) {
+	return req<undefined>("PUT", "model", model);
 }
 
 export type ModelRequest = {
 	identifier: string;
-	model: Model;
+	graph: Graph;
 	metadata: Metadata[];
 };
 
-export type Model = {
+export type Graph = {
 	nodes: Node[];
 	relations: Relation[];
 };

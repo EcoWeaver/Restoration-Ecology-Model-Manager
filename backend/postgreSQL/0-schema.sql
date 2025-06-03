@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS models (
     model_id SERIAL PRIMARY KEY,
-    model JSONB NOT NULL,
+    graph JSONB NOT NULL,
     identifier TEXT UNIQUE NOT NULL
 );
 

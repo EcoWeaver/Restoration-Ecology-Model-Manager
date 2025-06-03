@@ -8,7 +8,7 @@
 
 	let nodes: Node[] = $derived(
 		Array.from(
-			model.model.nodes?.entries().map(([id, { body, position, color }]) => ({
+			model.graph.nodes?.entries().map(([id, { body, position, color }]) => ({
 				position,
 				type: "custom",
 				id: id.toString(),
@@ -18,7 +18,7 @@
 	);
 
 	let edges: Edge[] = $derived(
-		model.model.relations?.map(({ from, to, kind }) => ({
+		model.graph.relations?.map(({ from, to, kind }) => ({
 			source: from.toString(),
 			target: to.toString(),
 			type: "custom",
