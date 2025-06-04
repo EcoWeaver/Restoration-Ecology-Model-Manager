@@ -41,13 +41,13 @@ func (self *State) GetModel(c echo.Context) error {
 	identifier := c.QueryParam("identifier")
 	err := VerifyIdentifier(identifier)
 	if err != nil {
-		return err
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
 	version := c.QueryParam("version")
 	err = VerifyVersion(version)
 	if err != nil {
-		return err
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
 	conn, err := self.DbPool.Begin(ctx)
