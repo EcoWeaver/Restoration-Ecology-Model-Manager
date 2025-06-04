@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from "./$types";
 
+	import { goto } from "$app/navigation";
 	import { type Node } from "$lib/model/NodeComponent.svelte";
 	import { type Edge } from "$lib/model/EdgeComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
@@ -25,7 +26,7 @@
 	let identifier = $state("");
 	let metadata = $state<Metadata[]>([]);
 
-	function save() {
+	async function save() {
 		error = undefined;
 
 		const outNodes: ApiNode[] = nodes.map((n) => {
@@ -51,11 +52,17 @@
 
 		const req: ModelRequest = {
 			identifier,
+			version: "",
 			metadata,
 			graph: { nodes: outNodes, relations: outRelations },
 		};
 
-		putModel(req).catch((e) => (error = e));
+		try {
+			const model = await putModel(req);
+			await goto(`/view/${model.identifier}?version=${model.version}`);
+		} catch (e: any) {
+			error = e;
+		}
 	}
 
 	function add() {

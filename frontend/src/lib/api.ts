@@ -6,7 +6,7 @@ async function req<T>(method: string, path: string, body?: any | undefined): Pro
 		body: body === undefined ? undefined : JSON.stringify(body),
 	});
 
-	if (res.status == 200) {
+	if (res.status == 200 || res.status == 201) {
 		return res.json();
 	} else if (res.ok) {
 		return undefined as T;
@@ -21,12 +21,13 @@ export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>
 export const metadataElements = req<MetadataElements>("GET", "metadata");
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 
-export function putModel(model: ModelRequest) {
-	return req<undefined>("PUT", "model", model);
+export function putModel(model: ModelRequest): Promise<ModelRequest> {
+	return req<ModelRequest>("PUT", "model", model);
 }
 
 export type ModelRequest = {
 	identifier: string;
+	version: string,
 	graph: Graph;
 	metadata: Metadata[];
 };
