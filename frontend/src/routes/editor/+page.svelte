@@ -2,8 +2,9 @@
 	import type { PageProps } from "./$types";
 
 	import { goto } from "$app/navigation";
-	import { type Node } from "$lib/model/NodeComponent.svelte";
-	import { type Edge } from "$lib/model/EdgeComponent.svelte";
+	import Graph from "$lib/Graph.svelte";
+	import { type Node } from "$lib/graph/NodeComponent.svelte";
+	import { type Edge } from "$lib/graph/EdgeComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import {
 		putModel,
@@ -12,7 +13,6 @@
 		type Metadata,
 		type ModelRequest,
 	} from "$lib/api";
-	import Model from "$lib/Model.svelte";
 
 	let { data }: PageProps = $props();
 	let { metadataElements } = data;
@@ -93,7 +93,7 @@
 {/if}
 
 <div class="h-dvh w-dvw">
-	<Model
+	<Graph
 		bind:nodes
 		bind:edges
 		interactive={true}
@@ -120,5 +120,5 @@
 		{#snippet panel()}
 			<MetadataPanel elements={metadataElements} bind:identifier bind:metadata />
 		{/snippet}
-	</Model>
+	</Graph>
 </div>

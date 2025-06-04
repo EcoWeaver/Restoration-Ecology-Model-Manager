@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Model from "$lib/Model.svelte";
-	import type { Node } from "$lib/model/NodeComponent.svelte";
-	import type { Edge } from "$lib/model/EdgeComponent.svelte";
+	import Graph from "$lib/Graph.svelte";
+	import type { Node } from "$lib/graph/NodeComponent.svelte";
+	import type { Edge } from "$lib/graph/EdgeComponent.svelte";
 
 	let { data } = $props();
 	let { model } = $derived(data);
@@ -29,7 +29,7 @@
 </script>
 
 <div class="h-dvh w-dvw">
-	<Model {nodes} {edges} interactive={false}>
+	<Graph {nodes} {edges} interactive={false}>
 		{#snippet panel()}
 			<div class="table">
 				<div class="table-row">
@@ -50,5 +50,5 @@
 				{/each}
 			</div>
 		{/snippet}
-	</Model>
+	</Graph>
 </div>
