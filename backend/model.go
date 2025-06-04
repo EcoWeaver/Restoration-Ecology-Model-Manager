@@ -15,6 +15,7 @@ import (
 type ModelRequest struct {
 	Identifier string     `json:"identifier"`
 	Graph      Graph      `json:"graph"`
+	Version    string     `json:"version"`
 	Metadata   []Metadata `json:"metadata"`
 }
 
@@ -47,22 +48,22 @@ type Point struct {
 
 type ModelVerifyError struct{ err error }
 
-func (err ModelVerifyError) Error() string {
-	return err.err.Error()
+func (self ModelVerifyError) Error() string {
+	return self.err.Error()
 }
 
-var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
-
 func (self ModelRequest) verify(s *State, l echo.Logger) error {
-	if len(self.Identifier) == 0 {
-		return ModelVerifyError{errors.New("expected non-empty identifier")}
+	err := VerifyIdentifier(self.Identifier)
+	if err != nil {
+		return err
 	}
 
-	if !doiRegexp.MatchString(self.Identifier) {
-		return ModelVerifyError{fmt.Errorf("encountered invalid identifier '%s', expected type 'doi'", self.Identifier)}
+	err = VerifyVersion(self.Version)
+	if err != nil {
+		return err
 	}
 
-	err := self.Graph.verify(s, l)
+	err = self.Graph.verify(s, l)
 	if err != nil {
 		return err
 	}
@@ -77,6 +78,34 @@ func (self ModelRequest) verify(s *State, l echo.Logger) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
+
+func VerifyIdentifier(i string) error {
+	if i == "" {
+		return ModelVerifyError{errors.New("expected non-empty identifier")}
+	}
+
+	if !doiRegexp.MatchString(i) {
+		return ModelVerifyError{fmt.Errorf("encountered invalid identifier '%s', expected type 'doi'", i)}
+	}
+
+	return nil
+}
+
+var verRegexp = regexp.MustCompile(`\d(\.\d+)+`)
+
+func VerifyVersion(v string) error {
+	if v == "" {
+		return ModelVerifyError{errors.New("expected non-empty version")}
+	}
+
+	if !verRegexp.MatchString(v) {
+		return ModelVerifyError{fmt.Errorf("encountered invalid version '%s'", v)}
 	}
 
 	return nil
@@ -127,7 +156,7 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			continue
 		}
 
-		if len(self.Value) == 0 {
+		if self.Value == "" {
 			return ModelVerifyError{fmt.Errorf("encountered unset value of metadata kind '%s', expected type '%s'", self.Kind, me.Type)}
 		}
 

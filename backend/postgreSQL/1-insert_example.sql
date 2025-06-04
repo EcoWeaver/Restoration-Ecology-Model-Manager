@@ -1,4 +1,4 @@
-INSERT INTO models (graph, identifier) VALUES ('{}', '10.1016/j.ecolmodel.2022.110262');
+INSERT INTO models (identifier, graph, version) VALUES ('10.1016/j.ecolmodel.2022.110262', '{}', '1');
 INSERT INTO metadata (model_id, kind, value) VALUES
 (1, 'creator', '0000-0001-6699-1845'),
 (1, 'title', 'Fuzzy logic modelling of anadromous Arctic char spawning habitat from Nunavik Inuit knowledge'),

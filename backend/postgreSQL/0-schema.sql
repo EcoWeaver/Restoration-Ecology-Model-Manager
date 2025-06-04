@@ -1,7 +1,10 @@
 CREATE TABLE IF NOT EXISTS models (
     model_id SERIAL PRIMARY KEY,
+    identifier TEXT NOT NULL,
     graph JSONB NOT NULL,
-    identifier TEXT UNIQUE NOT NULL
+    version TEXT NOT NULL,
+    num_derivatives INT NOT NULL DEFAULT 0,
+    UNIQUE (identifier, version)
 );
 
 CREATE TABLE IF NOT EXISTS metadata (

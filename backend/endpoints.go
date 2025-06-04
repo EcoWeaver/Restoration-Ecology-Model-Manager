@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -40,6 +39,16 @@ func (self *State) GetModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	identifier := c.QueryParam("identifier")
+	err := VerifyIdentifier(identifier)
+	if err != nil {
+		return err
+	}
+
+	version := c.QueryParam("version")
+	err = VerifyVersion(version)
+	if err != nil {
+		return err
+	}
 
 	conn, err := self.DbPool.Begin(ctx)
 	if err != nil {
@@ -57,19 +66,21 @@ func (self *State) GetModel(c echo.Context) error {
 			models
 			JOIN metadata ON models.model_id = metadata.model_id
 		WHERE
-			models.identifier = $1
+			models.identifier = $1 AND models.version = $2
 		GROUP BY
 			models.graph`
 
 	var graph Graph
 	var metadata []Metadata
-	err = conn.QueryRow(ctx, query, identifier).Scan(&graph, &metadata)
-	if err == pgx.ErrNoRows {
-		err = fmt.Errorf("model with identifier '%s' not found", identifier)
-		c.Logger().Warn(err)
-		return c.String(http.StatusNotFound, err.Error())
-	} else if err != nil {
-		return err
+	err = conn.QueryRow(ctx, query, identifier, version).Scan(&graph, &metadata)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			err = fmt.Errorf("model with identifier '%s' at version '%s' not found", identifier, version)
+			c.Logger().Warn(err)
+			return c.String(http.StatusNotFound, err.Error())
+		} else {
+			return err
+		}
 	}
 
 	err = conn.Commit(ctx)
@@ -77,11 +88,11 @@ func (self *State) GetModel(c echo.Context) error {
 		return err
 	}
 
-	r := ModelRequest{identifier, graph, metadata}
+	r := ModelRequest{identifier, graph, version, metadata}
 	err = r.verify(self, c.Logger())
 	if err != nil {
 		if _, ok := err.(ModelVerifyError); ok {
-			err = fmt.Errorf("encountered error while verifying model with identifier '%s': %s", identifier, err.Error())
+			err = fmt.Errorf("encountered error while verifying model with identifier '%s' at version '%s': %s", identifier, version, err.Error())
 			c.Logger().Warn(err)
 		} else {
 			return err
@@ -106,6 +117,11 @@ func (self *State) PutModel(c echo.Context) error {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
+	isCreate := r.Version == ""
+	if isCreate {
+		r.Version = "1"
+	}
+
 	err = r.verify(self, c.Logger())
 	if err != nil {
 		if _, ok := err.(ModelVerifyError); ok {
@@ -122,21 +138,45 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
+	if !isCreate {
+		query := `
+		UPDATE models
+			SET num_derivatives = num_derivatives + 1
+		WHERE
+			identifier = $1 AND version = $2
+		RETURNING
+			num_derivatives`
+
+		numDerivatives := 0
+		err = conn.QueryRow(ctx, query, r.Identifier, r.Version).Scan(&numDerivatives)
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				err = fmt.Errorf("model with identifier '%s' at version '%s' not found", r.Identifier, r.Version)
+				c.Logger().Warn(err)
+				return c.String(http.StatusNotFound, err.Error())
+			} else {
+				return err
+			}
+		}
+
+		r.Version += fmt.Sprintf(".%d", numDerivatives)
+	}
+
 	const ERR_UNIQUE_VIOLATION = "23505"
 
 	query := `
 		INSERT INTO
-			models (graph, identifier)
+			models (identifier, graph, version)
 		VALUES
-			($1, $2)
+			($1, $2, $3)
 		RETURNING
 			model_id`
 
 	var modelId int
-	err = conn.QueryRow(ctx, query, r.Graph, r.Identifier).Scan(&modelId)
+	err = conn.QueryRow(ctx, query, r.Identifier, r.Graph, r.Version).Scan(&modelId)
 	if err != nil {
 		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == ERR_UNIQUE_VIOLATION {
-			err = errors.New("encountered non-unique model identifier")
+			err = fmt.Errorf("encountered non-unique model identifier '%s' at version '%s'", r.Identifier, r.Version)
 			c.Logger().Warn(err)
 			return c.String(http.StatusBadRequest, err.Error())
 		} else {
@@ -169,7 +209,7 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	return c.NoContent(http.StatusCreated)
+	return c.JSON(http.StatusCreated, r)
 }
 
 func (self *State) SearchModel(c echo.Context) error {
@@ -183,6 +223,7 @@ func (self *State) SearchModel(c echo.Context) error {
 	query := `
 		SELECT
 			models.identifier,
+			models.version,
 			metadata.value
 		FROM
 			models
@@ -251,13 +292,14 @@ func (self *State) SearchModel(c echo.Context) error {
 
 	type SearchResult struct {
 		Identifier string `json:"identifier"`
+		Version    string `json:"version"`
 		Title      string `json:"title"`
 	}
 
-	var identifier, title string
+	var identifier, version, title string
 	var idents []SearchResult
-	_, err = pgx.ForEachRow(rows, []any{&identifier, &title}, func() error {
-		idents = append(idents, SearchResult{identifier, title})
+	_, err = pgx.ForEachRow(rows, []any{&identifier, &version, &title}, func() error {
+		idents = append(idents, SearchResult{identifier, version, title})
 		return nil
 	})
 	if err != nil {
