@@ -97,7 +97,7 @@ func VerifyIdentifier(i string) error {
 	return nil
 }
 
-var verRegexp = regexp.MustCompile(`\d(\.\d+)+`)
+var verRegexp = regexp.MustCompile(`\d(\.\d+)*`)
 
 func VerifyVersion(v string) error {
 	if v == "" {
