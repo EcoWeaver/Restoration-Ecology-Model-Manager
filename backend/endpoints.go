@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/verify"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -114,7 +115,7 @@ func (self *State) PutModel(c echo.Context) error {
 
 	err = r.verify(self, c.Logger())
 	if err != nil {
-		if _, ok := err.(ModelVerifyError); ok {
+		if _, ok := err.(verify.VerifyError); ok {
 			c.Logger().Warn(err)
 			return c.String(http.StatusBadRequest, err.Error())
 		} else {

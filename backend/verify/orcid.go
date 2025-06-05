@@ -2,6 +2,7 @@ package verify
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -11,11 +12,11 @@ var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{4}`)
 
 func Orcid(s string) error {
 	if s == "" {
-		return errors.New("no orcid provided")
+		return VerifyError{E: errors.New("no orcid provided")}
 	}
 
 	if !orcidRegexp.MatchString(s) {
-		return errors.New("not a valid orcid")
+		return VerifyError{E: fmt.Errorf("encountered invalid orcid '%s'", s)}
 	}
 
 	if !REQ {
@@ -29,7 +30,7 @@ func Orcid(s string) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return errors.New("not a registered orcid")
+		return VerifyError{E: fmt.Errorf("encountered unregistered orcid '%s'", s)}
 	}
 
 	return nil

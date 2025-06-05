@@ -10,7 +10,7 @@ import (
 
 func Species(s *string) error {
 	if *s == "" {
-		return errors.New("no species provided")
+		return VerifyError{E: errors.New("no species provided")}
 	}
 
 	if !REQ {
@@ -41,11 +41,11 @@ func Species(s *string) error {
 	}
 
 	if r.MatchType == "NONE" {
-		return errors.New("no match or multiple matches")
+		return VerifyError{E: errors.New("no match or multiple matches")}
 	}
 
 	if r.Rank != "SPECIES" {
-		return errors.New("match not a species")
+		return VerifyError{E: errors.New("match is not a species")}
 	}
 
 	*s = r.CanonicalName
