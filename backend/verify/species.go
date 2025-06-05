@@ -32,6 +32,7 @@ func Species(s *string) error {
 		MatchType     string `json:"matchType"`
 		Rank          string `json:"rank"`
 		CanonicalName string `json:"canonicalName"`
+		Status        string `json:"status"`
 	}
 
 	var r Response
@@ -40,7 +41,10 @@ func Species(s *string) error {
 		return err
 	}
 
-	if r.MatchType == "NONE" {
+	if r.Status != "ACCEPTED" {
+		return VerifyError{E: errors.New("species name is not accepted")}
+	}
+	if r.MatchType != "EXACT" {
 		return VerifyError{E: errors.New("no match or multiple matches")}
 	}
 
