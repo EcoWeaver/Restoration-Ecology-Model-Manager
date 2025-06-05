@@ -194,7 +194,8 @@
       ]
     },
     {
-      "name": "target-species"
+      "name": "target-species",
+      "type": "species"
     }
   ],
   "optional": [

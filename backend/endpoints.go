@@ -39,18 +39,7 @@ func (self *State) GetModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	identifier := c.QueryParam("identifier")
-	err := VerifyIdentifier(identifier)
-	if err != nil {
-		c.Logger().Warn(err)
-		return c.String(http.StatusBadRequest, err.Error())
-	}
-
 	version := c.QueryParam("version")
-	err = VerifyVersion(version)
-	if err != nil {
-		c.Logger().Warn(err)
-		return c.String(http.StatusBadRequest, err.Error())
-	}
 
 	conn, err := self.DbPool.Begin(ctx)
 	if err != nil {
@@ -91,15 +80,14 @@ func (self *State) GetModel(c echo.Context) error {
 	}
 
 	r := ModelRequest{identifier, graph, version, metadata}
-	err = r.verify(self, c.Logger())
-	if err != nil {
-		if _, ok := err.(ModelVerifyError); ok {
+
+	go func() {
+		err := r.verify(self, c.Logger())
+		if err != nil {
 			err = fmt.Errorf("encountered error while verifying model with identifier '%s' at version '%s': %s", identifier, version, err.Error())
 			c.Logger().Warn(err)
-		} else {
-			return err
 		}
-	}
+	}()
 
 	return c.JSON(http.StatusOK, r)
 }

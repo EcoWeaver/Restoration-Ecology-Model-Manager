@@ -1,10 +1,9 @@
 package main
 
 import (
-	"errors"
+	"backend/verify"
 	"fmt"
 	"net/url"
-	"regexp"
 	"slices"
 	"time"
 
@@ -53,12 +52,12 @@ func (self ModelVerifyError) Error() string {
 }
 
 func (self ModelRequest) verify(s *State, l echo.Logger) error {
-	err := VerifyIdentifier(self.Identifier)
+	err := verify.Doi(self.Identifier)
 	if err != nil {
 		return err
 	}
 
-	err = VerifyVersion(self.Version)
+	err = verify.Version(self.Version)
 	if err != nil {
 		return err
 	}
@@ -78,34 +77,6 @@ func (self ModelRequest) verify(s *State, l echo.Logger) error {
 		if err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
-
-func VerifyIdentifier(i string) error {
-	if i == "" {
-		return ModelVerifyError{errors.New("expected non-empty identifier")}
-	}
-
-	if !doiRegexp.MatchString(i) {
-		return ModelVerifyError{fmt.Errorf("encountered invalid identifier '%s', expected type 'doi'", i)}
-	}
-
-	return nil
-}
-
-var verRegexp = regexp.MustCompile(`\d(\.\d+)*`)
-
-func VerifyVersion(v string) error {
-	if v == "" {
-		return ModelVerifyError{errors.New("expected non-empty version")}
-	}
-
-	if !verRegexp.MatchString(v) {
-		return ModelVerifyError{fmt.Errorf("encountered invalid version '%s'", v)}
 	}
 
 	return nil
@@ -148,9 +119,7 @@ const Year = "2006"
 const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
-var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{4}`)
-
-func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
+func (self *Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 	for _, me := range slices.Concat(m.Mandatory, m.Recommended, m.Optional) {
 		if me.Name != self.Kind {
 			continue
@@ -169,14 +138,6 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 					return nil
 				}
 			}
-		case "orcid":
-			if orcidRegexp.MatchString(self.Value) {
-				return nil
-			}
-		case "url":
-			if _, err := url.ParseRequestURI(self.Value); err == nil {
-				return nil
-			}
 		case "ietf-bcp-47":
 			if _, err := language.Parse(self.Value); err == nil {
 				return nil
@@ -191,6 +152,18 @@ func (self Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 			fallthrough
 		case "year":
 			if _, err := time.Parse(Year, self.Value); err == nil {
+				return nil
+			}
+		case "url":
+			if _, err := url.ParseRequestURI(self.Value); err == nil {
+				return nil
+			}
+		case "orcid":
+			if err := verify.Orcid(self.Value); err == nil {
+				return err
+			}
+		case "species":
+			if err := verify.Species(&self.Value); err == nil {
 				return nil
 			}
 		default:

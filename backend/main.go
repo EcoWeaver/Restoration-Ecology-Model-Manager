@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/verify"
 	"context"
 	"os"
 
@@ -16,17 +17,6 @@ func main() {
 	ctx := context.Background()
 	e := echo.New()
 
-	err := godotenv.Load()
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
-
-	dbPool, err := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
-	defer dbPool.Close()
-
 	e.Logger.SetLevel(log.WARN)
 	e.Logger.SetHeader("${time_rfc3339}")
 
@@ -38,6 +28,21 @@ func main() {
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
+
+	err := godotenv.Load()
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+
+	if os.Getenv("REMMA_NO_VERIFY_REQ") == "yes" {
+		verify.REQ = false
+	}
+
+	dbPool, err := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+	defer dbPool.Close()
 
 	state := State{DbPool: dbPool}
 
