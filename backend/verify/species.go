@@ -44,7 +44,7 @@ func Species(s *string) error {
 	if r.Status != "ACCEPTED" {
 		return VerifyError{E: errors.New("species name is not accepted")}
 	}
-	if r.MatchType != "EXACT" {
+	if r.MatchType != "EXACT" && r.MatchType != "FUZZY" {
 		return VerifyError{E: errors.New("no match or multiple matches")}
 	}
 
