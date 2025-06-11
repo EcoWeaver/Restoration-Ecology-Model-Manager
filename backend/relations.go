@@ -46,7 +46,6 @@ func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
 	}
 
 	e := map[string]struct{}{}
-
 	for _, s := range []*[]string{&r.Causal, &r.Noncausal} {
 		*s = slices.DeleteFunc(*s, func(re string) bool {
 			_, ok := e[re]

@@ -172,7 +172,7 @@ func (self *State) PutModel(c echo.Context) error {
 			`
 
 	args := []any{modelId}
-	ins := []string{}
+	var ins []string
 	for _, me := range r.Metadata {
 		args = append(args, me.Kind, me.Value)
 		ins = append(ins, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
@@ -221,7 +221,7 @@ func (self *State) GetSearch(c echo.Context) error {
 	var args []any
 	params := c.QueryParams()
 	if len(params) != 0 {
-		conds := []string{}
+		var conds []string
 		for k, v := range params {
 			if !metadata.IsMetadataKind(k) {
 				err = fmt.Errorf("encountered invalid metadata kind '%s'", k)
@@ -232,7 +232,7 @@ func (self *State) GetSearch(c echo.Context) error {
 			args = append(args, k)
 			conj := fmt.Sprintf("(metadata.kind = $%d AND (", len(args))
 
-			disj := []string{}
+			var disj []string
 			for _, ve := range v {
 				args = append(args, "%"+ve+"%")
 				disj = append(disj, fmt.Sprintf("metadata.value ILIKE $%d", len(args)))
