@@ -54,8 +54,7 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 	}
 
 	var m MetadataConfig
-	err = json.Unmarshal(data, &m)
-	if err != nil {
+	if err = json.Unmarshal(data, &m); err != nil {
 		return MetadataConfig{}, err
 	}
 
@@ -63,13 +62,18 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 
 	for _, s := range []*[]MetadataEntry{&m.Mandatory, &m.Recommended, &m.Optional} {
 		*s = slices.DeleteFunc(*s, func(me MetadataEntry) bool {
+			if err != nil {
+				return false
+			}
+			err = me.verify(l)
+			if err != nil {
+				return false
+			}
+
 			_, ok := e[me.Name]
 			e[me.Name] = struct{}{}
 			if ok {
 				l.Warnf("ignoring duplicate relation kind '%s'", me)
-			}
-			if err == nil {
-				err = me.verify(l)
 			}
 			return ok
 		})

@@ -46,18 +46,15 @@ type Point struct {
 }
 
 func (self *ModelRequest) verify(s *State, l echo.Logger) error {
-	err := verify.Doi(self.Identifier)
-	if err != nil {
+	if err := verify.Doi(self.Identifier); err != nil {
 		return err
 	}
 
-	err = verify.Version(self.Version)
-	if err != nil {
+	if err := verify.Version(self.Version); err != nil {
 		return err
 	}
 
-	err = self.Graph.verify(s, l)
-	if err != nil {
+	if err := self.Graph.verify(s, l); err != nil {
 		return err
 	}
 
@@ -67,8 +64,7 @@ func (self *ModelRequest) verify(s *State, l echo.Logger) error {
 	}
 
 	for _, me := range self.Metadata {
-		err = me.verify(&m, l)
-		if err != nil {
+		if err = me.verify(&m, l); err != nil {
 			return err
 		}
 	}
@@ -100,8 +96,7 @@ func (self Graph) verify(s *State, l echo.Logger) error {
 			return verify.VerifyError{E: fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)}
 		}
 		relations[pair] = struct{}{}
-		err := relation.verify(&r)
-		if err != nil {
+		if err := relation.verify(&r); err != nil {
 			return err
 		}
 	}

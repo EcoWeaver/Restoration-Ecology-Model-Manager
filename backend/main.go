@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
 	e := echo.New()
 
 	e.Logger.SetLevel(log.WARN)
@@ -29,8 +28,7 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 
-	err := godotenv.Load()
-	if err != nil {
+	if err := godotenv.Load(); err != nil {
 		e.Logger.Fatal(err)
 	}
 
@@ -38,7 +36,7 @@ func main() {
 		verify.REQ = false
 	}
 
-	dbPool, err := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
+	dbPool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
@@ -54,8 +52,7 @@ func main() {
 
 	e.GET("/search", state.SearchModel)
 
-	err = e.Start(":8080")
-	if err != nil {
+	if err = e.Start(":8080"); err != nil {
 		e.Logger.Fatal(err)
 	}
 }

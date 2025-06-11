@@ -29,21 +29,21 @@ func Species(s *string) error {
 	}
 
 	type Response struct {
+		Status        string `json:"status"`
 		MatchType     string `json:"matchType"`
 		Rank          string `json:"rank"`
 		CanonicalName string `json:"canonicalName"`
-		Status        string `json:"status"`
 	}
 
 	var r Response
-	err = json.Unmarshal(body, &r)
-	if err != nil {
+	if err = json.Unmarshal(body, &r); err != nil {
 		return err
 	}
 
-	if r.Status != "ACCEPTED" {
+	if r.Status != "ACCEPTED" && r.Status != "SYNONYM" && r.Status != "HOMOTYPIC_SYNONYM" {
 		return VerifyError{E: errors.New("species name is not accepted")}
 	}
+
 	if r.MatchType != "EXACT" && r.MatchType != "FUZZY" {
 		return VerifyError{E: errors.New("no match or multiple matches")}
 	}

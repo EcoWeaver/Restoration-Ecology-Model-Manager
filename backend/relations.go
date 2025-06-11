@@ -41,8 +41,7 @@ func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
 	}
 
 	var r RelationsConfig
-	err = json.Unmarshal(data, &r)
-	if err != nil {
+	if err = json.Unmarshal(data, &r); err != nil {
 		return RelationsConfig{}, err
 	}
 

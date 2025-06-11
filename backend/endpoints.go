@@ -64,8 +64,7 @@ func (self *State) GetModel(c echo.Context) error {
 
 	var graph Graph
 	var metadata []Metadata
-	err = conn.QueryRow(ctx, query, identifier, version).Scan(&graph, &metadata)
-	if err != nil {
+	if err = conn.QueryRow(ctx, query, identifier, version).Scan(&graph, &metadata); err != nil {
 		if err == pgx.ErrNoRows {
 			err = fmt.Errorf("model with identifier '%s' at version '%s' not found", identifier, version)
 			c.Logger().Warn(err)
@@ -75,18 +74,15 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}
 
-	err = conn.Commit(ctx)
-	if err != nil {
+	if err = conn.Commit(ctx); err != nil {
 		return err
 	}
 
 	r := ModelRequest{identifier, graph, version, metadata}
 
 	go func() {
-		err := r.verify(self, c.Logger())
-		if err != nil {
-			err = fmt.Errorf("encountered error while verifying model with identifier '%s' at version '%s': %s", identifier, version, err.Error())
-			c.Logger().Warn(err)
+		if err := r.verify(self, c.Logger()); err != nil {
+			c.Logger().Warn(fmt.Sprintf("encountered error while verifying model with identifier '%s' at version '%s': %s", identifier, version, err))
 		}
 	}()
 
@@ -102,19 +98,17 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 
 	var r ModelRequest
-	err = json.Unmarshal(body, &r)
-	if err != nil {
+	if err = json.Unmarshal(body, &r); err != nil {
 		c.Logger().Warn(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	isCreate := r.Version == ""
-	if isCreate {
+	isDerivative := r.Version != ""
+	if !isDerivative {
 		r.Version = "1"
 	}
 
-	err = r.verify(self, c.Logger())
-	if err != nil {
+	if err = r.verify(self, c.Logger()); err != nil {
 		if _, ok := err.(verify.VerifyError); ok {
 			c.Logger().Warn(err)
 			return c.String(http.StatusBadRequest, err.Error())
@@ -129,7 +123,7 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	if !isCreate {
+	if isDerivative {
 		query := `
 		UPDATE models
 			SET num_derivatives = num_derivatives + 1
@@ -138,9 +132,8 @@ func (self *State) PutModel(c echo.Context) error {
 		RETURNING
 			num_derivatives`
 
-		numDerivatives := 0
-		err = conn.QueryRow(ctx, query, r.Identifier, r.Version).Scan(&numDerivatives)
-		if err != nil {
+		var numDerivatives int
+		if err = conn.QueryRow(ctx, query, r.Identifier, r.Version).Scan(&numDerivatives); err != nil {
 			if err == pgx.ErrNoRows {
 				err = fmt.Errorf("model with identifier '%s' at version '%s' not found", r.Identifier, r.Version)
 				c.Logger().Warn(err)
@@ -164,8 +157,7 @@ func (self *State) PutModel(c echo.Context) error {
 			model_id`
 
 	var modelId int
-	err = conn.QueryRow(ctx, query, r.Identifier, r.Graph, r.Version).Scan(&modelId)
-	if err != nil {
+	if err = conn.QueryRow(ctx, query, r.Identifier, r.Graph, r.Version).Scan(&modelId); err != nil {
 		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == ERR_UNIQUE_VIOLATION {
 			err = fmt.Errorf("encountered non-unique model identifier '%s' at version '%s'", r.Identifier, r.Version)
 			c.Logger().Warn(err)
@@ -190,13 +182,11 @@ func (self *State) PutModel(c echo.Context) error {
 	query += strings.Join(ins, `,
 			`)
 
-	_, err = conn.Exec(ctx, query, args...)
-	if err != nil {
+	if _, err = conn.Exec(ctx, query, args...); err != nil {
 		return err
 	}
 
-	err = conn.Commit(ctx)
-	if err != nil {
+	if err = conn.Commit(ctx); err != nil {
 		return err
 	}
 
@@ -297,8 +287,7 @@ func (self *State) SearchModel(c echo.Context) error {
 		return err
 	}
 
-	err = conn.Commit(ctx)
-	if err != nil {
+	if err = conn.Commit(ctx); err != nil {
 		return err
 	}
 
