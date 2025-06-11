@@ -217,8 +217,8 @@ func (self *State) GetSearch(c echo.Context) error {
 			JOIN metadata ON models.model_id = metadata.model_id
 		WHERE
 			metadata.kind = 'title'`
-	var args []any
 
+	var args []any
 	params := c.QueryParams()
 	if len(params) != 0 {
 		conds := []string{}

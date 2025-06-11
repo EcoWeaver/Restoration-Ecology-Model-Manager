@@ -69,7 +69,6 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 			if err != nil {
 				return false
 			}
-
 			_, ok := e[me.Name]
 			e[me.Name] = struct{}{}
 			if ok {
@@ -89,14 +88,9 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 }
 
 func (self *MetadataEntry) verify(l echo.Logger) error {
-	// type "choice" needs choices
-	// type "" can have choices
-	// all other types can't have choices
-
 	if len(self.Choices) != 0 {
 		if self.Type == "" || self.Type == "choice" {
 			e := map[string]struct{}{}
-
 			self.Choices = slices.DeleteFunc(self.Choices, func(ce Choice) bool {
 				_, ok := e[ce.Label]
 				e[ce.Label] = struct{}{}

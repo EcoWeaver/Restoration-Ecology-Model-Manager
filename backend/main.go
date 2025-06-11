@@ -32,9 +32,7 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 
-	if os.Getenv("REMMA_NO_VERIFY_REQ") == "yes" {
-		verify.REQ = false
-	}
+	verify.REQ = os.Getenv("REMMA_NO_VERIFY_REQ") != "yes"
 
 	dbPool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
