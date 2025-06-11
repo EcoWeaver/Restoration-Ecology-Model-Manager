@@ -3,6 +3,7 @@
 	import YearInput from "./metadata-panel/YearInput.svelte";
 	import DateInput from "./metadata-panel/DateInput.svelte";
 	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
+	import Input from "./metadata-panel/Input.svelte";
 
 	let {
 		elements,
@@ -44,16 +45,16 @@
 
 <h2 class="text-lg">Metadata</h2>
 
-<div class="table border-collapse p-2">
+<div class="table">
 	<div class="mb-2 table-row">
-		<span class="table-cell p-2 pl-0 font-bold">kind</span>
-		<span class="table-cell p-2 font-bold">value</span>
+		<span class="table-cell py-2 pr-2 font-bold">kind</span>
+		<span class="table-cell py-2 pl-2 font-bold">value</span>
 	</div>
 
 	<div class="table-row">
-		<span class="table-cell pr-2">identifier</span>
-		<span class="table-cell pl-2">
-			<input class="h-6 w-full outline" placeholder="doi" bind:value={identifier} />
+		<span class="table-cell py-1 pr-2">identifier</span>
+		<span class="table-cell py-1 pl-2">
+			<Input placeholder="doi" bind:value={identifier} />
 		</span>
 	</div>
 
@@ -62,9 +63,9 @@
 
 		<div class="table-row">
 			{#if m.mandatory}
-				<span class="table-cell pr-2">{m.kind}</span>
+				<span class="table-cell py-1 pr-2">{m.kind}</span>
 			{:else}
-				<select bind:value={m.kind} class="table-cell field-sizing-content pr-2">
+				<select bind:value={m.kind} class="table-cell field-sizing-content py-1 pr-2">
 					<option class="hidden" value="" disabled selected>-- select a kind --</option>
 					{#each Object.entries(elements) as [type, values]}
 						<optgroup label={type}>
@@ -76,18 +77,18 @@
 				</select>
 			{/if}
 
-			<span class="table-cell pl-2">
+			<span class="table-cell py-1 pl-2">
 				{#if m.kind === ""}
-					<input class="h-6 w-full outline" disabled placeholder="please select a metadata kind" />
+					<Input value="" disabled placeholder="please select a metadata kind" />
 				{:else if type == "choice"}
 					<select
 						required
-						class="picker-icon:text-black h-6 w-full outline outline-black"
+						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 outline-black"
 						bind:value={m.value}
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>
 						{#each choices! as choice}
-							<option value={choice}>{choice}</option>
+							<option class="cursor-pointer" value={choice}>{choice}</option>
 						{/each}
 					</select>
 				{:else if type === "date"}
@@ -95,22 +96,22 @@
 				{:else if type === "orcid"}
 					<OrcidInput bind:value={m.value} />
 				{:else if type == "url"}
-					<input placeholder={type} class="h-6 w-full outline" bind:value={m.value} type="url" />
+					<Input placeholder={type} bind:value={m.value} type="url" />
 				{:else if type === "year"}
 					<YearInput {type} bind:value={m.value} />
 				{:else}
-					<input placeholder={type || m.kind} class="h-6 w-full outline" bind:value={m.value} />
+					<Input placeholder={type || m.kind} bind:value={m.value} />
 				{/if}
 			</span>
 			{#if !m.mandatory}
 				<button
 					onclick={() => meta.splice(i, 1)}
-					class="cursor-pointer pl-2 font-bold text-red-500"
+					class="-mr-4 w-4 cursor-pointer text-right font-bold text-red-500"
 				>
 					x
 				</button>
 			{:else}
-				<button class="invisible pl-2 font-bold">x</button>
+				<button class="invisible -mr-4 w-4 text-right font-bold">x</button>
 			{/if}
 		</div>
 	{/each}

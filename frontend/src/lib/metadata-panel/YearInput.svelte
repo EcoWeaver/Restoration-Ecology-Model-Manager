@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Input from "./Input.svelte";
+
 	let { type, value = $bindable() }: { type: string; value: string } = $props();
 
 	function set(v: string) {
@@ -8,4 +10,4 @@
 	}
 </script>
 
-<input placeholder={type} class="h-6 w-full outline" bind:value={() => value, set} type="text" />
+<Input placeholder={type} bind:value={() => value, set} type="text" />

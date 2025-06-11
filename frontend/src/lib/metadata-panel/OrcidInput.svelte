@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Input from "./Input.svelte";
+
 	let { value = $bindable() }: { value: string } = $props();
 
 	function set(v: string) {
@@ -25,4 +27,4 @@
 	}
 </script>
 
-<input placeholder="orcid" class="h-6 w-full outline" bind:value={() => value, set} type="text" />
+<Input placeholder="orcid" bind:value={() => value, set} type="text" />
