@@ -115,15 +115,13 @@ func (self *Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 		} else {
 			return verify.VerifyError{E: fmt.Errorf("encountered unset metadata kind with value '%s'", self.Value)}
 		}
+	} else if self.Value == "" {
+		return verify.VerifyError{E: fmt.Errorf("encountered unset value of metadata kind '%s'", self.Kind)}
 	}
 
 	for _, me := range slices.Concat(m.Mandatory, m.Recommended, m.Optional) {
 		if me.Name != self.Kind {
 			continue
-		}
-
-		if self.Value == "" {
-			return verify.VerifyError{E: fmt.Errorf("encountered unset value of metadata kind '%s', expected type '%s'", self.Kind, me.Type)}
 		}
 
 		switch me.Type {
