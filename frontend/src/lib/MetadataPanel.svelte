@@ -33,6 +33,10 @@
 		})),
 	);
 
+	export function addMetadata() {
+		meta.push({ mandatory: false, kind: "title", value: "" });
+	}
+
 	$effect(() => {
 		metadata = meta.map(({ kind, value }) => ({ kind, value }));
 	});
@@ -107,13 +111,4 @@
 			{/if}
 		</div>
 	{/each}
-
-	<div class="table-caption caption-bottom">
-		<div class="flex w-full justify-center">
-			<button
-				onclick={() => meta.push({ mandatory: false, kind: "title", value: "" })}
-				class="cursor-pointer px-4 py-2 text-center font-bold">+ add metadata</button
-			>
-		</div>
-	</div>
 </div>

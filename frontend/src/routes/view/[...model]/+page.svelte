@@ -2,6 +2,7 @@
 	import Graph from "$lib/Graph.svelte";
 	import type { Node } from "$lib/graph/NodeComponent.svelte";
 	import type { Edge } from "$lib/graph/EdgeComponent.svelte";
+	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 
 	let { data } = $props();
 	let { model } = $derived(data);
@@ -31,24 +32,26 @@
 <div class="h-dvh w-dvw">
 	<Graph {nodes} {edges} interactive={false}>
 		{#snippet panel()}
-			<div class="table">
-				<div class="table-row">
-					<div class="table-cell text-center font-bold">kind</div>
-					<div class="table-cell text-center font-bold">value</div>
-				</div>
-				<div class="table-row">
-					<div class="table-cell">identifier</div>
-					<a class="text-blue-700 hover:underline" href={`https://doi.org/${model.identifier}`}>
-						{model.identifier}
-					</a>
-				</div>
-				{#each model.metadata as { kind, value }}
+			<PanelComponent>
+				<div class="table">
 					<div class="table-row">
-						<div class="table-cell">{kind}</div>
-						<div class="table-cell max-w-128">{value}</div>
+						<div class="table-cell text-center font-bold">kind</div>
+						<div class="table-cell text-center font-bold">value</div>
 					</div>
-				{/each}
-			</div>
+					<div class="table-row">
+						<div class="table-cell">identifier</div>
+						<a class="text-blue-700 hover:underline" href={`https://doi.org/${model.identifier}`}>
+							{model.identifier}
+						</a>
+					</div>
+					{#each model.metadata as { kind, value }}
+						<div class="table-row">
+							<div class="table-cell">{kind}</div>
+							<div class="table-cell max-w-128">{value}</div>
+						</div>
+					{/each}
+				</div>
+			</PanelComponent>
 		{/snippet}
 	</Graph>
 </div>

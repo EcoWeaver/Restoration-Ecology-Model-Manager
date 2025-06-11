@@ -13,6 +13,7 @@
 		type Metadata,
 		type ModelRequest,
 	} from "$lib/api";
+	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 
 	let { data }: PageProps = $props();
 	let { metadataElements } = data;
@@ -75,6 +76,8 @@
 		};
 		nodes = [...nodes, node];
 	}
+
+	let metadataPanel: ReturnType<typeof MetadataPanel>;
 </script>
 
 {#if error}
@@ -118,7 +121,14 @@
 		{/snippet}
 
 		{#snippet panel()}
-			<MetadataPanel elements={metadataElements} bind:identifier bind:metadata />
+			<PanelComponent onmetadata={() => metadataPanel.addMetadata()}>
+				<MetadataPanel
+					bind:this={metadataPanel}
+					elements={metadataElements}
+					bind:identifier
+					bind:metadata
+				/>
+			</PanelComponent>
 		{/snippet}
 	</Graph>
 </div>

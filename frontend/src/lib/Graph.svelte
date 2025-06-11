@@ -41,9 +41,7 @@
 	{/if}
 
 	<Panel position="bottom-right">
-		<PanelComponent>
-			{@render panel()}
-		</PanelComponent>
+		{@render panel()}
 	</Panel>
 
 	<Background variant={BackgroundVariant.Dots} />
