@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { type Snippet } from "svelte";
+	import { GanttChartSquare, PlusIcon } from "@lucide/svelte";
+	import { slide } from "svelte/transition";
 
 	let { children, onmetadata }: { children: Snippet; onmetadata?: () => any } = $props();
 	let show = $state(true);
@@ -7,26 +9,30 @@
 
 {#if show}
 	<div
+		transition:slide={{ duration: 100 }}
 		class="m-3 mb-2 max-h-[55vh] overflow-y-auto rounded-xl bg-neutral-200/60 px-8 py-6 backdrop-blur-sm"
 	>
 		{@render children()}
 	</div>
 {/if}
 
-<div class="flex h-8 w-full flex-row-reverse gap-2 px-3">
+<div class="flex h-10 w-full flex-row-reverse gap-2 px-3">
 	<button
+		title="toggle metadata"
 		onclick={() => (show = !show)}
-		class="cursor right-0 block cursor-pointer rounded-md bg-neutral-200 p-3 py-1 hover:bg-neutral-300"
+		class:bg-neutral-300={show}
+		class="cursor right-0 block cursor-pointer rounded-4xl bg-neutral-200 p-2 hover:bg-neutral-300"
 	>
-		{show ? "hide" : "show metadata"}
+		<GanttChartSquare />
 	</button>
 
 	{#if onmetadata && show}
 		<button
+			transition:slide={{ duration: 100, axis: "x" }}
 			onclick={onmetadata}
-			class="cursor right-0 block cursor-pointer rounded-md bg-neutral-200 p-3 py-1 hover:bg-neutral-300"
+			class="cursor right-0 flex cursor-pointer items-center gap-1 rounded-4xl bg-neutral-200 px-4 py-1 text-nowrap hover:bg-neutral-300"
 		>
-			+ add metadata
+			<PlusIcon class="inline size-5.5" /> add metadata
 		</button>
 	{/if}
 </div>
