@@ -109,6 +109,14 @@ const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
 func (self *Metadata) verify(m *MetadataConfig, l echo.Logger) error {
+	if self.Kind == "" {
+		if self.Value == "" {
+			return verify.VerifyError{E: fmt.Errorf("encountered unset metadata kind with unset value")}
+		} else {
+			return verify.VerifyError{E: fmt.Errorf("encountered unset metadata kind with value '%s'", self.Value)}
+		}
+	}
+
 	for _, me := range slices.Concat(m.Mandatory, m.Recommended, m.Optional) {
 		if me.Name != self.Kind {
 			continue
