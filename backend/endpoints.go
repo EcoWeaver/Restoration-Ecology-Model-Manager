@@ -20,12 +20,10 @@ type State struct {
 	Relations LiveRelationsConfig
 }
 
-func (self *State) GetRelations(c echo.Context) error {
-	relations, err := self.Relations.Get(c.Logger())
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, relations)
+type SearchResult struct {
+	Identifier string `json:"identifier"`
+	Version    string `json:"version"`
+	Title      string `json:"title"`
 }
 
 func (self *State) GetMetadata(c echo.Context) error {
@@ -42,12 +40,6 @@ func (self *State) GetModel(c echo.Context) error {
 	identifier := c.QueryParam("identifier")
 	version := c.QueryParam("version")
 
-	conn, err := self.DbPool.Begin(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Rollback(ctx)
-
 	query := `
 		SELECT
 			models.graph,
@@ -61,6 +53,12 @@ func (self *State) GetModel(c echo.Context) error {
 			models.identifier = $1 AND models.version = $2
 		GROUP BY
 			models.graph`
+
+	conn, err := self.DbPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Rollback(ctx)
 
 	var graph Graph
 	var metadata []Metadata
@@ -193,7 +191,15 @@ func (self *State) PutModel(c echo.Context) error {
 	return c.JSON(http.StatusCreated, r)
 }
 
-func (self *State) SearchModel(c echo.Context) error {
+func (self *State) GetRelations(c echo.Context) error {
+	relations, err := self.Relations.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, relations)
+}
+
+func (self *State) GetSearch(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	metadata, err := self.Metadata.Get(c.Logger())
@@ -271,15 +277,52 @@ func (self *State) SearchModel(c echo.Context) error {
 		return err
 	}
 
-	type SearchResult struct {
-		Identifier string `json:"identifier"`
-		Version    string `json:"version"`
-		Title      string `json:"title"`
-	}
-
 	var identifier, version, title string
 	var idents []SearchResult
 	_, err = pgx.ForEachRow(rows, []any{&identifier, &version, &title}, func() error {
+		idents = append(idents, SearchResult{identifier, version, title})
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if err = conn.Commit(ctx); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, idents)
+}
+
+func (self *State) GetVersions(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	identifier := c.QueryParam("identifier")
+
+	query := `
+		SELECT
+			models.version,
+			metadata.value
+		FROM
+			models
+			JOIN metadata ON models.model_id = metadata.model_id
+		WHERE
+			models.identifier = $1 AND metadata.kind = 'title'`
+
+	conn, err := self.DbPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Rollback(ctx)
+
+	rows, err := conn.Query(ctx, query, identifier)
+	if err != nil {
+		return err
+	}
+
+	var version, title string
+	var idents []SearchResult
+	_, err = pgx.ForEachRow(rows, []any{&version, &title}, func() error {
 		idents = append(idents, SearchResult{identifier, version, title})
 		return nil
 	})
