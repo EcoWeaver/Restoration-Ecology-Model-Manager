@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import type { Snippet } from "svelte";
 	import { metadataElements } from "./api";
 	import Chip, { type ChipElement } from "./search/Chip.svelte";
 	import Input from "./search/Input.svelte";
+	import SearchButton from "./search/Button.svelte";
 
-	let {
-		params = [],
-		button,
-	}: { params?: ChipElement[]; button: Snippet<[{ onclick: () => any }]> } = $props();
+	let { params = [] }: { params?: ChipElement[] } = $props();
 
 	const elements = metadataElements.then((e) =>
 		Object.values(e)
@@ -173,4 +170,4 @@
 	{/if}
 </div>
 
-{@render button({ onclick: submit })}
+<SearchButton onclick={submit} />

@@ -6,7 +6,7 @@
 </script>
 
 <div class="flex">
-	<Search {params} {identifier} selected={identifier != null ? "ident" : "meta"} />
+	<Search {params} {identifier} selectedSearch={identifier != null ? "ident" : "meta"} />
 
 	<a
 		href="/editor"

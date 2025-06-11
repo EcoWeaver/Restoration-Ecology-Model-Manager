@@ -1,14 +1,13 @@
 <script lang="ts">
-	import type { Snippet } from "svelte";
-	import Input from "./search/Input.svelte";
 	import { goto } from "$app/navigation";
+	import Input from "./search/Input.svelte";
+	import SearchButton from "./search/Button.svelte";
 
-	let { value, button }: { value: string; button: Snippet<[{ onclick: () => any }]> } = $props();
-	$inspect(value);
+	let { identifier }: { identifier: string } = $props();
 
 	async function submit() {
 		let query = new URLSearchParams();
-		query.set("identifier", value);
+		query.set("identifier", identifier);
 		await goto(`/versions?${query}`);
 	}
 
@@ -20,7 +19,7 @@
 </script>
 
 <div class="p-4">
-	<Input placeholder="search identifier" bind:value {onkeydown} />
+	<Input placeholder="search identifier" bind:value={identifier} {onkeydown} />
 </div>
 
-{@render button({ onclick: submit })}
+<SearchButton onclick={submit} />
