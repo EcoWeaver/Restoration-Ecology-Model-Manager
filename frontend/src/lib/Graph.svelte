@@ -2,8 +2,8 @@
 	import type { Snippet } from "svelte";
 	import { Background, BackgroundVariant, Panel, SvelteFlow, type OnConnect } from "@xyflow/svelte";
 	import "@xyflow/svelte/dist/style.css";
-	import NodeComponent, { type Node } from "./model/NodeComponent.svelte";
-	import EdgeComponent, { type Edge } from "./model/EdgeComponent.svelte";
+	import NodeComponent, { type Node } from "./graph/NodeComponent.svelte";
+	import EdgeComponent, { type Edge } from "./graph/EdgeComponent.svelte";
 
 	let {
 		interactive,

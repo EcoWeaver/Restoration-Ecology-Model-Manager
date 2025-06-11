@@ -2,11 +2,12 @@
 	import Search from "./Search.svelte";
 	import type { ChipElement } from "./search/Chip.svelte";
 
-	let { params }: { params?: ChipElement[] } = $props();
+	let { params, identifier }: { params?: ChipElement[]; identifier?: string } = $props();
 </script>
 
 <div class="flex">
-	<Search {params} />
+	<Search {params} {identifier} selected={identifier != null ? "ident" : "meta"} />
+
 	<a
 		href="/editor"
 		class="m-4 ml-0 flex h-10 place-items-center rounded bg-indigo-300 px-4 hover:bg-indigo-400"

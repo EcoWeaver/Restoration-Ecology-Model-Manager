@@ -27,7 +27,7 @@ export function putModel(model: ModelRequest): Promise<ModelRequest> {
 
 export type ModelRequest = {
 	identifier: string;
-	version: string,
+	version: string;
 	graph: Graph;
 	metadata: Metadata[];
 };
@@ -72,4 +72,10 @@ export type RelationElement = string;
 export type Point = {
 	x: number;
 	y: number;
+};
+
+export type SearchItem = {
+	identifier: string;
+	version: string;
+	title: string;
 };
