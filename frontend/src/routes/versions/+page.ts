@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
 		return error(res.status, await res.text());
 	}
 
-	const items: SearchItem[] = await res.json();
+	const items: SearchItem[] = await res.json() ?? [];
 	const identifier = url.searchParams.get("identifier") || "";
 	return { items, identifier };
 };
