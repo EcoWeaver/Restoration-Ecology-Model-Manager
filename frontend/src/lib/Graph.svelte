@@ -4,6 +4,7 @@
 	import "@xyflow/svelte/dist/style.css";
 	import NodeComponent, { type Node } from "./graph/NodeComponent.svelte";
 	import EdgeComponent, { type Edge } from "./graph/EdgeComponent.svelte";
+	import PanelComponent from "./graph/PanelComponent.svelte";
 
 	let {
 		interactive,
@@ -40,11 +41,9 @@
 	{/if}
 
 	<Panel position="bottom-right">
-		<div
-			class="bottom-0 m-3 max-h-[55vh] overflow-y-scroll rounded-xl bg-neutral-200/60 px-8 py-4 backdrop-blur-sm"
-		>
+		<PanelComponent>
 			{@render panel()}
-		</div>
+		</PanelComponent>
 	</Panel>
 
 	<Background variant={BackgroundVariant.Dots} />
