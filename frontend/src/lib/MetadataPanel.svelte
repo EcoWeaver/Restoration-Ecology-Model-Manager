@@ -34,7 +34,7 @@
 	);
 
 	export function addMetadata() {
-		meta.push({ mandatory: false, kind: "title", value: "" });
+		meta.push({ mandatory: false, kind: "", value: "" });
 	}
 
 	$effect(() => {
@@ -58,13 +58,14 @@
 	</div>
 
 	{#each meta as m, i (m)}
-		{@const { type, choices } = flatMetadata.get(m.kind)!}
+		{@const { type, choices } = flatMetadata.get(m.kind) || {}}
 
 		<div class="table-row">
 			{#if m.mandatory}
 				<span class="table-cell pr-2">{m.kind}</span>
 			{:else}
 				<select bind:value={m.kind} class="table-cell field-sizing-content pr-2">
+					<option class="hidden" value="" disabled selected>-- select a kind --</option>
 					{#each Object.entries(elements) as [type, values]}
 						<optgroup label={type}>
 							{#each values as { name: kind }}
@@ -76,7 +77,9 @@
 			{/if}
 
 			<span class="table-cell pl-2">
-				{#if type == "choice"}
+				{#if m.kind === ""}
+					<input class="h-6 w-full outline" disabled placeholder="please select a metadata kind" />
+				{:else if type == "choice"}
 					<select
 						required
 						class="picker-icon:text-black h-6 w-full outline outline-black"
