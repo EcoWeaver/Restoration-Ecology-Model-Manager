@@ -39,8 +39,12 @@
 		</Panel>
 	{/if}
 
-	<Panel position="top-right">
-		{@render panel()}
+	<Panel position="bottom-right">
+		<div
+			class="bottom-0 m-3 max-h-[55vh] overflow-y-scroll rounded-xl bg-neutral-200/60 px-8 py-4 backdrop-blur-sm"
+		>
+			{@render panel()}
+		</div>
 	</Panel>
 
 	<Background variant={BackgroundVariant.Dots} />
