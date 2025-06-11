@@ -35,19 +35,22 @@
 			<PanelComponent>
 				<div class="table">
 					<div class="table-row">
-						<div class="table-cell text-center font-bold">kind</div>
-						<div class="table-cell text-center font-bold">value</div>
+						<div class="table-cell pr-2 pb-1 font-bold">kind</div>
+						<div class="table-cell pb-1 pl-2 font-bold">value</div>
 					</div>
 					<div class="table-row">
-						<div class="table-cell">identifier</div>
-						<a class="text-blue-700 hover:underline" href={`https://doi.org/${model.identifier}`}>
+						<div class="table-cell pr-2">identifier</div>
+						<a
+							class="pl-2 text-blue-700 hover:underline"
+							href={`https://doi.org/${model.identifier}`}
+						>
 							{model.identifier}
 						</a>
 					</div>
 					{#each model.metadata as { kind, value }}
 						<div class="table-row">
-							<div class="table-cell">{kind}</div>
-							<div class="table-cell max-w-128">{value}</div>
+							<div class="table-cell pr-2">{kind}</div>
+							<div class="table-cell max-w-128 pl-2">{value}</div>
 						</div>
 					{/each}
 				</div>

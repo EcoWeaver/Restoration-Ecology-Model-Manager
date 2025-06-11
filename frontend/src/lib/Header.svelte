@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Home } from "@lucide/svelte";
 	import Search from "./Search.svelte";
 	import type { ChipElement } from "./search/Chip.svelte";
 
@@ -6,6 +7,10 @@
 </script>
 
 <div class="flex">
+	<a class="m-4 mr-0" title="home" href="/">
+		<Home class="size-10" />
+	</a>
+
 	<Search {params} {identifier} selectedSearch={identifier != null ? "ident" : "meta"} />
 
 	<a
