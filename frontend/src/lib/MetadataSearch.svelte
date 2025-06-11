@@ -111,7 +111,7 @@
 	});
 </script>
 
-<div class="p-4">
+<div class="grow py-4">
 	<Input
 		placeholder={chips.length === 0 && !chip ? "search metadata" : undefined}
 		bind:value={input}

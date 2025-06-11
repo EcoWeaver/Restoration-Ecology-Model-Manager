@@ -4,7 +4,7 @@
 
 <button
 	{onclick}
-	class="m-4 ml-0 flex h-10 cursor-pointer place-items-center rounded bg-indigo-300 px-4 hover:bg-indigo-400"
+	class="m-4 ml-0 flex h-10 cursor-pointer place-items-center rounded-r-md border border-l-0 border-neutral-600 px-4 hover:bg-neutral-200"
 >
 	<span class="font-medium">search</span>
 </button>

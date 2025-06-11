@@ -10,7 +10,7 @@
 
 	<a
 		href="/editor"
-		class="m-4 ml-0 flex h-10 place-items-center rounded bg-indigo-300 px-4 hover:bg-indigo-400"
+		class="m-4 ml-0 flex h-10 place-items-center rounded-md bg-indigo-300 px-4 hover:bg-indigo-400"
 	>
 		<span class="font-medium">+ create model</span>
 	</a>
