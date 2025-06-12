@@ -11,6 +11,6 @@
 	{disabled}
 	{placeholder}
 	bind:value
-	class="h-8 w-full rounded border border-neutral-600 pr-2 pl-3"
+	class="h-8 w-full rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-within:outline-2"
 	{type}
 />

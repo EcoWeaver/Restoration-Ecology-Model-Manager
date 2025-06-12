@@ -22,7 +22,7 @@
 </script>
 
 <span
-	class="flex h-10 overflow-y-scroll border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
+	class="relative z-10 flex h-10 overflow-y-scroll border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
 >
 	{@render children?.()}
 

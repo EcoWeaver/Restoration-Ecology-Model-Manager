@@ -6,7 +6,7 @@
 	let { params, identifier }: { params?: ChipElement[]; identifier?: string } = $props();
 </script>
 
-<div class="flex">
+<div class="flex" role="navigation">
 	<a class="m-4 mr-0 pt-1 pb-1" title="home" href="/">
 		<House class="size-8" />
 	</a>

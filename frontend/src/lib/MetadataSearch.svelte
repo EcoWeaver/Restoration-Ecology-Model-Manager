@@ -139,6 +139,7 @@
 			{#each suggestions as suggestion, idx}
 				{#if idx === selected}
 					<button
+						tabindex="-1"
 						onmousedown={() => (dontUnfocus = true)}
 						onclick={(event) => select(event, idx)}
 						onmouseleave={() => {
@@ -154,6 +155,7 @@
 					</button>
 				{:else}
 					<button
+						tabindex="-1"
 						onmousedown={() => (dontUnfocus = true)}
 						onclick={(event) => select(event, idx)}
 						onmouseleave={() => {
