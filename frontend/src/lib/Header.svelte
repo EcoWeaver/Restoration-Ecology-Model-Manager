@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Gitlab, House } from "@lucide/svelte";
+	import { CodeXml, House } from "@lucide/svelte";
 	import Search from "./Search.svelte";
 	import type { ChipElement } from "./search/Chip.svelte";
 
@@ -24,7 +24,9 @@
 		class="m-4 ml-0 pt-1 pb-1"
 		title="source"
 		href="https://git.uni-jena.de/fusion/teaching/project/2025sose/swep/restoration-ecology-model-manager/restoration-ecology-model-manager-app"
+		target="_blank"
+		rel="noopener noreferrer"
 	>
-		<Gitlab class="size-8" />
+		<CodeXml class="size-8" />
 	</a>
 </div>

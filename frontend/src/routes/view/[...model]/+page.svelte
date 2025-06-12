@@ -43,6 +43,8 @@
 						<a
 							class="pl-2 text-blue-700 hover:underline"
 							href={`https://doi.org/${model.identifier}`}
+							target="_blank"
+							rel="noopener noreferrer"
 						>
 							{model.identifier}
 						</a>
