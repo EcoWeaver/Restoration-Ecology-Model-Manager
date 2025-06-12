@@ -29,8 +29,8 @@
 	{/each}
 </div>
 
-{#if selectedSearch == "meta"}
+{#if selectedSearch === "meta"}
 	<MetadataSearch {params} />
-{:else if selectedSearch == "ident"}
+{:else if selectedSearch === "ident"}
 	<IdentifierSearch {identifier} />
 {/if}

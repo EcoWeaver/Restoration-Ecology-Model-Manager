@@ -26,7 +26,7 @@
 
 	const { updateEdge } = useSvelteFlow();
 
-	let value = $state(data.kind);
+	let value = $state(data!.kind);
 
 	$effect(() => {
 		const v = value;
@@ -35,7 +35,7 @@
 				id,
 				{
 					markerEnd: re.causal.includes(v) ? { type: MarkerType.ArrowClosed } : undefined,
-					data: { kind: value, editable: data.editable },
+					data: { kind: value, editable: data!.editable },
 				},
 				{ replace: true },
 			);
@@ -45,7 +45,7 @@
 
 <BaseEdge {id} {path} {markerEnd} />
 <EdgeLabel x={labelX} y={labelY}>
-	{#if data.editable}
+	{#if data!.editable}
 		<select bind:value>
 			{#await relationElements then es}
 				{#each Object.entries(es) as [key, values]}
@@ -58,6 +58,6 @@
 			{/await}
 		</select>
 	{:else}
-		<p>{data.kind}</p>
+		<p>{data!.kind}</p>
 	{/if}
 </EdgeLabel>

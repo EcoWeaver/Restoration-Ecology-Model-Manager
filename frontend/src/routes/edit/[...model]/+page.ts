@@ -20,5 +20,5 @@ export const load: PageLoad = async ({ fetch, params, url }) => {
 
 	const model: ModelRequest = await modelRes.json();
 	const metadataElements: MetadataElements = await metaRes.json();
-	return { model, version,metadataElements };
+	return { model, version, metadataElements };
 };

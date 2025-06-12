@@ -32,7 +32,7 @@
 
 	let initialMetadata = $state.snapshot(metadata);
 	for (let kind of elements.mandatory) {
-		let index = initialMetadata.findIndex((m) => m.kind == kind.name);
+		let index = initialMetadata.findIndex((m) => m.kind === kind.name);
 		if (index >= 0) {
 			let value = initialMetadata[index].value;
 			initialMetadata.splice(index, 1);
@@ -102,7 +102,7 @@
 			<span class="table-cell py-1 pl-2">
 				{#if m.kind === ""}
 					<Input value="" disabled placeholder="please select a metadata kind" />
-				{:else if type == "choice"}
+				{:else if type === "choice"}
 					<select
 						required
 						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 outline-black"
@@ -117,7 +117,7 @@
 					<DateInput bind:value={m.value} />
 				{:else if type === "orcid"}
 					<OrcidInput bind:value={m.value} />
-				{:else if type == "url"}
+				{:else if type === "url"}
 					<Input placeholder={type} bind:value={m.value} type="url" />
 				{:else if type === "year"}
 					<YearInput {type} bind:value={m.value} />
