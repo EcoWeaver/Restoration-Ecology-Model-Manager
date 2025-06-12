@@ -85,7 +85,8 @@
 				<MetadataPanel
 					bind:this={metadataPanel}
 					elements={metadataElements}
-					bind:identifier
+					{identifier}
+					identifierEditable={false}
 					bind:metadata
 				/>
 			</PanelComponent>

@@ -8,10 +8,12 @@
 	let {
 		elements,
 		identifier = $bindable(),
+		identifierEditable = true,
 		metadata = $bindable(),
 	}: {
 		elements: MetadataElements;
 		identifier: string;
+		identifierEditable?: boolean;
 		metadata: Metadata[];
 	} = $props();
 
@@ -63,7 +65,18 @@
 	<div class="table-row">
 		<span class="table-cell py-1 pr-2">identifier</span>
 		<span class="table-cell py-1 pl-2">
-			<Input placeholder="doi" bind:value={identifier} />
+			{#if identifierEditable}
+				<Input placeholder="doi" bind:value={identifier} />
+			{:else}
+				<a
+					class="pl-2 text-blue-700 hover:underline dark:text-blue-500"
+					href={`https://doi.org/${identifier}`}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{identifier}
+				</a>
+			{/if}
 		</span>
 	</div>
 
