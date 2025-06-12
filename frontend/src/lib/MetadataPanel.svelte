@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { X } from "@lucide/svelte";
 	import { type Metadata, type MetadataElements, type MetadataType } from "$lib/api";
 	import YearInput from "./metadata-panel/YearInput.svelte";
 	import DateInput from "./metadata-panel/DateInput.svelte";
@@ -54,22 +55,22 @@
 	});
 </script>
 
-<h2 class="text-lg">Metadata</h2>
+<h2 class="px-2 text-xl">Metadata</h2>
 
 <div class="table">
 	<div class="mb-2 table-row">
-		<span class="table-cell py-2 pr-2 font-bold">kind</span>
+		<span class="table-cell px-2 py-2 font-bold">kind</span>
 		<span class="table-cell py-2 pl-2 font-bold">value</span>
 	</div>
 
 	<div class="table-row">
-		<span class="table-cell py-1 pr-2">identifier</span>
+		<span class="table-cell px-2 py-1">identifier</span>
 		<span class="table-cell py-1 pl-2">
 			{#if identifierEditable}
 				<Input placeholder="doi" bind:value={identifier} />
 			{:else}
 				<a
-					class="pl-2 text-blue-700 hover:underline dark:text-blue-500"
+					class="text-blue-700 hover:underline dark:text-blue-500"
 					href={`https://doi.org/${identifier}`}
 					target="_blank"
 					rel="noopener noreferrer"
@@ -85,9 +86,12 @@
 
 		<div class="table-row">
 			{#if m.mandatory}
-				<span class="table-cell py-1 pr-2">{m.kind}</span>
+				<span class="table-cell px-2 py-1">{m.kind}</span>
 			{:else}
-				<select bind:value={m.kind} class="table-cell field-sizing-content py-1 pr-2">
+				<select
+					bind:value={m.kind}
+					class="table-cell field-sizing-content rounded px-2 py-1 focus-within:outline-2 focus-within:outline-indigo-400"
+				>
 					<option class="hidden" value="" disabled selected>-- select a kind --</option>
 					{#each Object.entries(elements) as [type, values]}
 						<optgroup label={type}>
@@ -126,14 +130,14 @@
 				{/if}
 			</span>
 			{#if !m.mandatory}
-				<button
-					onclick={() => meta.splice(i, 1)}
-					class="-mr-4 w-4 cursor-pointer text-right font-bold text-red-500"
-				>
-					x
-				</button>
-			{:else}
-				<button class="invisible -mr-4 w-4 text-right font-bold">x</button>
+				<div class="relative table-cell">
+					<button
+						class="absolute top-2 left-[2px] inline h-6 cursor-pointer rounded-4xl focus-within:outline-indigo-400 focus:outline-2"
+						onclick={() => meta.splice(i, 1)}
+					>
+						<X class="stroke-red-500 " />
+					</button>
+				</div>
 			{/if}
 		</div>
 	{/each}
