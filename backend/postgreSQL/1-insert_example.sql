@@ -7,7 +7,7 @@ INSERT INTO metadata (model_id, kind, value) VALUES
 (1, 'publication-year', '2022'),
 (1, 'subject', 'Reproduction habitat; Arctic char habitat; Expert systems; Indigenous knowledge; Inuit Qaujimajatuqangit; Fish habitat model; Arctic fish'),
 (1, 'date', '2022-12-20'),
-(1, 'language', 'en-US'),
+(1, 'language', 'en'),
 (1, 'resource-type', 'Model'),
 (1, 'ecological-domain', 'Freshwater biome'),
 (1, 'format', 'XLSX'),

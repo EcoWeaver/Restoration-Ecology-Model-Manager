@@ -10,6 +10,7 @@
 <input
 	{disabled}
 	{placeholder}
+	bind:value
 	class="h-8 w-full rounded border border-neutral-600 pr-2 pl-3"
 	{type}
 />
