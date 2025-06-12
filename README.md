@@ -2,12 +2,13 @@
 
 
 ## Start Program
+The three steps have to be performed successively in separate terminals. 
 
 1. Run Docker Container
 
 This project includes a Docker container that runs both the PostgreSQL database and pgAdmin for visually
-exploring and managing the database. The Docker container can be executed by the following by the following
-prompts. pdAdmin can be viewed on http://localhost:15432.
+exploring and managing the database. The Docker container can be executed by the following
+command. pdAdmin can be viewed on http://localhost:15432.
 
 ```sh
 cd backend
