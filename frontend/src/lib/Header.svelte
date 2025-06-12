@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Home } from "@lucide/svelte";
+	import { Gitlab, House } from "@lucide/svelte";
 	import Search from "./Search.svelte";
 	import type { ChipElement } from "./search/Chip.svelte";
 
@@ -7,8 +7,8 @@
 </script>
 
 <div class="flex">
-	<a class="m-4 mr-0" title="home" href="/">
-		<Home class="size-10" />
+	<a class="m-4 mr-0 pt-1 pb-1" title="home" href="/">
+		<House class="size-8" />
 	</a>
 
 	<Search {params} {identifier} selectedSearch={identifier != null ? "ident" : "meta"} />
@@ -18,5 +18,13 @@
 		class="m-4 ml-0 flex h-10 place-items-center rounded-md bg-indigo-300 px-4 hover:bg-indigo-400"
 	>
 		<span class="font-medium">+ create model</span>
+	</a>
+
+	<a
+		class="m-4 ml-0 pt-1 pb-1"
+		title="source"
+		href="https://git.uni-jena.de/fusion/teaching/project/2025sose/swep/restoration-ecology-model-manager/restoration-ecology-model-manager-app"
+	>
+		<Gitlab class="size-8" />
 	</a>
 </div>
