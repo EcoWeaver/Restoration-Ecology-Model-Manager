@@ -1,8 +1,3 @@
-<script lang="ts" module>
-	import type { Edge as FlowEdge } from "@xyflow/svelte";
-	export type Edge = FlowEdge<Omit<Relation, "from" | "to"> & { editable: boolean }, "custom">;
-</script>
-
 <script lang="ts">
 	import {
 		BaseEdge,
@@ -13,7 +8,8 @@
 		useSvelteFlow,
 		type EdgeProps,
 	} from "@xyflow/svelte";
-	import { relationElements, type Relation } from "$lib/api";
+	import type { Edge } from "$lib/model";
+	import { relationElements } from "$lib/api";
 
 	let { id, data, sourceX, sourceY, targetX, targetY, markerEnd }: EdgeProps<Edge> = $props();
 

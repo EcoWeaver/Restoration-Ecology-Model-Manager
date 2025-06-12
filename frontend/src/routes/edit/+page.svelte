@@ -2,9 +2,8 @@
 	import type { PageProps } from "./$types";
 
 	import { goto } from "$app/navigation";
+	import { type Node, type Edge, saveModel } from "$lib/model";
 	import Graph from "$lib/Graph.svelte";
-	import { type Node } from "$lib/graph/NodeComponent.svelte";
-	import { type Edge } from "$lib/graph/EdgeComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import {
 		putModel,
@@ -28,38 +27,8 @@
 	let metadata = $state<Metadata[]>([]);
 
 	async function save() {
-		error = undefined;
-
-		const outNodes: ApiNode[] = nodes.map((n) => {
-			let { body, color } = n.data;
-			return {
-				body,
-				color,
-				position: {
-					x: Math.round(n.position.x),
-					y: Math.round(n.position.y),
-				},
-			};
-		});
-		const outRelations: ApiRelation[] = edges
-			.filter((e) => e.type == "custom")
-			.map((e) => {
-				const from = nodes.findIndex((n) => n.id === e.source);
-				const to = nodes.findIndex((n) => n.id === e.target)!;
-
-				let { kind } = e.data!;
-				return { kind, from, to };
-			});
-
-		const req: ModelRequest = {
-			identifier,
-			version: "",
-			metadata,
-			graph: { nodes: outNodes, relations: outRelations },
-		};
-
 		try {
-			const model = await putModel(req);
+			const model = await saveModel(identifier, metadata, nodes, edges);
 			await goto(`/view/${model.identifier}?version=${model.version}`);
 		} catch (e: any) {
 			error = e;

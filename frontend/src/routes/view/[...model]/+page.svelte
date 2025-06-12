@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Graph from "$lib/Graph.svelte";
-	import type { Node } from "$lib/graph/NodeComponent.svelte";
-	import type { Edge } from "$lib/graph/EdgeComponent.svelte";
+	import type { Node, Edge } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 
 	let { data } = $props();
