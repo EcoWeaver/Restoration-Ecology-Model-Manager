@@ -80,7 +80,7 @@ func (self *State) GetModel(c echo.Context) error {
 
 	go func() {
 		if err, ok := r.verify(self, c.Logger()).(verify.VerifyError); ok {
-			c.Logger().Warn(fmt.Sprintf("encountered error while verifying model with identifier '%s' at version '%s': %s", identifier, version, err))
+			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with identifier '%s' at version '%s': %w", identifier, version, err))
 		}
 	}()
 
