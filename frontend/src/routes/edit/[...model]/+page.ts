@@ -1,0 +1,24 @@
+import { apiBase, type MetadataElements, type ModelRequest } from "$lib/api";
+import { error } from "@sveltejs/kit";
+import type { PageLoad } from "./$types";
+
+export const load: PageLoad = async ({ fetch, params, url }) => {
+	let apiUrl = new URL("/model", apiBase);
+	apiUrl.searchParams.set("identifier", params.model);
+	const version = url.searchParams.get("version") ?? "";
+	apiUrl.searchParams.set("version", version);
+
+	const modelRes = await fetch(apiUrl);
+	if (!modelRes.ok) {
+		return error(modelRes.status, await modelRes.text());
+	}
+
+	const metaRes = await fetch(`${apiBase}/metadata`);
+	if (!metaRes.ok) {
+		return error(modelRes.status, await modelRes.text());
+	}
+
+	const model: ModelRequest = await modelRes.json();
+	const metadataElements: MetadataElements = await metaRes.json();
+	return { model, version,metadataElements };
+};

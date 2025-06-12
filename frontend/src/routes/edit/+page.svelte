@@ -5,19 +5,11 @@
 	import { type Node, type Edge, saveModel } from "$lib/model";
 	import Graph from "$lib/Graph.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
-	import {
-		putModel,
-		type Node as ApiNode,
-		type Relation as ApiRelation,
-		type Metadata,
-		type ModelRequest,
-	} from "$lib/api";
+	import { type Metadata } from "$lib/api";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 
 	let { data }: PageProps = $props();
 	let { metadataElements } = data;
-
-	let id = $state(0);
 
 	let nodes: Node[] = $state.raw([]);
 	let edges: Edge[] = $state.raw([]);
@@ -35,6 +27,7 @@
 		}
 	}
 
+	let id = $state(0);
 	function add() {
 		const i = id++;
 		const node: Node = {

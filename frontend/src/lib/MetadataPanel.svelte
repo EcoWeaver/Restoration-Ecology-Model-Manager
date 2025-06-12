@@ -26,13 +26,22 @@
 		flatMetadata.set(name, { type, choices });
 	}
 
-	let meta = $state(
-		elements.mandatory.map((kind) => ({
-			mandatory: true,
-			kind: kind.name,
-			value: "",
-		})),
-	);
+	let meta: (Metadata & { mandatory: boolean })[] = $state([]);
+
+	let initialMetadata = $state.snapshot(metadata);
+	for (let kind of elements.mandatory) {
+		let index = initialMetadata.findIndex((m) => m.kind == kind.name);
+		if (index >= 0) {
+			let value = initialMetadata[index].value;
+			initialMetadata.splice(index, 1);
+			meta.push({ mandatory: true, kind: kind.name, value });
+		} else {
+			meta.push({ mandatory: true, kind: kind.name, value: "" });
+		}
+	}
+	for (let { kind, value } of initialMetadata) {
+		meta.push({ mandatory: false, kind, value });
+	}
 
 	export function addMetadata() {
 		meta.push({ mandatory: false, kind: "", value: "" });
