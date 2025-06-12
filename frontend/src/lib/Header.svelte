@@ -15,7 +15,7 @@
 
 	<a
 		href="/edit"
-		class="m-4 ml-0 flex h-10 place-items-center rounded-md bg-indigo-300 px-4 hover:bg-indigo-400"
+		class="m-4 ml-0 flex h-10 place-items-center rounded-md bg-indigo-300 px-4 hover:bg-indigo-400 dark:bg-indigo-500"
 	>
 		<span class="font-medium">+ create model</span>
 	</a>

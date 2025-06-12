@@ -22,6 +22,7 @@
 
 <div
 	class="rounded-lg px-4 py-2"
+	class:text-black={isLight(data.color)}
 	class:text-white={!isLight(data.color)}
 	style:background-color={data.color}
 >

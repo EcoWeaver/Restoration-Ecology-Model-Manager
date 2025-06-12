@@ -133,7 +133,9 @@
 	</Input>
 
 	{#if focused && suggestions.length != 0}
-		<div class="absolute mt-px max-h-96 min-w-64 overflow-y-scroll bg-white p-2 shadow-xl">
+		<div
+			class="absolute mt-px max-h-96 min-w-64 overflow-y-scroll bg-neutral-100 p-2 shadow-xl dark:bg-neutral-700"
+		>
 			{#each suggestions as suggestion, idx}
 				{#if idx === selected}
 					<button
@@ -145,7 +147,7 @@
 								dontUnfocus = false;
 							}
 						}}
-						class="my-1 block w-full cursor-pointer rounded bg-neutral-200 p-2 text-left ring-2 ring-blue-500 hover:bg-neutral-200"
+						class="my-1 block w-full cursor-pointer rounded bg-neutral-200 p-2 text-left ring-2 ring-indigo-400 dark:bg-neutral-600"
 						bind:this={element}
 					>
 						{suggestion}
@@ -160,7 +162,7 @@
 								dontUnfocus = false;
 							}
 						}}
-						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-200"
+						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-200 dark:hover:bg-neutral-600"
 					>
 						{suggestion}
 					</button>

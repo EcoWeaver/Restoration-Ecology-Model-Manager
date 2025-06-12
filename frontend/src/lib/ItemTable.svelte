@@ -14,7 +14,7 @@
 		{#each items as { identifier, version, title }}
 			<a
 				href="/view/{identifier}?version={version}"
-				class="table-row border-b-1 border-neutral-300 last:border-none hover:bg-neutral-200"
+				class="table-row border-b-1 border-neutral-300 last:border-none hover:bg-neutral-200 dark:hover:bg-neutral-700"
 			>
 				<span class="table-cell p-3">{title}</span>
 				<span class="table-cell p-3">v{version}</span>

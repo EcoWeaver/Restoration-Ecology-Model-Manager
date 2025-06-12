@@ -76,8 +76,8 @@
 	>
 		{#snippet info()}
 			<h1 class="text-2xl">Restoration Ecology Model Manager</h1>
-			<button class="hover:bg-neutral-200" onclick={save}>Save</button>
-			<button class="hover:bg-neutral-200" onclick={add}>Add</button>
+			<button class="hover:bg-neutral-200 dark:hover:bg-neutral-700" onclick={save}>Save</button>
+			<button class="hover:bg-neutral-200 dark:hover:bg-neutral-700" onclick={add}>Add</button>
 		{/snippet}
 
 		{#snippet panel()}

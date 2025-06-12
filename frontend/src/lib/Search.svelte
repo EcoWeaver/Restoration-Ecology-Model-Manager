@@ -21,7 +21,7 @@
 	{#each searches as { value, tooltip }}
 		<label
 			title={tooltip}
-			class="flex h-10 cursor-pointer place-items-center border border-r-0 px-2 first:rounded-l-md hover:bg-neutral-200 has-checked:bg-indigo-300 hover:has-checked:bg-indigo-400"
+			class="flex h-10 cursor-pointer place-items-center border border-r-0 border-neutral-600 px-2 first:rounded-l-md hover:bg-neutral-200 has-checked:bg-indigo-300 hover:has-checked:bg-indigo-400 dark:hover:bg-neutral-700 dark:has-checked:bg-indigo-500"
 		>
 			<input class="hidden" type="radio" name="search" {value} bind:group={selectedSearch} />
 			<span>{value}</span>

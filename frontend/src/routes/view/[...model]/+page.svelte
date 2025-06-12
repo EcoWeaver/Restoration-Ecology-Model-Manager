@@ -20,7 +20,7 @@
 					<div class="table-row">
 						<div class="table-cell pr-2">identifier</div>
 						<a
-							class="pl-2 text-blue-700 hover:underline"
+							class="pl-2 text-blue-700 hover:underline dark:text-blue-500"
 							href={`https://doi.org/${model.identifier}`}
 							target="_blank"
 							rel="noopener noreferrer"

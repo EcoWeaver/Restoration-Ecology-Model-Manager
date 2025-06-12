@@ -4,3 +4,13 @@
 	--color-accent: AccentColor;
 	--color-on-accent: AccentColorText;
 }
+
+.svelte-flow {
+	--xy-edge-label-background-color: var(--xy-background-color);
+}
+
+@media (prefers-color-scheme: dark) {
+	.svelte-flow {
+		--xy-background-color: theme(--color-neutral-800);
+	}
+}
