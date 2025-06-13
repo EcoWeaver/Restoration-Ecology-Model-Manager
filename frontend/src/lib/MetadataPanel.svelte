@@ -109,7 +109,7 @@
 				{:else if type === "choice"}
 					<select
 						required
-						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 outline-black"
+						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 focus-within:outline-2 focus-within:outline-indigo-400"
 						bind:value={m.value}
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>
