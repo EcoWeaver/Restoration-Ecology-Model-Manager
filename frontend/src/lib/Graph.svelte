@@ -10,14 +10,16 @@
 		interactive,
 		nodes = $bindable(),
 		edges = $bindable(),
-		info,
+		headerLeft,
+		headerRight,
 		panel,
 		onconnect,
 	}: {
 		interactive: boolean;
 		nodes: Node[];
 		edges: Edge[];
-		info?: Snippet;
+		headerLeft?: Snippet;
+		headerRight?: Snippet;
 		panel: Snippet;
 		onconnect?: OnConnect;
 	} = $props();
@@ -37,9 +39,14 @@
 	fitView
 	fitViewOptions={{ padding: { right: 1000 } }}
 >
-	{#if info}
+	{#if headerLeft}
 		<Panel position="top-left">
-			{@render info()}
+			{@render headerLeft()}
+		</Panel>
+	{/if}
+	{#if headerRight}
+		<Panel position="top-right">
+			{@render headerRight()}
 		</Panel>
 	{/if}
 
