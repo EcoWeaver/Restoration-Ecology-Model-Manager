@@ -18,7 +18,7 @@
 	}
 </script>
 
-<div class="grow px-0 py-4">
+<div class="grow">
 	<Input placeholder="search identifier" bind:value={identifier} {onkeydown} />
 </div>
 

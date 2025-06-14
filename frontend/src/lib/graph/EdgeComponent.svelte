@@ -5,6 +5,7 @@
 		getBezierPath,
 		MarkerType,
 		Position,
+		useStore,
 		useSvelteFlow,
 		type EdgeProps,
 	} from "@xyflow/svelte";
@@ -24,7 +25,7 @@
 		}),
 	);
 
-	const { updateEdge } = useSvelteFlow();
+	const { updateEdge, getZoom } = useSvelteFlow();
 
 	let value = $state(data!.kind);
 
@@ -49,7 +50,7 @@
 		<select bind:value>
 			{#await relationElements then es}
 				{#each Object.entries(es) as [key, values]}
-					<optgroup label={key}>
+					<optgroup label={key} style:font-size={`${getZoom()}em`}>
 						{#each values as value}
 							<option {value}>{value}</option>
 						{/each}

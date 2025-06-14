@@ -17,7 +17,7 @@
 	];
 </script>
 
-<div class="flex p-4 pr-0" role="radiogroup">
+<div class="flex" role="radiogroup">
 	{#each searches as { value, tooltip }}
 		<label
 			title={tooltip}

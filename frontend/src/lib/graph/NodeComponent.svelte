@@ -3,7 +3,7 @@
 	import type { Node } from "$lib/model";
 	import { Handle } from "@xyflow/svelte";
 
-	let { id, data }: NodeProps<Node> = $props();
+	const { id, data }: NodeProps<Node> = $props();
 	const { updateNodeData } = useSvelteFlow();
 
 	let body = $state(data.body);
@@ -18,18 +18,19 @@
 		const luma = r * 0.2126 + g * 0.7152 + b * 0.0722;
 		return luma > 127;
 	}
+	const light = $derived(isLight(data.color));
 </script>
 
 <div
 	class="rounded-lg px-4 py-2"
-	class:text-black={isLight(data.color)}
-	class:text-white={!isLight(data.color)}
+	class:text-black={light}
+	class:text-white={!light}
 	style:background-color={data.color}
 >
 	{#if data.editable}
-		<span class="cursor-text" contenteditable bind:innerText={body}></span>
+		<div class="cursor-text" contenteditable bind:innerText={body}></div>
 	{:else}
-		<span>{body}</span>
+		<div>{body}</div>
 	{/if}
 </div>
 
