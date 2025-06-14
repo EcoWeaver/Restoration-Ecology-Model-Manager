@@ -5,7 +5,7 @@
 
 	let { data } = $props();
 	let { model } = $derived(data);
-	let { nodes, edges } = $derived(apiToFlow(model.graph));
+	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
 </script>
 
 <div class="h-dvh w-dvw">

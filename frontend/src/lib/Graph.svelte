@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type Snippet } from "svelte";
-	import { Background, BackgroundVariant, Panel, SvelteFlow, type OnConnect } from "@xyflow/svelte";
+	import { Background, BackgroundVariant, Panel, SvelteFlow } from "@xyflow/svelte";
 	import "@xyflow/svelte/dist/style.css";
 	import NodeComponent from "./graph/NodeComponent.svelte";
 	import EdgeComponent from "./graph/EdgeComponent.svelte";
@@ -13,7 +13,6 @@
 		headerLeft,
 		headerRight,
 		panel,
-		onconnect,
 	}: {
 		interactive: boolean;
 		nodes: Node[];
@@ -21,8 +20,15 @@
 		headerLeft?: Snippet;
 		headerRight?: Snippet;
 		panel: Snippet;
-		onconnect?: OnConnect;
 	} = $props();
+
+	const defaultEdge: Partial<Edge> = {
+		type: "custom",
+		data: {
+			kind: "correlated-with",
+			editable: interactive,
+		},
+	};
 </script>
 
 <SvelteFlow
@@ -32,10 +38,11 @@
 	proOptions={{ hideAttribution: true }}
 	nodeTypes={{ custom: NodeComponent }}
 	edgeTypes={{ custom: EdgeComponent }}
-	{onconnect}
+	defaultEdgeOptions={defaultEdge}
 	nodesConnectable={interactive}
 	nodesDraggable={interactive}
 	elementsSelectable={interactive}
+	deleteKey={["Delete", "Backspace"]}
 	fitView
 	fitViewOptions={{ padding: { right: 1000 } }}
 >

@@ -5,7 +5,6 @@
 		getBezierPath,
 		MarkerType,
 		Position,
-		useStore,
 		useSvelteFlow,
 		type EdgeProps,
 	} from "@xyflow/svelte";

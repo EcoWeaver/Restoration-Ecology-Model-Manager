@@ -7,7 +7,7 @@
 	let { identifier, metadata } = $derived(model);
 
 	// svelte-ignore state_referenced_locally
-	let { nodes, edges } = apiToFlow(model.graph);
+	let { nodes, edges } = apiToFlow(model.graph, true);
 </script>
 
 <GraphEdit {version} bind:identifier bind:metadata {metadataElements} {nodes} {edges} />

@@ -11,13 +11,13 @@ import {
 export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom">;
 export type Edge = FlowEdge<Omit<ApiRelation, "from" | "to"> & { editable: boolean }, "custom">;
 
-export function apiToFlow(graph: Graph): { nodes: Node[]; edges: Edge[] } {
+export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edges: Edge[] } {
 	let nodes: Node[] = Array.from(
 		graph.nodes?.entries().map(([id, { body, position, color }]) => ({
 			position,
 			type: "custom",
 			id: id.toString(),
-			data: { body, color, editable: false },
+			data: { body, color, editable },
 		})) ?? [],
 	);
 
@@ -27,7 +27,7 @@ export function apiToFlow(graph: Graph): { nodes: Node[]; edges: Edge[] } {
 			target: to.toString(),
 			type: "custom",
 			id: `${from}-${to}`,
-			data: { kind, editable: false },
+			data: { kind, editable },
 		})) ?? [];
 
 	return { nodes, edges };
@@ -53,7 +53,6 @@ export async function saveModel(
 	});
 
 	const relations: ApiRelation[] = e
-		.filter((e) => e.type === "custom")
 		.map((e) => {
 			const from = n.findIndex((n) => n.id === e.source);
 			const to = n.findIndex((n) => n.id === e.target)!;

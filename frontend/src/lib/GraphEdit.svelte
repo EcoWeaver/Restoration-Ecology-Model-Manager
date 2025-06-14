@@ -67,24 +67,7 @@
 {/if}
 
 <div class="h-dvh w-dvw">
-	<Graph
-		bind:nodes
-		bind:edges
-		interactive={true}
-		onconnect={(c) => {
-			const edge: Edge = {
-				id: `${c.source}-${c.target}`,
-				type: "custom",
-				source: c.source,
-				target: c.target,
-				data: {
-					kind: "correlated-with",
-					editable: true,
-				},
-			};
-			edges = [...edges, edge];
-		}}
-	>
+	<Graph bind:nodes bind:edges interactive={true}>
 		{#snippet headerLeft()}
 			<button class="hover:bg-neutral-200 dark:hover:bg-neutral-700" onclick={add}>Add</button>
 		{/snippet}
