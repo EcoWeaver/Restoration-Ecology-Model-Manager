@@ -7,8 +7,8 @@ services:
     ports:
       - 25432:5432
     volumes:
-      - ./postgreSQL:/docker-entrypoint-initdb.d
-      - ./data/postgres:/var/lib/postgresql/data
+      - ./postgreSQL:/docker-entrypoint-initdb.d:z
+      - ./data/postgres:/var/lib/postgresql/data:z
   pgadmin:
     image: dpage/pgadmin4
     env_file:

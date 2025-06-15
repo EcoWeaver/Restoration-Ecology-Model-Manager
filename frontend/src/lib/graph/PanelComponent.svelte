@@ -24,7 +24,7 @@
 		class:bg-neutral-200={!show}
 		class:dark:bg-neutral-600={show}
 		class:dark:bg-neutral-700={!show}
-		class="cursor right-0 block cursor-pointer rounded-4xl p-2 focus-within:outline-2 focus-within:outline-indigo-400 hover:bg-neutral-300 dark:hover:bg-neutral-600"
+		class="cursor right-0 block cursor-pointer rounded-full p-2 focus-within:outline-2 focus-within:outline-indigo-400 hover:bg-neutral-300 dark:hover:bg-neutral-600"
 	>
 		<GanttChartSquare />
 	</button>
@@ -33,7 +33,7 @@
 		<button
 			transition:slide={{ duration: 100, axis: "x" }}
 			onclick={onmetadata}
-			class="cursor right-0 flex cursor-pointer items-center gap-1 rounded-4xl bg-neutral-200 px-4 py-1 text-nowrap focus-within:outline-2 focus-within:outline-indigo-400 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+			class="cursor right-0 flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 px-4 py-1 text-nowrap focus-within:outline-2 focus-within:outline-indigo-400 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
 		>
 			<PlusIcon class="inline size-5.5" /> add metadata
 		</button>

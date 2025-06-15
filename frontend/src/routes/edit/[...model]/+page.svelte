@@ -10,4 +10,12 @@
 	let { nodes, edges } = apiToFlow(model.graph, true);
 </script>
 
-<GraphEdit {version} bind:identifier bind:metadata {metadataElements} {nodes} {edges} />
+<GraphEdit
+	{version}
+	bind:identifier
+	identifierEditable={false}
+	bind:metadata
+	{metadataElements}
+	{nodes}
+	{edges}
+/>

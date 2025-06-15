@@ -12,6 +12,7 @@
 
 <GraphEdit
 	bind:identifier
+	identifierEditable={true}
 	bind:metadata
 	metadataElements={data.metadataElements}
 	nodes={[]}

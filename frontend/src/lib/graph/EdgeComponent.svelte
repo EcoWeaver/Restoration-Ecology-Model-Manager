@@ -10,6 +10,7 @@
 	} from "@xyflow/svelte";
 	import type { Edge } from "$lib/model";
 	import { relationElements } from "$lib/api";
+	import { Trash2 } from "@lucide/svelte";
 
 	let { id, data, sourceX, sourceY, targetX, targetY, markerEnd }: EdgeProps<Edge> = $props();
 
@@ -24,7 +25,7 @@
 		}),
 	);
 
-	const { updateEdge, getZoom } = useSvelteFlow();
+	const { updateEdge, getZoom, deleteElements } = useSvelteFlow();
 
 	let value = $state(data!.kind);
 
@@ -41,23 +42,34 @@
 			);
 		});
 	});
+
+	function deleteSelf() {
+		deleteElements({ edges: [{ id }] });
+	}
 </script>
 
 <BaseEdge {id} {path} {markerEnd} />
 <EdgeLabel x={labelX} y={labelY}>
 	{#if data!.editable}
-		<select bind:value>
-			{#await relationElements then es}
-				{#each Object.entries(es) as [key, values]}
-					<optgroup label={key} style:font-size={`${getZoom()}em`}>
-						{#each values as value}
-							<option {value}>{value}</option>
-						{/each}
-					</optgroup>
-				{/each}
-			{/await}
-		</select>
+		<div class="flex text-base">
+			<select bind:value class="h-10 rounded-full bg-neutral-700 px-2">
+				{#await relationElements then es}
+					{#each Object.entries(es) as [key, values]}
+						<optgroup label={key} style:font-size={`${getZoom()}em`}>
+							{#each values as value}
+								<option {value}>{value}</option>
+							{/each}
+						</optgroup>
+					{/each}
+				{/await}
+			</select>
+			<button
+				class="ml-1 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
+				onclick={deleteSelf}
+				title="Delete"><Trash2 /></button
+			>
+		</div>
 	{:else}
-		<p>{data!.kind}</p>
+		<span class="text-base">{data!.kind}</span>
 	{/if}
 </EdgeLabel>

@@ -10,6 +10,7 @@
 	let {
 		version = undefined,
 		identifier = $bindable(),
+		identifierEditable,
 		metadata = $bindable(),
 		metadataElements,
 		nodes: initialNodes,
@@ -17,6 +18,7 @@
 	}: {
 		version?: string;
 		identifier: string;
+		identifierEditable: boolean;
 		metadata: Metadata[];
 		metadataElements: MetadataElements;
 		nodes: Node[];
@@ -81,8 +83,8 @@
 				<MetadataPanel
 					bind:this={metadataPanel}
 					elements={metadataElements}
-					{identifier}
-					identifierEditable={false}
+					bind:identifier
+					{identifierEditable}
 					bind:metadata
 				/>
 			</PanelComponent>
