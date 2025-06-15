@@ -52,7 +52,7 @@
 <EdgeLabel x={labelX} y={labelY}>
 	{#if data!.editable}
 		<div class="flex text-base">
-			<select bind:value class="h-10 rounded-full bg-neutral-700 px-2">
+			<select bind:value class="h-10 rounded-full bg-neutral-200 px-2 dark:bg-neutral-700">
 				{#await relationElements then es}
 					{#each Object.entries(es) as [key, values]}
 						<optgroup label={key} style:font-size={`${getZoom()}em`}>
