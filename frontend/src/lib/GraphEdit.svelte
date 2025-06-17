@@ -38,14 +38,16 @@
 		}
 	}
 
-	let id = $state(0);
 	function add() {
-		const i = id++;
 		const node: Node = {
-			id: i.toString(),
+			id: nodes.length.toString(),
 			type: "custom",
 			position: { x: 100, y: 100 },
-			data: { body: "new", color: ["#ff0000", "#00ff00", "#0000ff"][i % 3], editable: true },
+			data: {
+				body: "new",
+				color: ["#ff0000", "#00ff00", "#0000ff"][nodes.length % 3],
+				editable: true,
+			},
 		};
 		nodes = [...nodes, node];
 	}
