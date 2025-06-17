@@ -22,22 +22,13 @@ func (self *Cache) Verify(key string) error {
 }
 
 func DoiCache() Cache {
-	return Cache{
-		get:   doi,
-		cache: sync.Map{},
-	}
+	return Cache{get: doi}
 }
 
 func OrcidCache() Cache {
-	return Cache{
-		get:   orcid,
-		cache: sync.Map{},
-	}
+	return Cache{get: orcid}
 }
 
 func SpeciesCache() Cache {
-	return Cache{
-		get:   species,
-		cache: sync.Map{},
-	}
+	return Cache{get: species}
 }
