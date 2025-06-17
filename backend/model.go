@@ -119,54 +119,56 @@ func (self *Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 		return verify.VerifyError{E: fmt.Errorf("encountered unset value of metadata kind '%s'", self.Kind)}
 	}
 
-	for _, me := range slices.Concat(m.Mandatory, m.Recommended, m.Optional) {
-		if me.Name != self.Kind {
-			continue
-		}
+	for _, s := range [][]MetadataEntry{m.Mandatory, m.Recommended, m.Optional} {
+		for _, me := range s {
+			if me.Name != self.Kind {
+				continue
+			}
 
-		switch me.Type {
-		case "":
-			return nil
-		case "choice":
-			for _, ch := range me.Choices {
-				if ch.Label == self.Value {
+			switch me.Type {
+			case "":
+				return nil
+			case "choice":
+				for _, ch := range me.Choices {
+					if ch.Label == self.Value {
+						return nil
+					}
+				}
+			case "ietf-bcp-47":
+				if _, err := language.Parse(self.Value); err == nil {
 					return nil
 				}
-			}
-		case "ietf-bcp-47":
-			if _, err := language.Parse(self.Value); err == nil {
+			case "date":
+				if _, err := time.Parse(YearMonthDay, self.Value); err == nil {
+					return nil
+				}
+				if _, err := time.Parse(YearMonth, self.Value); err == nil {
+					return nil
+				}
+				fallthrough
+			case "year":
+				if _, err := time.Parse(Year, self.Value); err == nil {
+					return nil
+				}
+			case "url":
+				if _, err := url.ParseRequestURI(self.Value); err == nil {
+					return nil
+				}
+			case "orcid":
+				if err := verify.Orcid(self.Value); err == nil {
+					return err
+				}
+			case "species":
+				if err := verify.Species(&self.Value); err == nil {
+					return nil
+				}
+			default:
+				l.Warnf("encountered unknown metadata type '%s', assuming 'string'", me.Type)
 				return nil
 			}
-		case "date":
-			if _, err := time.Parse(YearMonthDay, self.Value); err == nil {
-				return nil
-			}
-			if _, err := time.Parse(YearMonth, self.Value); err == nil {
-				return nil
-			}
-			fallthrough
-		case "year":
-			if _, err := time.Parse(Year, self.Value); err == nil {
-				return nil
-			}
-		case "url":
-			if _, err := url.ParseRequestURI(self.Value); err == nil {
-				return nil
-			}
-		case "orcid":
-			if err := verify.Orcid(self.Value); err == nil {
-				return err
-			}
-		case "species":
-			if err := verify.Species(&self.Value); err == nil {
-				return nil
-			}
-		default:
-			l.Warnf("encountered unknown metadata kind '%s', assuming 'string'", self.Kind)
-			return nil
-		}
 
-		return verify.VerifyError{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
+			return verify.VerifyError{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
+		}
 	}
 
 	return verify.VerifyError{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
