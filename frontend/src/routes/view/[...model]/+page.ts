@@ -13,6 +13,5 @@ export const load: PageLoad = async ({ fetch, params, url }) => {
 	}
 
 	const model: ModelRequest = await res.json();
-
 	return { model };
 };

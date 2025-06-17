@@ -46,8 +46,8 @@
 		<div
 			class="absolute top-full left-0 mt-1 h-10 w-max rounded-full bg-neutral-200 p-2 text-black dark:bg-neutral-700 dark:text-white"
 		>
-			<button onclick={changeColor} title="Change color"><Palette /></button>
-			<button onclick={deleteSelf} title="Delete"><Trash2 /></button>
+			<button class="cursor-pointer" onclick={changeColor} title="Change color"><Palette /></button>
+			<button class="cursor-pointer" onclick={deleteSelf} title="Delete"><Trash2 /></button>
 		</div>
 	{:else}
 		<div>{body}</div>

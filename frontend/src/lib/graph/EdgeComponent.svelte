@@ -52,7 +52,10 @@
 <EdgeLabel x={labelX} y={labelY}>
 	{#if data!.editable}
 		<div class="flex text-base">
-			<select bind:value class="h-10 rounded-full bg-neutral-200 px-2 dark:bg-neutral-700">
+			<select
+				bind:value
+				class="field-sizing-content h-10 cursor-pointer rounded-full bg-neutral-200 px-2 text-center dark:bg-neutral-700"
+			>
 				{#await relationElements then es}
 					{#each Object.entries(es) as [key, values]}
 						<optgroup label={key} style:font-size={`${getZoom()}em`}>
@@ -64,12 +67,16 @@
 				{/await}
 			</select>
 			<button
-				class="ml-1 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
+				class="ml-1 cursor-pointer rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
 				onclick={deleteSelf}
 				title="Delete"><Trash2 /></button
 			>
 		</div>
 	{:else}
-		<span class="text-base">{data!.kind}</span>
+		<div
+			class="flex h-10 items-center rounded-full bg-neutral-200 px-2 text-base dark:bg-neutral-700"
+		>
+			{data!.kind}
+		</div>
 	{/if}
 </EdgeLabel>
