@@ -12,5 +12,5 @@ export const load: PageLoad = async ({ fetch, url }) => {
 	const items = queryItems.sort(sortVersion);
 
 	const identifier = url.searchParams.get("identifier") || "";
-	return { items: queryItems, identifier };
+	return { items, identifier };
 };

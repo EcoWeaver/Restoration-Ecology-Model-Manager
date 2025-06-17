@@ -134,6 +134,7 @@
 
 	{#if focused && suggestions.length != 0}
 		<div
+			tabindex="-1"
 			class="absolute mt-px max-h-96 min-w-64 overflow-y-scroll bg-neutral-100 p-2 shadow-xl dark:bg-neutral-700"
 		>
 			{#each suggestions as suggestion, idx}

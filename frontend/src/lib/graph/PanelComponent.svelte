@@ -16,7 +16,17 @@
 	</div>
 {/if}
 
-<div class="flex h-10 w-full flex-row-reverse gap-2 px-3">
+<div class="flex h-10 w-full flex-row justify-end gap-2 px-3">
+	{#if onmetadata && show}
+		<button
+			transition:slide={{ duration: 100, axis: "x" }}
+			onclick={onmetadata}
+			class="cursor right-0 flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 px-4 py-1 text-nowrap focus-within:outline-2 focus-within:outline-indigo-400 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+		>
+			<PlusIcon class="inline size-5.5" /> add metadata
+		</button>
+	{/if}
+
 	<button
 		title="toggle metadata"
 		onclick={() => (show = !show)}
@@ -28,14 +38,4 @@
 	>
 		<GanttChartSquare />
 	</button>
-
-	{#if onmetadata && show}
-		<button
-			transition:slide={{ duration: 100, axis: "x" }}
-			onclick={onmetadata}
-			class="cursor right-0 flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 px-4 py-1 text-nowrap focus-within:outline-2 focus-within:outline-indigo-400 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
-		>
-			<PlusIcon class="inline size-5.5" /> add metadata
-		</button>
-	{/if}
 </div>
