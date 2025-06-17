@@ -52,14 +52,13 @@ export async function saveModel(
 		};
 	});
 
-	const relations: ApiRelation[] = e
-		.map((e) => {
-			const from = n.findIndex((n) => n.id === e.source);
-			const to = n.findIndex((n) => n.id === e.target)!;
+	const relations: ApiRelation[] = e.map((e) => {
+		const from = n.findIndex((n) => n.id === e.source);
+		const to = n.findIndex((n) => n.id === e.target)!;
 
-			let { kind } = e.data!;
-			return { kind, from, to };
-		});
+		let { kind } = e.data!;
+		return { kind, from, to };
+	});
 
 	const graph = { nodes, relations };
 	const request: ModelRequest = {

@@ -1,4 +1,4 @@
-import { apiBase, type SearchItem } from "$lib/api";
+import { apiBase, sortVersion, type SearchItem } from "$lib/api";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
@@ -8,7 +8,9 @@ export const load: PageLoad = async ({ fetch, url }) => {
 		return error(res.status, await res.text());
 	}
 
-	const items: SearchItem[] = (await res.json()) ?? [];
+	const queryItems: SearchItem[] = (await res.json()) ?? [];
+	const items = queryItems.sort(sortVersion);
+
 	const identifier = url.searchParams.get("identifier") || "";
-	return { items, identifier };
+	return { items: queryItems, identifier };
 };

@@ -79,3 +79,18 @@ export type SearchItem = {
 	version: string;
 	title: string;
 };
+
+export function sortVersion(a: SearchItem, b: SearchItem) {
+	let left = a.version.split(".").map((v) => Number(v));
+	let right = b.version.split(".").map((v) => Number(v));
+
+	let max = Math.min(left.length, right.length);
+	for (let i = 0; i < max; i++) {
+		let cmp = left[i] - right[i];
+		if (cmp != 0) {
+			return cmp;
+		}
+	}
+
+	return left.length - right.length;
+}
