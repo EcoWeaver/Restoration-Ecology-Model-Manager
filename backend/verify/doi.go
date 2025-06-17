@@ -10,13 +10,13 @@ import (
 
 var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
 
-func Doi(s string) error {
+func doi(s string) error {
 	if s == "" {
-		return VerifyError{E: errors.New("no doi provided")}
+		return Error{E: errors.New("no doi provided")}
 	}
 
 	if !doiRegexp.MatchString(s) {
-		return VerifyError{E: fmt.Errorf("encountered invalid doi '%s'", s)}
+		return Error{E: fmt.Errorf("encountered invalid doi '%s'", s)}
 	}
 
 	if !REQ {
@@ -30,7 +30,7 @@ func Doi(s string) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return VerifyError{E: fmt.Errorf("encountered unregistered doi '%s'", s)}
+		return Error{E: fmt.Errorf("encountered unregistered doi '%s'", s)}
 	}
 
 	return nil

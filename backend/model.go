@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -46,7 +47,7 @@ type Point struct {
 }
 
 func (self *ModelRequest) verify(s *State, l echo.Logger) error {
-	if err := verify.Doi(self.Identifier); err != nil {
+	if err := s.DoiCache.Verify(self.Identifier); err != nil {
 		return err
 	}
 
@@ -64,7 +65,7 @@ func (self *ModelRequest) verify(s *State, l echo.Logger) error {
 	}
 
 	for _, me := range self.Metadata {
-		if err = me.verify(&m, l); err != nil {
+		if err = me.verify(s, &m, l); err != nil {
 			return err
 		}
 	}
@@ -86,14 +87,14 @@ func (self Graph) verify(s *State, l echo.Logger) error {
 
 	for _, relation := range self.Relations {
 		if relation.From < 0 || relation.From >= len(self.Nodes) {
-			return verify.VerifyError{E: fmt.Errorf("encountered invalid relation from %d", relation.From)}
+			return verify.Error{E: fmt.Errorf("encountered invalid relation from %d", relation.From)}
 		}
 		if relation.To < 0 || relation.To >= len(self.Nodes) {
-			return verify.VerifyError{E: fmt.Errorf("encountered invalid relation to %d", relation.To)}
+			return verify.Error{E: fmt.Errorf("encountered invalid relation to %d", relation.To)}
 		}
 		pair := Relation{relation.From, relation.To}
 		if _, ok := relations[pair]; ok {
-			return verify.VerifyError{E: fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)}
+			return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)}
 		}
 		relations[pair] = struct{}{}
 		if err := relation.verify(&r); err != nil {
@@ -108,19 +109,20 @@ const Year = "2006"
 const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
-func (self *Metadata) verify(m *MetadataConfig, l echo.Logger) error {
+func (self *Metadata) verify(s *State, m *MetadataConfig, l echo.Logger) error {
+	self.Value = strings.TrimSpace(self.Value)
 	if self.Kind == "" {
 		if self.Value == "" {
-			return verify.VerifyError{E: fmt.Errorf("encountered unset metadata kind with unset value")}
+			return verify.Error{E: fmt.Errorf("encountered unset metadata kind with unset value")}
 		} else {
-			return verify.VerifyError{E: fmt.Errorf("encountered unset metadata kind with value '%s'", self.Value)}
+			return verify.Error{E: fmt.Errorf("encountered unset metadata kind with value '%s'", self.Value)}
 		}
 	} else if self.Value == "" {
-		return verify.VerifyError{E: fmt.Errorf("encountered unset value of metadata kind '%s'", self.Kind)}
+		return verify.Error{E: fmt.Errorf("encountered unset value of metadata kind '%s'", self.Kind)}
 	}
 
-	for _, s := range [][]MetadataEntry{m.Mandatory, m.Recommended, m.Optional} {
-		for _, me := range s {
+	for _, ml := range [][]MetadataEntry{m.Mandatory, m.Recommended, m.Optional} {
+		for _, me := range ml {
 			if me.Name != self.Kind {
 				continue
 			}
@@ -155,23 +157,31 @@ func (self *Metadata) verify(m *MetadataConfig, l echo.Logger) error {
 					return nil
 				}
 			case "orcid":
-				if err := verify.Orcid(self.Value); err == nil {
-					return err
+				if err := s.OrcidCache.Verify(self.Value); err != nil {
+					if _, ok := err.(verify.Error); !ok {
+						return err
+					}
+				} else {
+					return nil
 				}
 			case "species":
-				if err := verify.Species(&self.Value); err == nil {
+				if err := s.SpeciesCache.Verify(self.Value); err != nil {
+					if _, ok := err.(verify.Error); !ok {
+						return err
+					}
+				} else {
 					return nil
 				}
 			default:
-				l.Warnf("encountered unknown metadata type '%s', assuming 'string'", me.Type)
+				l.Warnf("encountered unknown metadata type '%s', assuming free text", me.Type)
 				return nil
 			}
 
-			return verify.VerifyError{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
+			return verify.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
 		}
 	}
 
-	return verify.VerifyError{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
+	return verify.Error{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
 }
 
 func (self Relation) verify(r *RelationsConfig) error {
@@ -179,5 +189,5 @@ func (self Relation) verify(r *RelationsConfig) error {
 		return nil
 	}
 
-	return verify.VerifyError{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
+	return verify.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
 }

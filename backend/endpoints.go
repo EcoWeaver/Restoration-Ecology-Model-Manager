@@ -15,9 +15,12 @@ import (
 )
 
 type State struct {
-	DbPool    *pgxpool.Pool
-	Metadata  LiveMetadataConfig
-	Relations LiveRelationsConfig
+	DbPool       *pgxpool.Pool
+	Metadata     LiveMetadataConfig
+	Relations    LiveRelationsConfig
+	DoiCache     verify.Cache
+	OrcidCache   verify.Cache
+	SpeciesCache verify.Cache
 }
 
 type SearchResult struct {
@@ -79,7 +82,7 @@ func (self *State) GetModel(c echo.Context) error {
 	r := ModelRequest{identifier, graph, version, metadata}
 
 	go func() {
-		if err, ok := r.verify(self, c.Logger()).(verify.VerifyError); ok {
+		if err, ok := r.verify(self, c.Logger()).(verify.Error); ok {
 			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with identifier '%s' at version '%s': %w", identifier, version, err))
 		}
 	}()
@@ -107,7 +110,7 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 
 	if err = r.verify(self, c.Logger()); err != nil {
-		if _, ok := err.(verify.VerifyError); ok {
+		if _, ok := err.(verify.Error); ok {
 			c.Logger().Warn(err)
 			return c.String(http.StatusBadRequest, err.Error())
 		} else {

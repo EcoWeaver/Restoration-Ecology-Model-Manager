@@ -40,7 +40,12 @@ func main() {
 	}
 	defer dbPool.Close()
 
-	state := State{DbPool: dbPool}
+	state := State{
+		DbPool:       dbPool,
+		DoiCache:     verify.DoiCache(),
+		OrcidCache:   verify.OrcidCache(),
+		SpeciesCache: verify.SpeciesCache(),
+	}
 
 	e.GET("/metadata", state.GetMetadata)
 

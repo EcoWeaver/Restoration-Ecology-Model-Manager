@@ -10,13 +10,13 @@ import (
 
 var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{4}`)
 
-func Orcid(s string) error {
+func orcid(s string) error {
 	if s == "" {
-		return VerifyError{E: errors.New("no orcid provided")}
+		return Error{E: errors.New("no orcid provided")}
 	}
 
 	if !orcidRegexp.MatchString(s) {
-		return VerifyError{E: fmt.Errorf("encountered invalid orcid '%s'", s)}
+		return Error{E: fmt.Errorf("encountered invalid orcid '%s'", s)}
 	}
 
 	if !REQ {
@@ -30,7 +30,7 @@ func Orcid(s string) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return VerifyError{E: fmt.Errorf("encountered unregistered orcid '%s'", s)}
+		return Error{E: fmt.Errorf("encountered unregistered orcid '%s'", s)}
 	}
 
 	return nil
