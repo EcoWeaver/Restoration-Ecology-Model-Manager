@@ -135,7 +135,7 @@
 						class="absolute top-2 left-[2px] inline h-6 cursor-pointer rounded-4xl focus-within:outline-indigo-400 focus:outline-2"
 						onclick={() => meta.splice(i, 1)}
 					>
-						<X class="stroke-red-500 " />
+						<X class="stroke-red-500" />
 					</button>
 				</div>
 			{/if}

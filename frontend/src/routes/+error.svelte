@@ -2,7 +2,7 @@
 	import { page } from "$app/state";
 	import { getReasonPhrase } from "http-status-codes";
 
-	let statusText = getReasonPhrase(page.status);
+	let statusText = getReasonPhrase(page.status).toLowerCase();
 </script>
 
 <main class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
@@ -10,10 +10,10 @@
 		<p class="text-2xl font-semibold tracking-tight text-red-600">
 			{page.status}
 			<span class="px-1">|</span>
-			{statusText.toLowerCase()}
+			{statusText}
 		</p>
 		<h1 class="mt-4 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-7xl">
-			{page.error?.message || statusText.toLowerCase()}
+			{page.error?.message || statusText}
 		</h1>
 		<div class="mt-10 items-center">
 			<a
