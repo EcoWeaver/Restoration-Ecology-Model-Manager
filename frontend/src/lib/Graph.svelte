@@ -1,10 +1,18 @@
 <script lang="ts">
 	import { type Snippet } from "svelte";
-	import { Background, BackgroundVariant, Panel, SvelteFlow } from "@xyflow/svelte";
-	import "@xyflow/svelte/dist/style.css";
+	import {
+		Background,
+		BackgroundVariant,
+		ConnectionLineType,
+		ConnectionMode,
+		Panel,
+		SvelteFlow,
+	} from "@xyflow/svelte";
 	import NodeComponent from "./graph/NodeComponent.svelte";
 	import EdgeComponent from "./graph/EdgeComponent.svelte";
 	import type { Node, Edge } from "$lib/model";
+
+	import "@xyflow/svelte/dist/style.css";
 
 	let {
 		interactive,
@@ -38,6 +46,8 @@
 	proOptions={{ hideAttribution: true }}
 	nodeTypes={{ custom: NodeComponent }}
 	edgeTypes={{ custom: EdgeComponent }}
+	connectionLineType={ConnectionLineType.Straight}
+	connectionMode={ConnectionMode.Loose}
 	defaultEdgeOptions={defaultEdge}
 	nodesConnectable={interactive}
 	nodesDraggable={interactive}

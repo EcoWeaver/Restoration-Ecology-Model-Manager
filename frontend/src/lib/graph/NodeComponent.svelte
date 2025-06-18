@@ -2,7 +2,7 @@
 	import { type NodeProps, Position, useSvelteFlow } from "@xyflow/svelte";
 	import type { Node } from "$lib/model";
 	import { Handle } from "@xyflow/svelte";
-	import { Edit, Palette, Pencil, Trash2 } from "@lucide/svelte";
+	import { Move, Palette, Trash2 } from "@lucide/svelte";
 
 	const { id, data }: NodeProps<Node> = $props();
 	const { updateNodeData, deleteElements } = useSvelteFlow();
@@ -41,18 +41,25 @@
 	class:text-white={!light}
 	style:background-color={color}
 >
+	<Handle
+		type="source"
+		position={Position.Top}
+		class="!absolute !inset-0 !size-full !transform-none !rounded-none !border-0 opacity-0"
+	/>
 	{#if data.editable}
-		<div class="cursor-text" contenteditable bind:innerText={body}></div>
 		<div
-			class="absolute top-full left-0 mt-1 h-10 w-max rounded-full bg-neutral-200 p-2 text-black dark:bg-neutral-700 dark:text-white"
+			class="wrap-break-word relative max-w-prose cursor-text"
+			contenteditable
+			bind:innerText={body}
+		></div>
+		<div
+			class="absolute left-0 top-full mt-1 h-10 w-max cursor-default rounded-full bg-neutral-200 p-2 text-black dark:bg-neutral-700 dark:text-white"
 		>
+			<div class="drag-handle inline-block cursor-grab"><Move /></div>
 			<button class="cursor-pointer" onclick={changeColor} title="Change color"><Palette /></button>
 			<button class="cursor-pointer" onclick={deleteSelf} title="Delete"><Trash2 /></button>
 		</div>
 	{:else}
-		<div>{body}</div>
+		<div class="wrap-break-word max-w-prose">{body}</div>
 	{/if}
 </div>
-
-<Handle type="target" position={Position.Left} />
-<Handle type="source" position={Position.Right} />

@@ -8,7 +8,7 @@ import {
 	type ModelRequest,
 } from "./api";
 
-export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom">;
+export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & { dragHandle: ".drag-handle" };
 export type Edge = FlowEdge<Omit<ApiRelation, "from" | "to"> & { editable: boolean }, "custom">;
 
 export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edges: Edge[] } {
@@ -16,6 +16,7 @@ export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edg
 		graph.nodes?.entries().map(([id, { body, position, color }]) => ({
 			position,
 			type: "custom",
+			dragHandle: ".drag-handle",
 			id: id.toString(),
 			data: { body, color, editable },
 		})) ?? [],
