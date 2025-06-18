@@ -4,6 +4,7 @@
 	import YearInput from "./metadata-panel/YearInput.svelte";
 	import DateInput from "./metadata-panel/DateInput.svelte";
 	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
+	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
 	import Input from "./metadata-panel/Input.svelte";
 
 	let {
@@ -125,6 +126,8 @@
 					<Input placeholder={type} bind:value={m.value} type="url" />
 				{:else if type === "year"}
 					<YearInput {type} bind:value={m.value} />
+				{:else if choices}
+					<AutoComplete placeholder={type || m.kind} {choices} bind:value={m.value} />
 				{:else}
 					<Input placeholder={type || m.kind} bind:value={m.value} />
 				{/if}
