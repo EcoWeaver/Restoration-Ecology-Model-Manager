@@ -8,7 +8,9 @@ import {
 	type ModelRequest,
 } from "./api";
 
-export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & { dragHandle: ".drag-handle" };
+export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & {
+	dragHandle: ".drag-handle";
+};
 export type Edge = FlowEdge<Omit<ApiRelation, "from" | "to"> & { editable: boolean }, "custom">;
 
 export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edges: Edge[] } {

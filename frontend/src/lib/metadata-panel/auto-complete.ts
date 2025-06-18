@@ -5,7 +5,7 @@ export function suggestChoices(choices: string[]) {
 		}
 
 		return choices.filter(
-			(choice) => choice.toLowerCase().startsWith(value.toLowerCase()) && choice != value,
+			(choice) => choice.toLowerCase().startsWith(value.toLowerCase()) && choice !== value,
 		);
 	};
 }

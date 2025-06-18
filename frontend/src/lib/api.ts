@@ -87,7 +87,7 @@ export function sortVersion(a: SearchItem, b: SearchItem) {
 	let max = Math.min(left.length, right.length);
 	for (let i = 0; i < max; i++) {
 		let cmp = left[i] - right[i];
-		if (cmp != 0) {
+		if (cmp !== 0) {
 			return cmp;
 		}
 	}

@@ -48,18 +48,18 @@
 	/>
 	{#if data.editable}
 		<div
-			class="wrap-break-word relative max-w-prose cursor-text"
+			class="relative max-w-prose cursor-text wrap-break-word"
 			contenteditable
 			bind:innerText={body}
 		></div>
 		<div
-			class="absolute left-0 top-full mt-1 h-10 w-max cursor-default rounded-full bg-neutral-200 p-2 text-black dark:bg-neutral-700 dark:text-white"
+			class="absolute top-full left-0 mt-1 h-10 w-max cursor-default rounded-full bg-neutral-200 p-2 text-black dark:bg-neutral-700 dark:text-white"
 		>
 			<div class="drag-handle inline-block cursor-grab"><Move /></div>
 			<button class="cursor-pointer" onclick={changeColor} title="Change color"><Palette /></button>
 			<button class="cursor-pointer" onclick={deleteSelf} title="Delete"><Trash2 /></button>
 		</div>
 	{:else}
-		<div class="wrap-break-word max-w-prose">{body}</div>
+		<div class="max-w-prose wrap-break-word">{body}</div>
 	{/if}
 </div>

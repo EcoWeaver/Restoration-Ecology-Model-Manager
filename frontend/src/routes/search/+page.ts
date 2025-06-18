@@ -22,7 +22,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
 		let r = order.get(b.identifier)!;
 
 		let cmp = l - r;
-		if (cmp != 0) {
+		if (cmp !== 0) {
 			return cmp;
 		}
 
