@@ -2,10 +2,14 @@
 	import Input from "./Input.svelte";
 
 	let {
-		choices,
 		placeholder,
+		suggest,
 		value = $bindable(),
-	}: { choices: string[]; placeholder: string; value: string } = $props();
+	}: {
+		placeholder: string;
+		suggest: (value: string) => Promise<string[]>;
+		value: string;
+	} = $props();
 
 	let suggestions = $state<string[]>([]);
 	let selected = $state(0);
@@ -40,13 +44,12 @@
 	}
 
 	$effect(() => {
-		if (value === "") {
-			suggestions = [];
-			selected = 0;
-			return;
-		}
-
-		suggestions = choices.filter((choice) => choice.startsWith(value) && choice != value);
+		suggest(value).then((newSuggestions) => {
+			suggestions = newSuggestions;
+			if (suggestions.length === 0) {
+				selected = 0;
+			}
+		});
 	});
 </script>
 

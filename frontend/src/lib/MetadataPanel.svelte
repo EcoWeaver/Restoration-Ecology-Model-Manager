@@ -5,6 +5,7 @@
 	import DateInput from "./metadata-panel/DateInput.svelte";
 	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
 	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
+	import { suggestChoices, suggestSpecies } from "./metadata-panel/auto-complete";
 	import Input from "./metadata-panel/Input.svelte";
 
 	let {
@@ -126,12 +127,19 @@
 					<Input placeholder={type} bind:value={m.value} type="url" />
 				{:else if type === "year"}
 					<YearInput {type} bind:value={m.value} />
+				{:else if type === "species"}
+					<AutoComplete placeholder="species" suggest={suggestSpecies} bind:value={m.value} />
 				{:else if choices}
-					<AutoComplete placeholder={type || m.kind} {choices} bind:value={m.value} />
+					<AutoComplete
+						placeholder={type || m.kind}
+						suggest={suggestChoices(choices)}
+						bind:value={m.value}
+					/>
 				{:else}
 					<Input placeholder={type || m.kind} bind:value={m.value} />
 				{/if}
 			</span>
+
 			{#if !m.mandatory}
 				<div class="relative table-cell">
 					<button

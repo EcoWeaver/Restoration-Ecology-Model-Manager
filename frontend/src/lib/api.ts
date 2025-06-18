@@ -47,7 +47,7 @@ export type Choice = {
 	ontology?: string;
 };
 
-export type MetadataType = "choice" | "date" | "ietf-bcp-47" | "orcid" | "url" | "year";
+export type MetadataType = "choice" | "date" | "ietf-bcp-47" | "orcid" | "species" | "url" | "year";
 
 export type MetadataElement = {
 	name: string;
