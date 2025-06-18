@@ -250,18 +250,6 @@
           "ontology": "http://edamontology.org/format_3590"
         },
         {
-          "label": "MATLAB",
-          "ontology": "http://edamontology.org/format_4007"
-        },
-        {
-          "label": "R",
-          "ontology": "http://edamontology.org/format_3554"
-        },
-        {
-          "label": "PY",
-          "ontology": "http://edamontology.org/format_3996"
-        },
-        {
           "label": "RDF",
           "ontology": "http://edamontology.org/format_3261"
         },
@@ -414,6 +402,10 @@
         {
           "label": "Fortran",
           "ontology": "https://www.wikidata.org/wiki/Q83303"
+        },
+        {
+            "label": "C",
+            "ontology": "https://www.wikidata.org/wiki/Q15777"
         },
         {
           "label": "C++",
