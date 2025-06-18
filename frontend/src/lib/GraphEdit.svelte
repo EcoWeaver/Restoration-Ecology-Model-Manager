@@ -42,6 +42,7 @@
 		const node: Node = {
 			id: nodes.length.toString(),
 			type: "custom",
+			dragHandle: ".drag-handle",
 			position: { x: 100, y: 100 },
 			data: {
 				body: "new",

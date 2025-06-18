@@ -4,7 +4,7 @@
 	import { Handle } from "@xyflow/svelte";
 	import { Move, Palette, Trash2 } from "@lucide/svelte";
 
-	const { id, data }: NodeProps<Node> = $props();
+	const { id, data }: NodeProps<Omit<Node, "dragHandle"> & { dragHandle?: string }> = $props();
 	const { updateNodeData, deleteElements } = useSvelteFlow();
 
 	let body = $state(data.body);
