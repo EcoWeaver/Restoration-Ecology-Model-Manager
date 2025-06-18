@@ -8,8 +8,7 @@
       "name": "title"
     },
     {
-      "name": "publisher",
-      "type": "orcid"
+      "name": "publisher"
     },
     {
       "name": "publication-year",
@@ -200,12 +199,12 @@
   ],
   "optional": [
     {
-      "name": "alternate-identifier",
-      "type": "url"
-    },
-    {
       "name": "language",
       "type": "ietf-bcp-47"
+    },
+    {
+      "name": "alternate-identifier",
+      "type": "url"
     },
     {
       "name": "size"
@@ -404,8 +403,8 @@
           "ontology": "https://www.wikidata.org/wiki/Q83303"
         },
         {
-            "label": "C",
-            "ontology": "https://www.wikidata.org/wiki/Q15777"
+          "label": "C",
+          "ontology": "https://www.wikidata.org/wiki/Q15777"
         },
         {
           "label": "C++",
