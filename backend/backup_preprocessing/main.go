@@ -3,7 +3,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -14,7 +13,7 @@ func main() {
 		log.Fatal("Please also enter filename as input.")
 	}
 	inputFile := os.Args[1]
-	content, err := ioutil.ReadFile(inputFile)
+	content, err := os.ReadFile(inputFile)
 	if err != nil {
 		log.Fatalf("Error when reading the file: %v", err)
 	}
@@ -32,7 +31,7 @@ func main() {
 	outputData := strings.Join(outputLines, "\n") + "\n"
 
 	tmpFile := inputFile + ".tmp"
-	err = ioutil.WriteFile(tmpFile, []byte(outputData), 0644)
+	err = os.WriteFile(tmpFile, []byte(outputData), 0644)
 	if err != nil {
 		log.Fatalf("Error when writing into temporary file: %v", err)
 	}
