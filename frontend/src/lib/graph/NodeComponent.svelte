@@ -35,12 +35,7 @@
 	}
 </script>
 
-<div
-	class="relative rounded-lg px-4 py-2"
-	class:text-black={light}
-	class:text-white={!light}
-	style:background-color={color}
->
+<div class="relative rounded-lg px-4 py-2" style:background-color={color}>
 	<Handle
 		type="source"
 		position={Position.Top}
@@ -50,10 +45,12 @@
 		<div
 			class="relative max-w-prose cursor-text wrap-break-word"
 			contenteditable
+			class:text-black={light}
+			class:text-white={!light}
 			bind:innerText={body}
 		></div>
 		<div
-			class="absolute top-full left-0 mt-1 h-10 w-max cursor-default rounded-full bg-neutral-200 p-2 text-black dark:bg-neutral-700 dark:text-white"
+			class="absolute top-full left-0 mt-1 h-10 w-max cursor-default rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
 		>
 			<div class="drag-handle inline-block cursor-grab"><Move /></div>
 			<button class="cursor-pointer" onclick={changeColor} title="Change color"><Palette /></button>
