@@ -11,6 +11,7 @@ export function suggestChoices(choices: string[]) {
 }
 
 type SpeciesSuggestion = {
+	status: string;
 	canonicalName: string;
 };
 
@@ -25,6 +26,7 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 	let suggestions: SpeciesSuggestion[] = await response.json();
 
 	return suggestions
+		.filter((suggestion) => suggestion.status == "ACCEPTED")
 		.map((suggestion) => suggestion.canonicalName)
 		.filter((suggestion) => suggestion !== "")
 		.filter((suggestion) => suggestion !== value);

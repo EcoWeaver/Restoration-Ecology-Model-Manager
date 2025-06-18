@@ -32,7 +32,6 @@ func species(s string) error {
 	type Response struct {
 		Status    string `json:"status"`
 		MatchType string `json:"matchType"`
-		Rank      string `json:"rank"`
 	}
 
 	var r Response
@@ -40,7 +39,7 @@ func species(s string) error {
 		return err
 	}
 
-	if r.Status != "ACCEPTED" || r.MatchType != "EXACT" || r.Rank != "SPECIES" {
+	if r.Status != "ACCEPTED" || r.MatchType != "EXACT" {
 		return Error{E: fmt.Errorf("encountered unregistered species '%s'", s)}
 	}
 
