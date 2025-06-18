@@ -57,6 +57,8 @@
 			<button class="cursor-pointer" onclick={deleteSelf} title="Delete"><Trash2 /></button>
 		</div>
 	{:else}
-		<div class="max-w-prose wrap-break-word">{body}</div>
+		<div class="max-w-prose wrap-break-word" class:text-black={light} class:text-white={!light}>
+			{body}
+		</div>
 	{/if}
 </div>
