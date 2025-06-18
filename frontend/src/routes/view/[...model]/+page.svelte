@@ -5,8 +5,10 @@
 	import { apiToFlow } from "$lib/model";
 
 	let { data } = $props();
-	let { model } = $derived(data);
+	let { model, metadataMap } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
+
+	$inspect(metadataMap);
 
 	async function edit() {
 		await goto(`/edit/${model.identifier}?version=${model.version}`);
@@ -40,9 +42,32 @@
 						</a>
 					</div>
 					{#each model.metadata as { kind, value }}
+						{@const type = metadataMap.get(kind)}
+
 						<div class="table-row">
 							<div class="table-cell pr-2">{kind}</div>
-							<div class="table-cell max-w-128 pl-2">{value}</div>
+
+							{#if type === "orcid"}
+								<a
+									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-500"
+									href={`https://orcid.org/${value}`}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{value}
+								</a>
+							{:else if type === "url"}
+								<a
+									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-500"
+									href={value}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{value}
+								</a>
+							{:else}
+								<div class="table-cell max-w-128 pl-2">{value}</div>
+							{/if}
 						</div>
 					{/each}
 				</div>

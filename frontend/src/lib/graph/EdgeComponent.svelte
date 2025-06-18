@@ -2,7 +2,6 @@
 	import {
 		BaseEdge,
 		EdgeLabel,
-		getBezierPath,
 		getStraightPath,
 		MarkerType,
 		Position,
@@ -136,6 +135,8 @@
 			>
 		</div>
 	{:else}
-		<div>{data!.kind}</div>
+		<div class="flex h-10 items-center rounded-full bg-neutral-200 px-2 dark:bg-neutral-700">
+			{data!.kind}
+		</div>
 	{/if}
 </EdgeLabel>

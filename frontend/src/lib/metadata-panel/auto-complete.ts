@@ -28,6 +28,6 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 	return suggestions
 		.filter((suggestion) => suggestion.status == "ACCEPTED")
 		.map((suggestion) => suggestion.canonicalName)
-		.filter((suggestion) => suggestion)
+		.filter((suggestion) => typeof suggestion === "string")
 		.filter((suggestion) => suggestion !== value);
 }
