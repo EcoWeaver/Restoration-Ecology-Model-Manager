@@ -15,6 +15,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>view {model.identifier}@v{model.version}</title>
+</svelte:head>
+
 <div class="h-dvh w-dvw">
 	<Graph {nodes} {edges} interactive={false}>
 		{#snippet headerLeft()}

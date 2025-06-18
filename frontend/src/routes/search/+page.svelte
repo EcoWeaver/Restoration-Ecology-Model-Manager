@@ -9,6 +9,10 @@
 	let params = $derived<ChipElement[]>(searchParams.map(([kind, value]) => ({ kind, value })));
 </script>
 
+<svelte:head>
+	<title>search by metadata</title>
+</svelte:head>
+
 <Header {params} />
 
 <ItemTable {items} />

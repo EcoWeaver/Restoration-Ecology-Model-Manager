@@ -6,6 +6,10 @@
 	let { items, identifier } = $derived(data);
 </script>
 
+<svelte:head>
+	<title>search by identifier</title>
+</svelte:head>
+
 <Header {identifier} />
 
 <ItemTable {items} />

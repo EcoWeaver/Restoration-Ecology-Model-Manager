@@ -10,6 +10,10 @@
 	let { nodes, edges } = apiToFlow(model.graph, true);
 </script>
 
+<svelte:head>
+	<title>edit {model.identifier}@v{model.version}</title>
+</svelte:head>
+
 <GraphEdit
 	{version}
 	bind:identifier

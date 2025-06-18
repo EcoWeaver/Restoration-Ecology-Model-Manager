@@ -10,6 +10,10 @@
 	let metadata = $state<Metadata[]>([]);
 </script>
 
+<svelte:head>
+	<title>create new model</title>
+</svelte:head>
+
 <GraphEdit
 	bind:identifier
 	identifierEditable={true}

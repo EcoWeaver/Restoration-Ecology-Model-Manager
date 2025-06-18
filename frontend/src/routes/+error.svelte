@@ -5,6 +5,10 @@
 	let statusText = getReasonPhrase(page.status).toLowerCase();
 </script>
 
+<svelte:head>
+	<title>{page.status} | {statusText}</title>
+</svelte:head>
+
 <main class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
 	<div class="text-center">
 		<p class="text-2xl font-semibold tracking-tight text-red-600">
