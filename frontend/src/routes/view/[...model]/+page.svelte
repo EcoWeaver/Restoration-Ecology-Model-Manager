@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { PencilLine } from "@lucide/svelte";
 	import { goto } from "$app/navigation";
 	import Graph from "$lib/Graph.svelte";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
+	import Header from "$lib/Header.svelte";
 	import { apiToFlow } from "$lib/model";
 
 	let { data } = $props();
@@ -19,12 +21,20 @@
 	<title>view {model.identifier}@v{model.version}</title>
 </svelte:head>
 
+<div class="absolute z-10 w-full bg-white dark:bg-neutral-800">
+	<Header>
+		<button
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			onclick={edit}
+		>
+			<PencilLine strokeWidth={1.7} />
+			<span class="pl-2">edit model</span>
+		</button>
+	</Header>
+</div>
+
 <div class="h-dvh w-dvw">
 	<Graph {nodes} {edges} interactive={false}>
-		{#snippet headerLeft()}
-			<button class="hover:bg-neutral-200 dark:hover:bg-neutral-700" onclick={edit}>Edit</button>
-		{/snippet}
-
 		{#snippet panel()}
 			<PanelComponent>
 				<h2 class="text-xl">Metadata</h2>

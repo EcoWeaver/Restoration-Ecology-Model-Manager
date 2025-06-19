@@ -18,15 +18,11 @@
 		interactive,
 		nodes = $bindable(),
 		edges = $bindable(),
-		headerLeft,
-		headerRight,
 		panel,
 	}: {
 		interactive: boolean;
 		nodes: Node[];
 		edges: Edge[];
-		headerLeft?: Snippet;
-		headerRight?: Snippet;
 		panel: Snippet;
 	} = $props();
 
@@ -57,17 +53,6 @@
 	fitView
 	fitViewOptions={{ padding: { right: 1000 } }}
 >
-	{#if headerLeft}
-		<Panel position="top-left">
-			{@render headerLeft()}
-		</Panel>
-	{/if}
-	{#if headerRight}
-		<Panel position="top-right">
-			{@render headerRight()}
-		</Panel>
-	{/if}
-
 	<Panel position="bottom-right">
 		{@render panel()}
 	</Panel>

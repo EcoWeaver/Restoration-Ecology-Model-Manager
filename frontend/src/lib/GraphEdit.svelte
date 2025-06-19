@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Plus, Save } from "@lucide/svelte";
 	import Graph from "$lib/Graph.svelte";
 	import { saveModel } from "$lib/model.js";
 	import type { Edge, Node } from "$lib/model";
@@ -6,6 +7,7 @@
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import { goto } from "$app/navigation";
 	import type { Metadata, MetadataElements } from "./api";
+	import Header from "./Header.svelte";
 
 	let {
 		version = undefined,
@@ -58,10 +60,11 @@
 
 {#if error}
 	<div
-		class="relative rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+		class="t-0 absolute z-20 mt-18 w-full rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
 		role="alert"
 	>
 		<span class="block sm:inline">{error}</span>
+
 		<button
 			onclick={() => (error = undefined)}
 			class="absolute top-0 right-0 bottom-0 cursor-pointer px-5 py-3 font-extrabold"
@@ -71,16 +74,27 @@
 	</div>
 {/if}
 
+<div class="t-0 absolute z-10 w-full bg-white dark:bg-neutral-800">
+	<Header createModel={false}>
+		<button
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			onclick={add}
+		>
+			<Plus />
+			<span class="pl-1">add node</span>
+		</button>
+		<button
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			onclick={save}
+		>
+			<Save />
+			<span class="pl-2">save model</span>
+		</button>
+	</Header>
+</div>
+
 <div class="h-dvh w-dvw">
 	<Graph bind:nodes bind:edges interactive={true}>
-		{#snippet headerLeft()}
-			<button class="hover:bg-neutral-200 dark:hover:bg-neutral-700" onclick={add}>Add</button>
-		{/snippet}
-
-		{#snippet headerRight()}
-			<button class="hover:bg-neutral-200 dark:hover:bg-neutral-700" onclick={save}>Save</button>
-		{/snippet}
-
 		{#snippet panel()}
 			<PanelComponent onmetadata={() => metadataPanel.addMetadata()}>
 				<MetadataPanel
