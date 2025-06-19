@@ -44,7 +44,7 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 	defer self.lock.Unlock()
 
 	mtime := fi.ModTime()
-	if mtime == self.lastMtime {
+	if time.Time.Equal(mtime, self.lastMtime) {
 		return self.config, nil
 	}
 

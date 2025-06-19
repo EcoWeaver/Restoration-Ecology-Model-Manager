@@ -31,7 +31,7 @@ func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
 	defer self.lock.Unlock()
 
 	mtime := fi.ModTime()
-	if mtime == self.lastMtime {
+	if time.Time.Equal(mtime, self.lastMtime) {
 		return self.config, nil
 	}
 
