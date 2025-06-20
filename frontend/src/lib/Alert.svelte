@@ -26,7 +26,7 @@
 </script>
 
 {#if open}
-	<div role="alert" class="t-0 absolute z-1000 mt-18 flex w-full justify-center">
+	<div role="alert" class="t-0 absolute z-200 mt-18 flex w-full justify-center">
 		<span
 			class:bg-red-100={isError}
 			class:text-red-700={isError}
@@ -34,7 +34,7 @@
 			class:dark:bg-red-500={isError}
 			class="flex items-center rounded-md bg-indigo-300 px-5 py-3 dark:bg-indigo-500"
 		>
-			<span>{text || "popup yay"}</span>
+			<span>{text}</span>
 			<button class="cursor-pointer pl-2" onclick={() => (open = false)}><X /></button>
 		</span>
 	</div>

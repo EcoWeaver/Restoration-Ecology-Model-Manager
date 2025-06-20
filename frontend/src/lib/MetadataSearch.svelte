@@ -17,16 +17,21 @@
 	let selected = $state<number>(-1);
 	let suggestions = $state<string[]>([]);
 
-	let dontUnfocus = $state(false);
-	let focused = $state(false);
-
 	let chips = $state<ChipElement[]>(params);
 	let chip = $state<ChipElement | undefined>(undefined);
 
+	let focused = $state(false);
+	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+		let { relatedTarget, currentTarget } = event;
+		if (relatedTarget instanceof HTMLElement && currentTarget.contains(relatedTarget)) {
+			return;
+		}
+
+		focused = false;
+	}
+
 	let inputElement: HTMLInputElement | undefined = $state();
 	function select(event: MouseEvent, selected: number) {
-		dontUnfocus = false;
-
 		inputElement?.focus();
 		event.preventDefault();
 
@@ -67,8 +72,6 @@
 
 			key.preventDefault();
 		} else if (key.code === "Backspace" && input === "") {
-			key.preventDefault();
-
 			if (chip) {
 				input = chip.kind;
 				chip = undefined;
@@ -78,11 +81,13 @@
 				input = chip.value ?? "";
 				chip.value = undefined;
 			}
+
+			key.preventDefault();
 		} else if (key.code === "ArrowDown") {
-			if (!chip && selected < suggestions.length - 1) selected += 1;
+			selected = Math.min(selected + 1, suggestions.length - 1);
 			key.preventDefault();
 		} else if (key.code === "ArrowUp") {
-			if (!chip && selected >= 0) selected -= 1;
+			selected = Math.max(0, selected - 1);
 			key.preventDefault();
 		}
 	}
@@ -111,18 +116,13 @@
 	});
 </script>
 
-<div class="grow">
+<div class="grow" {onfocusout}>
 	<Input
 		placeholder={chips.length === 0 && !chip ? "search metadata" : undefined}
 		bind:value={input}
 		bind:self={inputElement}
 		onkeydown={key}
 		onfocus={() => (focused = true)}
-		onblur={() => {
-			if (!dontUnfocus) {
-				focused = false;
-			}
-		}}
 	>
 		{#each chips as chip}
 			<Chip {chip} />
@@ -141,14 +141,7 @@
 				{#if idx === selected}
 					<button
 						tabindex="-1"
-						onmousedown={() => (dontUnfocus = true)}
 						onclick={(event) => select(event, idx)}
-						onmouseleave={() => {
-							if (dontUnfocus) {
-								focused = false;
-								dontUnfocus = false;
-							}
-						}}
 						class="my-1 block w-full cursor-pointer rounded bg-neutral-200 p-2 text-left ring-2 ring-indigo-400 dark:bg-neutral-600"
 						bind:this={element}
 					>
@@ -157,14 +150,7 @@
 				{:else}
 					<button
 						tabindex="-1"
-						onmousedown={() => (dontUnfocus = true)}
 						onclick={(event) => select(event, idx)}
-						onmouseleave={() => {
-							if (dontUnfocus) {
-								focused = false;
-								dontUnfocus = false;
-							}
-						}}
 						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-200 dark:hover:bg-neutral-600"
 					>
 						{suggestion}

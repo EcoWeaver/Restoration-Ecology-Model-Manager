@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { FocusEventHandler } from "svelte/elements";
 	import Input from "./Input.svelte";
 
 	let {
@@ -28,12 +29,9 @@
 		}
 	}
 
-	let dontUnfocus = $state(false);
 	let focused = $state(false);
 	let inputElement: ReturnType<typeof Input>;
 	function select(event: MouseEvent, idx: number) {
-		dontUnfocus = false;
-
 		inputElement.focus();
 		event.preventDefault();
 
@@ -41,6 +39,15 @@
 			value = suggestions[idx];
 			selected = 0;
 		}
+	}
+
+	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+		let { relatedTarget, currentTarget } = event;
+		if (relatedTarget instanceof HTMLElement && currentTarget.contains(relatedTarget)) {
+			return;
+		}
+
+		focused = false;
 	}
 
 	$effect(() => {
@@ -53,7 +60,7 @@
 	});
 </script>
 
-<div class="relative">
+<div class="relative" {onfocusout}>
 	{#if suggestions.length > 0 && focused}
 		<div
 			class="absolute bottom-9 flex min-w-64 flex-col-reverse rounded bg-neutral-200 p-4 dark:bg-neutral-700"
@@ -64,13 +71,6 @@
 					class:ring-2={idx === selected}
 					class:bg-neutral-300={idx === selected}
 					class:dark:bg-neutral-600={idx === selected}
-					onmousedown={() => (dontUnfocus = true)}
-					onmouseleave={() => {
-						if (dontUnfocus) {
-							focused = false;
-							dontUnfocus = false;
-						}
-					}}
 					onclick={(event) => select(event, idx)}
 					class="my-1 block w-full cursor-pointer rounded p-2 text-left ring-indigo-400 hover:bg-neutral-300 dark:hover:bg-neutral-600"
 				>
@@ -83,11 +83,6 @@
 	<Input
 		bind:this={inputElement}
 		onfocus={() => (focused = true)}
-		onblur={() => {
-			if (!dontUnfocus) {
-				focused = false;
-			}
-		}}
 		{onkeydown}
 		{placeholder}
 		bind:value
