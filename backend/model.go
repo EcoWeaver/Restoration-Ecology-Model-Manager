@@ -79,25 +79,31 @@ func (self Graph) verify(s *State, l echo.Logger) error {
 		To   int
 	}
 
-	relations := map[Relation]struct{}{}
+	e := map[Relation]struct{}{}
 	r, err := s.Relations.Get(l)
 	if err != nil {
 		return err
 	}
 
-	for _, relation := range self.Relations {
-		if relation.From < 0 || relation.From >= len(self.Nodes) {
-			return verify.Error{E: fmt.Errorf("encountered invalid relation from %d", relation.From)}
+	for _, ne := range self.Nodes {
+		if err := verify.Color(ne.Color); err != nil {
+			return err
 		}
-		if relation.To < 0 || relation.To >= len(self.Nodes) {
-			return verify.Error{E: fmt.Errorf("encountered invalid relation to %d", relation.To)}
+	}
+
+	for _, re := range self.Relations {
+		if re.From < 0 || re.From >= len(self.Nodes) {
+			return verify.Error{E: fmt.Errorf("encountered invalid relation from %d", re.From)}
 		}
-		pair := Relation{relation.From, relation.To}
-		if _, ok := relations[pair]; ok {
-			return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", relation.From, relation.To)}
+		if re.To < 0 || re.To >= len(self.Nodes) {
+			return verify.Error{E: fmt.Errorf("encountered invalid relation to %d", re.To)}
 		}
-		relations[pair] = struct{}{}
-		if err := relation.verify(&r); err != nil {
+		pair := Relation{re.From, re.To}
+		if _, ok := e[pair]; ok {
+			return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
+		}
+		e[pair] = struct{}{}
+		if err := re.verify(&r); err != nil {
 			return err
 		}
 	}

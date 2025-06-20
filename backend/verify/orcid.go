@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-var orcidRegexp = regexp.MustCompile(`\d{4}-\d{4}-\d{4}-\d{3}[\dX]`)
+var orcidRegexp = regexp.MustCompile(`^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$`)
 
 func orcid(s string) error {
 	if s == "" {

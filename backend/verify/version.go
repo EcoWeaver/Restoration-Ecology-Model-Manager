@@ -6,14 +6,14 @@ import (
 	"regexp"
 )
 
-var verRegexp = regexp.MustCompile(`\d(\.\d+)*`)
+var versionRegexp = regexp.MustCompile(`^1(\.\d+)*$`)
 
 func Version(s string) error {
 	if s == "" {
 		return Error{E: errors.New("no version provided")}
 	}
 
-	if !verRegexp.MatchString(s) {
+	if !versionRegexp.MatchString(s) {
 		return Error{E: fmt.Errorf("encountered invalid version '%s'", s)}
 	}
 
