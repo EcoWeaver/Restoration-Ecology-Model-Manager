@@ -43,7 +43,7 @@
 	async function submit() {
 		let query = new URLSearchParams();
 		for (let { kind, value } of chips) {
-			query.set(kind, value!);
+			query.append(kind, value!);
 		}
 
 		await goto(`/search?${query}`, { invalidateAll: true });
@@ -116,7 +116,7 @@
 	});
 </script>
 
-<div class="grow" {onfocusout}>
+<div class="min-w-0 grow overflow-x-auto" {onfocusout}>
 	<Input
 		placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
 		bind:value={input}

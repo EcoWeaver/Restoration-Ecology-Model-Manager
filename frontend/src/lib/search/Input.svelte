@@ -22,12 +22,12 @@
 </script>
 
 <span
-	class="relative z-10 flex h-10 overflow-y-scroll border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
+	class="relative z-10 flex h-10 overflow-x-auto border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
 >
 	{@render children?.()}
 
 	<input
-		class="block grow px-2 py-1 focus-within:outline-none"
+		class="block field-sizing-content min-w-16 grow px-2 py-1 focus-within:outline-none"
 		{placeholder}
 		bind:this={self}
 		bind:value

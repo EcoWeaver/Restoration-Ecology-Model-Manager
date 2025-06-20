@@ -20,7 +20,7 @@
 <div class="flex items-center gap-4 p-4" role="navigation">
 	<a title="home" href="/"><House /></a>
 
-	<div class="flex grow">
+	<div class="flex min-w-0 grow">
 		<Search {params} {identifier} selectedSearch={identifier != null ? "identifier" : "metadata"} />
 	</div>
 
