@@ -49,9 +49,9 @@
 	<button
 		onclick={() => (open = !open)}
 		title={current.tooltip}
-		class="flex h-full cursor-pointer items-center rounded-l-md px-3"
+		class="flex h-full cursor-pointer items-center rounded-l-md pr-2 pl-3"
 	>
-		<span class="pr-2">
+		<span class="pr-3">
 			<current.icon />
 		</span>
 
