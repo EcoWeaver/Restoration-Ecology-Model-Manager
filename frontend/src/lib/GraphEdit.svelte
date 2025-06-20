@@ -48,8 +48,8 @@
 			dragHandle: ".drag-handle",
 			position: { x: 100, y: 100 },
 			data: {
-				body: "new",
-				color: ["#ff0000", "#00ff00", "#0000ff"][nodes.length % 3],
+				body: `node #${nodes.length + 1}`,
+				color: ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"][nodes.length % 6],
 				editable: true,
 			},
 		};
