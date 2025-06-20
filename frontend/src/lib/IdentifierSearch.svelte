@@ -19,7 +19,7 @@
 </script>
 
 <div class="grow">
-	<Input placeholder="search identifier" bind:value={identifier} {onkeydown} />
+	<Input placeholder="search by identifier" bind:value={identifier} {onkeydown} />
 </div>
 
 <SearchButton onclick={submit} />

@@ -21,7 +21,7 @@
 	<a title="home" href="/"><House /></a>
 
 	<div class="flex grow">
-		<Search {params} {identifier} selectedSearch={identifier != null ? "ident" : "meta"} />
+		<Search {params} {identifier} selectedSearch={identifier != null ? "identifier" : "metadata"} />
 	</div>
 
 	{#if createModel}

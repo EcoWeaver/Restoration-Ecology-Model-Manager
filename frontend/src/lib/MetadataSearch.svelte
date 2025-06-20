@@ -101,13 +101,13 @@
 			return;
 		}
 
-		input;
+		const v = input;
 		elements.then((elements) => {
 			if (input === "") {
 				selected = -1;
 				suggestions = elements;
 			} else {
-				suggestions = elements.filter((elem) => elem.startsWith(input));
+				suggestions = elements.filter((elem) => elem.toLowerCase().includes(v.toLowerCase()));
 				if (selected === -1 && suggestions.length > 0) {
 					selected = 0;
 				}
@@ -118,7 +118,7 @@
 
 <div class="grow" {onfocusout}>
 	<Input
-		placeholder={chips.length === 0 && !chip ? "search metadata" : undefined}
+		placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
 		bind:value={input}
 		bind:self={inputElement}
 		onkeydown={key}
