@@ -51,7 +51,7 @@
 		title={current.tooltip}
 		class="flex h-full cursor-pointer items-center rounded-l-md pr-2 pl-3"
 	>
-		<span class="pr-3">
+		<span class="pr-2">
 			<current.icon />
 		</span>
 
@@ -64,7 +64,7 @@
 
 	{#if open}
 		<div
-			class="absolute mt-2 -ml-4 cursor-pointer rounded-md border border-neutral-600 bg-white px-2 py-1 dark:bg-neutral-800"
+			class="absolute mt-2 -ml-4 rounded-md border border-neutral-600 bg-white px-2 py-1 shadow-xl dark:bg-neutral-800"
 		>
 			{#each Object.entries(searches) as [value, { icon: Icon, tooltip }]}
 				<button

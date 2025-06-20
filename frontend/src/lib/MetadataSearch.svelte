@@ -135,14 +135,14 @@
 	{#if focused && suggestions.length !== 0}
 		<div
 			tabindex="-1"
-			class="absolute mt-px max-h-96 min-w-64 overflow-y-scroll bg-neutral-100 p-2 shadow-xl dark:bg-neutral-700"
+			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 p-2 py-1 shadow-xl dark:bg-neutral-800"
 		>
 			{#each suggestions as suggestion, idx}
 				{#if idx === selected}
 					<button
 						tabindex="-1"
 						onclick={(event) => select(event, idx)}
-						class="my-1 block w-full cursor-pointer rounded bg-neutral-200 p-2 text-left ring-2 ring-indigo-400 dark:bg-neutral-600"
+						class="my-1 block w-full cursor-pointer rounded-md bg-neutral-200 p-2 text-left ring-2 ring-indigo-400 dark:bg-neutral-700"
 						bind:this={element}
 					>
 						{suggestion}
@@ -151,7 +151,7 @@
 					<button
 						tabindex="-1"
 						onclick={(event) => select(event, idx)}
-						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-200 dark:hover:bg-neutral-600"
+						class="my-1 block w-full cursor-pointer rounded-md p-2 text-left hover:bg-neutral-200 dark:hover:bg-neutral-700"
 					>
 						{suggestion}
 					</button>
