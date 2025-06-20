@@ -3,20 +3,25 @@
 	import Graph from "$lib/Graph.svelte";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import Header from "$lib/Header.svelte";
+	import Alert from "$lib/Alert.svelte";
 	import { apiToFlow } from "$lib/model";
 
 	let { data } = $props();
 	let { model, metadataMap } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
 
+	let alert: ReturnType<typeof Alert>;
 	async function share() {
 		await navigator.clipboard.writeText(window.location.href);
+		alert.info("link copied to clipboard");
 	}
 </script>
 
 <svelte:head>
 	<title>view {model.identifier}@v{model.version}</title>
 </svelte:head>
+
+<Alert bind:this={alert} />
 
 <div class="absolute z-10 w-full bg-white dark:bg-neutral-800">
 	<Header>

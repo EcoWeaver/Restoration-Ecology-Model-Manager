@@ -8,6 +8,7 @@
 	import { goto } from "$app/navigation";
 	import type { Metadata, MetadataElements } from "./api";
 	import Header from "./Header.svelte";
+	import Alert from "./Alert.svelte";
 
 	let {
 		version = undefined,
@@ -30,13 +31,13 @@
 	let nodes: Node[] = $state.raw(initialNodes);
 	let edges: Edge[] = $state.raw(initialEdges);
 
-	let error = $state<string | undefined>(undefined);
+	let alert: ReturnType<typeof Alert>;
 	async function save() {
 		try {
 			const model = await saveModel(identifier, metadata, nodes, edges, version);
 			await goto(`/view/${model.identifier}?version=${model.version}`);
-		} catch (e: any) {
-			error = e;
+		} catch (error: any) {
+			alert.error(error);
 		}
 	}
 
@@ -58,21 +59,7 @@
 	let metadataPanel: ReturnType<typeof MetadataPanel>;
 </script>
 
-{#if error}
-	<div
-		class="t-0 absolute z-20 mt-18 w-full rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
-		role="alert"
-	>
-		<span class="block sm:inline">{error}</span>
-
-		<button
-			onclick={() => (error = undefined)}
-			class="absolute top-0 right-0 bottom-0 cursor-pointer px-5 py-3 font-extrabold"
-		>
-			X
-		</button>
-	</div>
-{/if}
+<Alert bind:this={alert} />
 
 <div class="t-0 absolute z-10 w-full bg-white dark:bg-neutral-800">
 	<Header createModel={false}>
