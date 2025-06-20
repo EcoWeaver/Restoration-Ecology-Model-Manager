@@ -38,7 +38,6 @@
 <SvelteFlow
 	bind:nodes
 	bind:edges
-	colorMode="system"
 	proOptions={{ hideAttribution: true }}
 	nodeTypes={{ custom: NodeComponent }}
 	edgeTypes={{ custom: EdgeComponent }}

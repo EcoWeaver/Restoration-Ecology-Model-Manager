@@ -3,6 +3,7 @@
 	import Search from "./Search.svelte";
 	import type { ChipElement } from "./search/Chip.svelte";
 	import type { Snippet } from "svelte";
+	import DarkLight from "./DarkLight.svelte";
 
 	let {
 		params,
@@ -36,6 +37,8 @@
 	{/if}
 
 	{@render children?.()}
+
+	<DarkLight />
 
 	<a
 		title="source"
