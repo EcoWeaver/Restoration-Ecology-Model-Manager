@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { PencilLine } from "@lucide/svelte";
-	import { goto } from "$app/navigation";
+	import { Link, PencilLine } from "@lucide/svelte";
 	import Graph from "$lib/Graph.svelte";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import Header from "$lib/Header.svelte";
@@ -10,10 +9,8 @@
 	let { model, metadataMap } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
 
-	$inspect(metadataMap);
-
-	async function edit() {
-		await goto(`/edit/${model.identifier}?version=${model.version}`);
+	async function share() {
+		await navigator.clipboard.writeText(window.location.href);
 	}
 </script>
 
@@ -23,12 +20,22 @@
 
 <div class="absolute z-10 w-full bg-white dark:bg-neutral-800">
 	<Header>
-		<button
+		<a
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
-			onclick={edit}
+			title="edit model"
+			href={`/edit/${model.identifier}?version=${model.version}`}
 		>
 			<PencilLine strokeWidth={1.7} />
-			<span class="pl-2">edit model</span>
+			<span class="pl-2">edit</span>
+		</a>
+
+		<button
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			title="copy model link to clipboard"
+			onclick={share}
+		>
+			<Link />
+			<span class="pl-2">share</span>
 		</button>
 	</Header>
 </div>

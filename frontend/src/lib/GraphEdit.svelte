@@ -78,17 +78,19 @@
 	<Header createModel={false}>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			title="add new node"
 			onclick={add}
 		>
 			<Plus />
-			<span class="pl-1">add node</span>
+			<span class="pl-1">node</span>
 		</button>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			title="save model"
 			onclick={save}
 		>
 			<Save />
-			<span class="pl-2">save model</span>
+			<span class="pl-2">save</span>
 		</button>
 	</Header>
 </div>

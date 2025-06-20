@@ -27,10 +27,11 @@
 	{#if createModel}
 		<a
 			href="/edit"
+			title="create new model"
 			class="flex h-10 items-center rounded-md bg-indigo-300 px-2 font-medium hover:bg-indigo-400 dark:bg-indigo-500"
 		>
 			<Plus />
-			<span class="px-1">new model</span>
+			<span class="px-1">model</span>
 		</a>
 	{/if}
 
