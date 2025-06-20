@@ -161,4 +161,10 @@
 	{/if}
 </div>
 
-<SearchButton onclick={submit} />
+<SearchButton
+	onclick={() => {
+		if (selected === -1 && input.length === 0) {
+			submit();
+		}
+	}}
+/>
