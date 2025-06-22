@@ -17,3 +17,8 @@ build:
 
 run:
 	go run .
+
+.PHONY:backup
+backup: 
+	chmod +x backup.sh
+	./backup.sh
