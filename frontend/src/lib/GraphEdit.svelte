@@ -59,6 +59,8 @@
 	let metadataPanel: ReturnType<typeof MetadataPanel>;
 </script>
 
+<svelte:window onbeforeunload={(event) => event.preventDefault()} />
+
 <Alert bind:this={alert} />
 
 <div class="t-0 absolute z-10 w-full bg-white dark:bg-neutral-800">
