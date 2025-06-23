@@ -11,8 +11,6 @@
 	--xy-edge-label-background-color: #ffffff00;
 }
 
-@media (prefers-color-scheme: dark) {
-	.svelte-flow {
-		--xy-background-color: theme(--color-neutral-800);
-	}
+.dark .svelte-flow {
+	--xy-background-color: theme(--color-neutral-800);
 }

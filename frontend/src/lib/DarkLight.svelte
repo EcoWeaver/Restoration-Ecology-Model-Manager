@@ -46,10 +46,17 @@
 	</script>
 </svelte:head>
 
-<button class="mr-1 cursor-pointer" onclick={toggle}>
-	{#if current}
-		<Sun />
-	{:else}
-		<Moon />
-	{/if}
+<button class="dark-light mr-1 cursor-pointer" onclick={toggle}>
+	<span class="sun hidden"><Sun /></span>
+	<span class="moon"><Moon /></span>
 </button>
+
+<style>
+	:global(.dark) .dark-light .sun {
+		display: unset;
+	}
+
+	:global(.dark) .dark-light .moon {
+		display: none;
+	}
+</style>
