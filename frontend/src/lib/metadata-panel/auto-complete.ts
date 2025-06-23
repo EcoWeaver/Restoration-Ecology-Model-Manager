@@ -1,7 +1,7 @@
 export function suggestChoices(choices: string[]) {
 	return async function suggest(value: string): Promise<string[]> {
 		if (value === "") {
-			return [];
+			return choices;
 		}
 
 		return choices.filter(
