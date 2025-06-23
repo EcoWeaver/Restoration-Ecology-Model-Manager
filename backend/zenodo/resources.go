@@ -8,19 +8,19 @@ import (
 )
 
 type Deposit struct {
-	Created   time.Time         `json:"created"`
-	Doi       *string           `json:"doi"`
-	DoiUrl    *string           `json:"doi_url"`
-	Files     []DepositionFile  `json:"files"`
-	Id        int               `json:"id"`
-	Metadata  []DepositMetadata `json:"metadata"`
-	Modified  time.Time         `json:"modified"`
-	Owner     int               `json:"owner"`
-	RecordId  *int              `json:"record_id"`
-	RecordUrl *url.URL          `json:"record_url"`
-	State     string            `json:"state"`
-	Submitted bool              `json:"submitted"`
-	Title     string            `json:"title"`
+	Created   time.Time        `json:"created"`
+	Doi       *string          `json:"doi"`
+	DoiUrl    *string          `json:"doi_url"`
+	Files     []DepositionFile `json:"files"`
+	Id        int              `json:"id"`
+	Metadata  DepositMetadata  `json:"metadata"`
+	Modified  time.Time        `json:"modified"`
+	Owner     int              `json:"owner"`
+	RecordId  *int             `json:"record_id"`
+	RecordUrl *url.URL         `json:"record_url"`
+	State     string           `json:"state"`
+	Submitted bool             `json:"submitted"`
+	Title     string           `json:"title"`
 }
 
 type DepositMetadata struct {
