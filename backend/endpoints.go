@@ -167,8 +167,6 @@ func (self *State) PutModel(c echo.Context) error {
 		r.Version += fmt.Sprintf(".%d", numDerivatives)
 	}
 
-	const ERR_UNIQUE_VIOLATION = "23505"
-
 	query := `
 		INSERT INTO
 			models (identifier, graph, version)
@@ -177,9 +175,9 @@ func (self *State) PutModel(c echo.Context) error {
 		RETURNING
 			model_id`
 
-	var modelId int
-	if err = conn.QueryRow(ctx, query, r.Identifier, r.Graph, r.Version).Scan(&modelId); err != nil {
-		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == ERR_UNIQUE_VIOLATION {
+	var modelID int
+	if err = conn.QueryRow(ctx, query, r.Identifier, r.Graph, r.Version).Scan(&modelID); err != nil {
+		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == "23505" {
 			err = fmt.Errorf("encountered non-unique model identifier '%s' at version '%s'", r.Identifier, r.Version)
 			c.Logger().Warn(err)
 			return c.String(http.StatusBadRequest, err.Error())
@@ -194,7 +192,7 @@ func (self *State) PutModel(c echo.Context) error {
 		VALUES
 			`
 
-	args := []any{modelId}
+	args := []any{modelID}
 	var ins []string
 	for _, me := range r.Metadata {
 		args = append(args, me.Kind, me.Value)
