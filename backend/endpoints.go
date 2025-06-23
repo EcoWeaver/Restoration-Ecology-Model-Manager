@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -117,6 +118,27 @@ func (self *State) PutModel(c echo.Context) error {
 			return err
 		}
 	}
+	var oldGraph Graph
+	var oldMetadata []Metadata
+	err = self.DbPool.QueryRow(ctx, `
+		SELECT
+			models.graph,
+			COALESCE(jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)), '[]')
+		FROM
+			models
+			JOIN metadata ON models.model_id = metadata.model_id
+		WHERE
+			models.identifier = $1 AND models.version = $2
+		GROUP BY
+			models.graph
+	`, r.Identifier, r.Version).Scan(&oldGraph, &oldMetadata)
+	if err == nil {
+		cleanOld := sanitizeGraph(oldGraph)
+		cleanNew := sanitizeGraph(r.Graph)
+		if cleanOld == cleanNew && reflect.DeepEqual(oldMetadata, r.Metadata) {
+			return c.NoContent(http.StatusNotModified)
+		}
+	}
 
 	conn, err := self.DbPool.Begin(ctx)
 	if err != nil {
@@ -192,6 +214,24 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, r)
+}
+
+func sanitizeGraph(g Graph) string {
+	b, _ := json.Marshal(g)
+	var obj map[string]interface{}
+	_ = json.Unmarshal(b, &obj)
+
+	nodes, ok := obj["nodes"].([]interface{})
+	if ok {
+		for _, n := range nodes {
+			if nodeMap, ok := n.(map[string]interface{}); ok {
+				delete(nodeMap, "color")
+				delete(nodeMap, "position")
+			}
+		}
+	}
+	cleaned, _ := json.Marshal(obj)
+	return string(cleaned)
 }
 
 func (self *State) GetRelations(c echo.Context) error {
