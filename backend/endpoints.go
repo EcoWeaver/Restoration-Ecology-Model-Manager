@@ -16,11 +16,11 @@ import (
 )
 
 type State struct {
-	DbPool       *pgxpool.Pool
+	DBPool       *pgxpool.Pool
 	Metadata     LiveMetadataConfig
 	Relations    LiveRelationsConfig
-	DoiCache     verify.Cache
-	OrcidCache   verify.Cache
+	DOICache     verify.Cache
+	ORCIDCache   verify.Cache
 	SpeciesCache verify.Cache
 }
 
@@ -56,7 +56,7 @@ func (self *State) GetModel(c echo.Context) error {
 		GROUP BY
 			models.graph`
 
-	conn, err := self.DbPool.Begin(ctx)
+	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func (self *State) PutModel(c echo.Context) error {
 			return err
 		}
 	}
-	conn, err := self.DbPool.Begin(ctx)
+	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
@@ -287,7 +287,7 @@ func (self *State) GetSearch(c echo.Context) error {
 			)`
 	}
 
-	conn, err := self.DbPool.Begin(ctx)
+	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
 		return err
 	}
@@ -330,7 +330,7 @@ func (self *State) GetVersions(c echo.Context) error {
 		WHERE
 			models.identifier = $1 AND metadata.kind = 'title'`
 
-	conn, err := self.DbPool.Begin(ctx)
+	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
 		return err
 	}

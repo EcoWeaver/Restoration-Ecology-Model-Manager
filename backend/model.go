@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/verify"
+	"errors"
 	"fmt"
 	"net/url"
 	"slices"
@@ -46,7 +47,7 @@ type Point struct {
 }
 
 func (self ModelRequest) verify(s *State, l echo.Logger) error {
-	if err := s.DoiCache.Verify(self.Identifier); err != nil {
+	if err := s.DOICache.Verify(self.Identifier); err != nil {
 		return err
 	}
 
@@ -117,7 +118,7 @@ const YearMonthDay = "2006-01-02"
 func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger) error {
 	if self.Kind == "" {
 		if self.Value == "" {
-			return verify.Error{E: fmt.Errorf("encountered unset metadata kind with unset value")}
+			return verify.Error{E: errors.New("encountered unset metadata kind with unset value")}
 		} else {
 			return verify.Error{E: fmt.Errorf("encountered unset metadata kind with value '%s'", self.Value)}
 		}
@@ -161,7 +162,7 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger) error {
 					return nil
 				}
 			case "orcid":
-				if err := s.OrcidCache.Verify(self.Value); err != nil {
+				if err := s.ORCIDCache.Verify(self.Value); err != nil {
 					if _, ok := err.(verify.Error); !ok {
 						return err
 					}

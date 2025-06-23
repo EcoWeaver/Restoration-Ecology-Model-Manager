@@ -7,16 +7,13 @@ services:
     ports:
       - 25432:5432
     volumes:
-      - ./postgreSQL:/docker-entrypoint-initdb.d:z
-      - ./data/postgres:/var/lib/postgresql/data:z
+      - ./postgresql:/docker-entrypoint-initdb.d:z
+      - ./postgresql/data:/var/lib/postgresql/data:z
   pgadmin:
     image: dpage/pgadmin4
     env_file:
       - .env
     ports:
       - 15432:80
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=swep@example.com
-      - PGADMIN_DEFAULT_PASSWORD=swep
     depends_on:
       - postgres

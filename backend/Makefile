@@ -1,9 +1,7 @@
 _default:
-	@echo "usage: make [up|down|psql|build|run]"
+	@echo "usage: make [up|down|psql|check|build|run|backup]"
 
 up:
-	docker stop postgres || true
-	docker rm postgres || true
 	docker compose up
 
 down:
@@ -12,13 +10,19 @@ down:
 psql:
 	docker exec -it postgres psql -U postgres -d postgres
 
+check:
+	golangci-lint run
+	golangci-lint fmt -d
+
 build:
 	go build .
 
 run:
 	go run .
 
-.PHONY:backup
-backup: 
-	chmod +x backup.sh
-	./backup.sh
+backup:
+	mkdir -p postgresql/backup
+	docker exec -it postgres pg_dump -U postgres -d postgres --column-inserts \
+		| grep "INSERT INTO " \
+		| sed -e "s/INSERT INTO public./INSERT INTO /g" \
+		> postgresql/backup/backup_$(shell date +%Y-%m-%d_%H-%M-%S).sql

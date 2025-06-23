@@ -41,9 +41,9 @@ func main() {
 	defer dbPool.Close()
 
 	state := State{
-		DbPool:       dbPool,
-		DoiCache:     verify.DoiCache(),
-		OrcidCache:   verify.OrcidCache(),
+		DBPool:       dbPool,
+		DOICache:     verify.DOICache(),
+		ORCIDCache:   verify.ORCIDCache(),
 		SpeciesCache: verify.SpeciesCache(),
 	}
 

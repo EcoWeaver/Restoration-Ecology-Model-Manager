@@ -10,8 +10,5 @@ Thumbs.db
 !.env.example
 !.env.test
 
-#data 
-data/
-
-#Backuo 
-backup/
+postgresql/data/
+postgresql/backup/

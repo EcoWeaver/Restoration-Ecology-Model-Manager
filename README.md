@@ -1,6 +1,7 @@
 # Restoration Ecology Model Manager
 
 ## Running the app
+
 The three steps have to be performed in separate terminals.
 
 1. Run Docker Container
@@ -30,4 +31,17 @@ The frontend is built with Svelte, using SvelteFlow for node-based user interfac
 cd frontend
 npm install
 npm run dev
+```
+
+## Linting and formatting
+
+This project uses static analysis tools to ensure correctness and idiomatic code style.
+
+### Backend
+
+The backend uses [`golangci-lint`](https://golangci-lint.run/) to run multiple linting and formatting checks in parallel. It can be started with the following commands.
+
+```sh
+cd backend
+make check
 ```

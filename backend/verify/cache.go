@@ -21,11 +21,11 @@ func (self *Cache) Verify(key string) error {
 	return err
 }
 
-func DoiCache() Cache {
+func DOICache() Cache {
 	return Cache{get: doi}
 }
 
-func OrcidCache() Cache {
+func ORCIDCache() Cache {
 	return Cache{get: orcid}
 }
 

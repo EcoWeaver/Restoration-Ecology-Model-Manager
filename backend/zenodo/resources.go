@@ -9,15 +9,15 @@ import (
 
 type Deposit struct {
 	Created   time.Time        `json:"created"`
-	Doi       *string          `json:"doi"`
-	DoiUrl    *url.URL         `json:"doi_url"`
+	DOI       *string          `json:"doi"`
+	DOIURL    *url.URL         `json:"doi_url"`
 	Files     []DepositionFile `json:"files"`
-	Id        int              `json:"id"`
+	ID        int              `json:"id"`
 	Metadata  DepositMetadata  `json:"metadata"`
 	Modified  time.Time        `json:"modified"`
 	Owner     int              `json:"owner"`
-	RecordId  *int             `json:"record_id"`
-	RecordUrl *url.URL         `json:"record_url"`
+	RecordID  *int             `json:"record_id"`
+	RecordURL *url.URL         `json:"record_url"`
 	State     string           `json:"state"`
 	Submitted bool             `json:"submitted"`
 	Title     string           `json:"title"`
@@ -32,16 +32,16 @@ type DepositMetadata struct {
 	Creators        []struct {
 		Name        string  `json:"name"`
 		Affiliation *string `json:"affiliation"`
-		Orcid       *string `json:"orcid"`
-		Gnd         *string `json:"gnd"`
+		ORCID       *string `json:"orcid"`
+		GND         *string `json:"gnd"`
 	} `json:"creators"`
 	Description        string     `json:"description"`
 	AccessRight        string     `json:"access_right"`
 	License            *string    `json:"license"`
 	EmbargoDate        *time.Time `json:"embargo_date"`
 	AccessConditions   *string    `json:"access_conditions"`
-	Doi                *string    `json:"doi"`
-	PreserveDoi        *string    `json:"preserve_doi"`
+	DOI                *string    `json:"doi"`
+	PreserveDOI        *string    `json:"preserve_doi"`
 	Keywords           *[]string  `json:"keywords"`
 	Notes              *string    `json:"notes"`
 	RelatedIdentifiers *[]struct {
@@ -52,15 +52,15 @@ type DepositMetadata struct {
 	Contributors *[]struct {
 		Name        string  `json:"name"`
 		Affiliation *string `json:"affiliation"`
-		Orcid       *string `json:"orcid"`
-		Gnd         *string `json:"gnd"`
+		ORCID       *string `json:"orcid"`
+		GND         *string `json:"gnd"`
 	} `json:"contributors"`
 	References  *[]string `json:"references"`
 	Communities *[]struct {
 		Identifier string `json:"identifier"`
 	} `json:"communities"`
 	Grants *[]struct {
-		Id string `json:"id"`
+		ID string `json:"id"`
 	} `json:"grants"`
 	JournalTitle          *string  `json:"journal_title"`
 	JournalVolume         *string  `json:"journal_volume"`
@@ -70,7 +70,7 @@ type DepositMetadata struct {
 	ConferenceAcronym     *string  `json:"conference_acronym"`
 	ConferenceDates       *string  `json:"conference_dates"`
 	ConferencePlace       *string  `json:"conference_place"`
-	ConferenceUrl         *url.URL `json:"conference_url"`
+	ConferenceURL         *url.URL `json:"conference_url"`
 	ConferenceSession     *string  `json:"conference_session"`
 	ConferenceSessionPart *string  `json:"conference_session_part"`
 	ImprintPublisher      *string  `json:"imprint_publisher"`
@@ -81,8 +81,8 @@ type DepositMetadata struct {
 	ThesisSupervisors     *[]struct {
 		Name        string  `json:"name"`
 		Affiliation *string `json:"affiliation"`
-		Orcid       *string `json:"orcid"`
-		Gnd         *string `json:"gnd"`
+		ORCID       *string `json:"orcid"`
+		GND         *string `json:"gnd"`
 	} `json:"thesis_supervisors"`
 	ThesisUniversity *string `json:"thesis_university"`
 	Subjects         *[]struct {
@@ -91,7 +91,7 @@ type DepositMetadata struct {
 		Scheme     string `json:"scheme"`
 	} `json:"subjects"`
 	Version   *string       `json:"version"`
-	Language  *language.Tag `json:"Language"`
+	Language  *language.Tag `json:"language"`
 	Locations *[]struct {
 		Lat         *float64 `json:"lat"`
 		Lon         *float64 `json:"lon"`
@@ -108,7 +108,7 @@ type DepositMetadata struct {
 }
 
 type DepositionFile struct {
-	Id       string `json:"id"`
+	ID       string `json:"id"`
 	FileName string `json:"filename"`
 	FileSize int    `json:"filesize"`
 	Checksum string `json:"checksum"`
