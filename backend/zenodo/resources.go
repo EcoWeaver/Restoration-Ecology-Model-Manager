@@ -10,7 +10,7 @@ import (
 type Deposit struct {
 	Created   time.Time        `json:"created"`
 	Doi       *string          `json:"doi"`
-	DoiUrl    *string          `json:"doi_url"`
+	DoiUrl    *url.URL         `json:"doi_url"`
 	Files     []DepositionFile `json:"files"`
 	Id        int              `json:"id"`
 	Metadata  DepositMetadata  `json:"metadata"`
