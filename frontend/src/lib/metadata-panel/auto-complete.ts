@@ -11,7 +11,7 @@ export function suggestChoices(choices: string[]) {
 		);
 
 		let newSelected = 0;
-		if (selected !== 0 && typeof prevChoices[selected] == "string") {
+		if (selected !== 0 && typeof prevChoices[selected] === "string") {
 			let index = newChoices.findIndex((choice) => choice === prevChoices[selected]);
 			newSelected = index === -1 ? 0 : index;
 		}
