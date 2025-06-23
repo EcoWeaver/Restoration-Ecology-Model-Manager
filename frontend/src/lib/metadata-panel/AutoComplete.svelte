@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { FocusEventHandler } from "svelte/elements";
+	import { untrack } from "svelte";
 	import Input from "./Input.svelte";
 
 	let {
@@ -8,7 +8,7 @@
 		value = $bindable(),
 	}: {
 		placeholder: string;
-		suggest: (value: string) => Promise<string[]>;
+		suggest: (value: string, index: number) => Promise<[string[], number]>;
 		value: string;
 	} = $props();
 
@@ -51,10 +51,15 @@
 	}
 
 	$effect(() => {
-		suggest(value).then((newSuggestions) => {
+		suggest(
+			value,
+			untrack(() => selected),
+		).then(([newSuggestions, newSelected]) => {
 			suggestions = newSuggestions;
 			if (suggestions.length === 0) {
 				selected = 0;
+			} else {
+				selected = newSelected;
 			}
 		});
 	});
