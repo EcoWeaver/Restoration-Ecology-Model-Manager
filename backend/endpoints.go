@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -47,9 +47,7 @@ func (self *State) GetModel(c echo.Context) error {
 	query := `
 		SELECT
 			models.graph,
-			jsonb_agg(
-				jsonb_build_object('kind', metadata.kind, 'value', metadata.value)
-			)
+			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
 		FROM
 			models
 			JOIN metadata ON models.model_id = metadata.model_id
@@ -118,28 +116,6 @@ func (self *State) PutModel(c echo.Context) error {
 			return err
 		}
 	}
-	var oldGraph Graph
-	var oldMetadata []Metadata
-	err = self.DbPool.QueryRow(ctx, `
-		SELECT
-			models.graph,
-			COALESCE(jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value)), '[]')
-		FROM
-			models
-			JOIN metadata ON models.model_id = metadata.model_id
-		WHERE
-			models.identifier = $1 AND models.version = $2
-		GROUP BY
-			models.graph
-	`, r.Identifier, r.Version).Scan(&oldGraph, &oldMetadata)
-	if err == nil {
-		cleanOld := sanitizeGraph(oldGraph)
-		cleanNew := sanitizeGraph(r.Graph)
-		if cleanOld == cleanNew && reflect.DeepEqual(oldMetadata, r.Metadata) {
-			return c.NoContent(http.StatusNotModified)
-		}
-	}
-
 	conn, err := self.DbPool.Begin(ctx)
 	if err != nil {
 		return err
@@ -148,6 +124,34 @@ func (self *State) PutModel(c echo.Context) error {
 
 	if isDerivative {
 		query := `
+		SELECT
+			models.graph,
+			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
+		FROM
+			models
+			JOIN metadata ON models.model_id = metadata.model_id
+		WHERE
+			models.identifier = $1 AND models.version = $2
+		GROUP BY
+			models.graph`
+
+		var graph Graph
+		var metadata []Metadata
+		if err = conn.QueryRow(ctx, query, r.Identifier, r.Version).Scan(&graph, &metadata); err != nil {
+			if err == pgx.ErrNoRows {
+				err = fmt.Errorf("model with identifier '%s' at version '%s' not found", r.Identifier, r.Version)
+				c.Logger().Warn(err)
+				return c.String(http.StatusNotFound, err.Error())
+			} else {
+				return err
+			}
+		}
+
+		if slices.Equal(r.Graph.Nodes, graph.Nodes) && slices.Equal(r.Graph.Relations, graph.Relations) && slices.Equal(r.Metadata, metadata) {
+			return c.String(http.StatusNotModified, fmt.Sprintf("model with identifier '%s' at version '%s' wasn't changed", r.Identifier, r.Version))
+		}
+
+		query = `
 		UPDATE models
 			SET num_derivatives = num_derivatives + 1
 		WHERE
@@ -157,13 +161,7 @@ func (self *State) PutModel(c echo.Context) error {
 
 		var numDerivatives int
 		if err = conn.QueryRow(ctx, query, r.Identifier, r.Version).Scan(&numDerivatives); err != nil {
-			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("model with identifier '%s' at version '%s' not found", r.Identifier, r.Version)
-				c.Logger().Warn(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				return err
-			}
+			return err
 		}
 
 		r.Version += fmt.Sprintf(".%d", numDerivatives)
@@ -214,24 +212,6 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, r)
-}
-
-func sanitizeGraph(g Graph) string {
-	b, _ := json.Marshal(g)
-	var obj map[string]interface{}
-	_ = json.Unmarshal(b, &obj)
-
-	nodes, ok := obj["nodes"].([]interface{})
-	if ok {
-		for _, n := range nodes {
-			if nodeMap, ok := n.(map[string]interface{}); ok {
-				delete(nodeMap, "color")
-				delete(nodeMap, "position")
-			}
-		}
-	}
-	cleaned, _ := json.Marshal(obj)
-	return string(cleaned)
 }
 
 func (self *State) GetRelations(c echo.Context) error {
