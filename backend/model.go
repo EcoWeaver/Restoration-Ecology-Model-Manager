@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -46,7 +45,7 @@ type Point struct {
 	Y int `json:"y"`
 }
 
-func (self *ModelRequest) verify(s *State, l echo.Logger) error {
+func (self ModelRequest) verify(s *State, l echo.Logger) error {
 	if err := s.DoiCache.Verify(self.Identifier); err != nil {
 		return err
 	}
@@ -65,7 +64,7 @@ func (self *ModelRequest) verify(s *State, l echo.Logger) error {
 	}
 
 	for _, me := range self.Metadata {
-		if err = me.verify(s, &m, l); err != nil {
+		if err = me.verify(s, m, l); err != nil {
 			return err
 		}
 	}
@@ -103,7 +102,7 @@ func (self Graph) verify(s *State, l echo.Logger) error {
 			return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
 		}
 		e[pair] = struct{}{}
-		if err := re.verify(&r); err != nil {
+		if err := re.verify(r); err != nil {
 			return err
 		}
 	}
@@ -115,8 +114,7 @@ const Year = "2006"
 const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
-func (self *Metadata) verify(s *State, m *MetadataConfig, l echo.Logger) error {
-	self.Value = strings.TrimSpace(self.Value)
+func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger) error {
 	if self.Kind == "" {
 		if self.Value == "" {
 			return verify.Error{E: fmt.Errorf("encountered unset metadata kind with unset value")}
@@ -190,7 +188,7 @@ func (self *Metadata) verify(s *State, m *MetadataConfig, l echo.Logger) error {
 	return verify.Error{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
 }
 
-func (self Relation) verify(r *RelationsConfig) error {
+func (self Relation) verify(r RelationsConfig) error {
 	if slices.Contains(r.Causal, self.Kind) || slices.Contains(r.Noncausal, self.Kind) {
 		return nil
 	}
