@@ -82,7 +82,7 @@ func (self *State) GetModel(c echo.Context) error {
 		if err == pgx.ErrNoRows {
 			err = fmt.Errorf("model with identifier '%s' at version '%s' not found", identifier, version)
 			c.Logger().Warn(err)
-			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err})
+			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
 		}
@@ -125,7 +125,7 @@ func (self *State) PutModel(c echo.Context) error {
 	var r ModelRequest
 	if err = json.Unmarshal(body, &r); err != nil {
 		c.Logger().Warn(err)
-		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err})
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
 	isDerivative := r.Version != ""
@@ -136,7 +136,7 @@ func (self *State) PutModel(c echo.Context) error {
 	if err = r.verify(self, c.Logger()); err != nil {
 		if _, ok := err.(verify.Error); ok {
 			c.Logger().Warn(err)
-			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err})
+			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
 		}
@@ -166,7 +166,7 @@ func (self *State) PutModel(c echo.Context) error {
 			if err == pgx.ErrNoRows {
 				err = fmt.Errorf("model with identifier '%s' at version '%s' not found", r.Identifier, r.Version)
 				c.Logger().Warn(err)
-				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err})
+				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 			} else {
 				return err
 			}
@@ -205,7 +205,7 @@ func (self *State) PutModel(c echo.Context) error {
 		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == "23505" {
 			err = fmt.Errorf("encountered non-unique model identifier '%s' at version '%s'", r.Identifier, r.Version)
 			c.Logger().Warn(err)
-			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err})
+			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
 		}
@@ -284,7 +284,7 @@ func (self *State) GetSearch(c echo.Context) error {
 			if !metadata.IsMetadataKind(k) {
 				err = fmt.Errorf("encountered invalid metadata kind '%s'", k)
 				c.Logger().Warn(err)
-				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err})
+				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 			}
 
 			args = append(args, k)
