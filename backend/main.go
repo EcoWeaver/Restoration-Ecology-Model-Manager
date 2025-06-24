@@ -16,13 +16,13 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// @title Restoration Ecology Model Manager API
-// @version 1.0
-
-// @license.name AGPL-3.0
-// @license.url https://www.gnu.org/licenses/agpl-3.0.en.html
-
-// @host localhost:8080
+// main godoc
+//
+//	@title			Restoration Ecology Model Manager API
+//	@version		1.0
+//	@license.name	AGPL-3.0
+//	@license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
+//	@host			localhost:8080
 func main() {
 	e := echo.New()
 

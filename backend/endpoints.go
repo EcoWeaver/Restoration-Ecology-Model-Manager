@@ -34,9 +34,9 @@ type SearchResult struct {
 //
 //	@Summary	Get list of currently accepted metadata kinds, types and obligations
 //	@Produce	json
-//	@Success	200				{object}	MetadataConfig
-//	@Failure	500				{object}	echo.HTTPError
-//	@Router		/metadata		[get]
+//	@Success	200			{object}	MetadataConfig
+//	@Failure	500			{object}	echo.HTTPError
+//	@Router		/metadata																		[get]
 func (self *State) GetMetadata(c echo.Context) error {
 	metadata, err := self.Metadata.Get(c.Logger())
 	if err != nil {
@@ -50,12 +50,12 @@ func (self *State) GetMetadata(c echo.Context) error {
 //	@Summary		Get a model
 //	@Description	Gets a model by its identifier and version
 //	@Produce		json
-//	@Param			identifier		query		string		true	"Model Identifier"
-//	@Param			version			query		string		true	"Model Version"
-//	@Success		200				{object}	ModelRequest
-//	@Failure		404				{object}	echo.HTTPError
-//	@Failure		500				{object}	echo.HTTPError
-//	@Router			/model			[get]
+//	@Param			identifier	query		string	true	"Model Identifier"
+//	@Param			version		query		string	true	"Model Version"
+//	@Success		200			{object}	ModelRequest
+//	@Failure		404			{object}	echo.HTTPError
+//	@Failure		500			{object}	echo.HTTPError
+//	@Router			/model																											[get]
 func (self *State) GetModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -113,13 +113,13 @@ func (self *State) GetModel(c echo.Context) error {
 //	@Description	Saves a model. The `version` field in the `ModelRequest` is to be set to the version this model bases on if it's an edit, or null otherwise. The returned model will be identical, except for the `version` field, which is updated to the version this model was saved as.
 //	@Accept			json
 //	@Produce		json
-//	@Param			model		body		ModelRequest	true	"Model"
-//	@Success		201			{object}	ModelRequest
-//	@Failure		304			{object}	echo.HTTPError
-//	@Failure		400			{object}	echo.HTTPError
-//	@Failure		404			{object}	echo.HTTPError
-//	@Failure		500			{object}	echo.HTTPError
-//	@Router			/model		[put]
+//	@Param			model	body		ModelRequest	true	"Model"
+//	@Success		201		{object}	ModelRequest
+//	@Failure		304		{object}	echo.HTTPError
+//	@Failure		400		{object}	echo.HTTPError
+//	@Failure		404		{object}	echo.HTTPError
+//	@Failure		500		{object}	echo.HTTPError
+//	@Router			/model																		[put]
 func (self *State) PutModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -249,9 +249,9 @@ func (self *State) PutModel(c echo.Context) error {
 //
 //	@Summary	Get list of currently accepted relation kinds and types
 //	@Produce	json
-//	@Success	200				{object}	RelationsConfig
-//	@Failure	500				{object}	echo.HTTPError
-//	@Router		/relations		[get]
+//	@Success	200			{object}	RelationsConfig
+//	@Failure	500			{object}	echo.HTTPError
+//	@Router		/relations																		[get]
 func (self *State) GetRelations(c echo.Context) error {
 	relations, err := self.Relations.Get(c.Logger())
 	if err != nil {
@@ -265,10 +265,10 @@ func (self *State) GetRelations(c echo.Context) error {
 //	@Summary		Search for models
 //	@Description	Searches for models that match at least one of the provided queries per metadata kind.
 //	@Produce		json
-//	@Success		200			{object}	[]SearchResult
-//	@Failure		400			{object}	echo.HTTPError
-//	@Failure		500			{object}	echo.HTTPError
-//	@Router			/search		[get]
+//	@Success		200		{object}	[]SearchResult
+//	@Failure		400		{object}	echo.HTTPError
+//	@Failure		500		{object}	echo.HTTPError
+//	@Router			/search																		[get]
 func (self *State) GetSearch(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -369,10 +369,10 @@ func (self *State) GetSearch(c echo.Context) error {
 //	@Summary		Get versions of a model
 //	@Description	Gets all versions of a model by its identifier
 //	@Produce		json
-//	@Param			identifier		query		string		true	"Model Identifier"
-//	@Success		200				{object}	[]SearchResult
-//	@Failure		500				{object}	echo.HTTPError
-//	@Router			/versions		[get]
+//	@Param			identifier	query		string	true	"Model Identifier"
+//	@Success		200			{object}	[]SearchResult
+//	@Failure		500			{object}	echo.HTTPError
+//	@Router			/versions																		[get]
 func (self *State) GetVersions(c echo.Context) error {
 	ctx := c.Request().Context()
 
