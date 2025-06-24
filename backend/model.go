@@ -64,10 +64,18 @@ func (self ModelRequest) verify(s *State, l echo.Logger) error {
 		return err
 	}
 
+	e := map[string]struct{}{}
+	for _, me := range m.Mandatory {
+		e[me.Name] = struct{}{}
+	}
 	for _, me := range self.Metadata {
 		if err = me.verify(s, m, l); err != nil {
 			return err
 		}
+		delete(e, me.Kind)
+	}
+	if len(e) != 0 {
+		return verify.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", e)}
 	}
 
 	return nil
