@@ -16,7 +16,7 @@
 			<span class="px-1">|</span>
 			{statusText}
 		</p>
-		<h1 class="mt-4 text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-7xl">
+		<h1 class="mt-4 text-5xl font-semibold tracking-tight text-balance sm:text-7xl">
 			{page.error?.message || statusText}
 		</h1>
 		<div class="mt-10 items-center">

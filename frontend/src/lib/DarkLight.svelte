@@ -31,19 +31,6 @@
 	});
 </script>
 
-<svelte:head>
-	<script>
-		{
-			const theme = localStorage.getItem("theme") ?? "system";
-			document.documentElement.classList.toggle(
-				"dark",
-				theme === "dark" ||
-					(theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches),
-			);
-		}
-	</script>
-</svelte:head>
-
 <button class="dark-light mr-1 cursor-pointer" onclick={toggle}>
 	<span class="sun hidden"><Sun /></span>
 	<span class="moon"><Moon /></span>
