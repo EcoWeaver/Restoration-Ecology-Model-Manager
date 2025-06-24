@@ -50,8 +50,8 @@ func (self *State) GetMetadata(c echo.Context) error {
 //	@Summary		Get a model
 //	@Description	Gets a model by its identifier and version
 //	@Produce		json
-//	@Param			identifier		path		string		true	"Model Identifier"
-//	@Param			version			path		string		true	"Model Version"
+//	@Param			identifier		query		string		true	"Model Identifier"
+//	@Param			version			query		string		true	"Model Version"
 //	@Success		200				{object}	ModelRequest
 //	@Failure		404				{object}	echo.HTTPError
 //	@Failure		500				{object}	echo.HTTPError
@@ -369,7 +369,7 @@ func (self *State) GetSearch(c echo.Context) error {
 //	@Summary		Get versions of a model
 //	@Description	Gets all versions of a model by its identifier
 //	@Produce		json
-//	@Param			identifier		path		string		true	"Model Identifier"
+//	@Param			identifier		query		string		true	"Model Identifier"
 //	@Success		200				{object}	[]SearchResult
 //	@Failure		500				{object}	echo.HTTPError
 //	@Router			/versions		[get]
