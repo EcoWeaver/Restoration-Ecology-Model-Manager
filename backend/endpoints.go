@@ -179,7 +179,9 @@ func (self *State) PutModel(c echo.Context) error {
 		}
 
 		if slices.Equal(r.Graph.Nodes, graph.Nodes) && slices.Equal(r.Graph.Relations, graph.Relations) && slices.Equal(r.Metadata, metadata) {
-			return c.JSON(http.StatusNotModified, echo.HTTPError{Message: fmt.Sprintf("model with identifier '%s' at version '%s' wasn't changed", r.Identifier, r.Version)})
+			err = fmt.Errorf("model with identifier '%s' at version '%s' wasn't changed", r.Identifier, r.Version)
+			c.Logger().Warn(err)
+			return c.JSON(http.StatusNotModified, echo.HTTPError{Message: err.Error()})
 		}
 
 		query = `
