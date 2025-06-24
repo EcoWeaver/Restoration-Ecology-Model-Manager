@@ -10,12 +10,12 @@ export const load: PageLoad = async ({ fetch, params, url }) => {
 
 	const modelRes = await fetch(apiUrl);
 	if (!modelRes.ok) {
-		return error(modelRes.status, await modelRes.text());
+		return error(modelRes.status, await modelRes.json());
 	}
 
 	const metaRes = await fetch(`${apiBase}/metadata`);
 	if (!metaRes.ok) {
-		return error(modelRes.status, await modelRes.text());
+		return error(modelRes.status, await modelRes.json());
 	}
 
 	const model: ModelRequest = await modelRes.json();

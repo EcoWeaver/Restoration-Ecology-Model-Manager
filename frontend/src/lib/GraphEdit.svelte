@@ -6,7 +6,7 @@
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import { goto } from "$app/navigation";
-	import type { Metadata, MetadataElements } from "./api";
+	import type { BackendError, Metadata, MetadataElements } from "./api";
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
 
@@ -36,8 +36,9 @@
 		try {
 			const model = await saveModel(identifier, metadata, nodes, edges, version);
 			await goto(`/view/${model.identifier}?version=${model.version}`);
-		} catch (error: any) {
-			alert.error(error);
+		} catch (err: unknown) {
+			const error = err as BackendError;
+			alert.error(error.message);
 		}
 	}
 

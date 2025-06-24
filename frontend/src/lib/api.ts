@@ -11,7 +11,7 @@ async function req<T>(method: string, path: string, body?: any | undefined): Pro
 	} else if (res.ok) {
 		return undefined as T;
 	} else {
-		throw await res.text();
+		throw await res.json();
 	}
 }
 
@@ -24,6 +24,10 @@ export type MetadataElements = Record<"mandatory" | "optional" | "recommended", 
 export function putModel(model: ModelRequest): Promise<ModelRequest> {
 	return req<ModelRequest>("PUT", "model", model);
 }
+
+export type BackendError = {
+	message: string;
+};
 
 export type ModelRequest = {
 	identifier: string;

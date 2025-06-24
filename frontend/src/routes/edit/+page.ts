@@ -5,7 +5,7 @@ import type { PageLoad } from "./$types";
 export const load: PageLoad = async ({ fetch }) => {
 	const res = await fetch(`${apiBase}/metadata`);
 	if (!res.ok) {
-		return error(res.status, await res.text());
+		return error(res.status, await res.json());
 	}
 
 	const metadataElements: MetadataElements = await res.json();
