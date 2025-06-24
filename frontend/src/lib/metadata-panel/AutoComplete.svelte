@@ -71,7 +71,7 @@
 <div class="relative" {onfocusout}>
 	{#if suggestions.length > 0 && focused}
 		<div
-			class="absolute bottom-9 flex max-h-64 min-w-64 flex-col-reverse overflow-y-auto rounded bg-neutral-200 p-4 dark:bg-neutral-700"
+			class="absolute bottom-9 flex max-h-64 min-w-64 flex-col-reverse overflow-y-auto rounded bg-neutral-200 p-4 shadow-xl dark:bg-neutral-700"
 		>
 			{#each suggestions.slice(0, 10) as choice, idx}
 				{#if idx === selected}

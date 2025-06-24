@@ -88,7 +88,7 @@
 			selected = Math.min(selected + 1, suggestions.length - 1);
 			key.preventDefault();
 		} else if (key.code === "ArrowUp") {
-			selected = Math.max(0, selected - 1);
+			selected = Math.max(input === "" ? -1 : 0, selected - 1);
 			key.preventDefault();
 		}
 	}
@@ -154,7 +154,7 @@
 	{#if focused && suggestions.length !== 0}
 		<div
 			tabindex="-1"
-			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 p-2 py-1 shadow-xl dark:bg-neutral-800"
+			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 bg-white p-2 py-1 shadow-xl dark:bg-neutral-800"
 		>
 			{#each suggestions as suggestion, idx}
 				{#if idx === selected}
