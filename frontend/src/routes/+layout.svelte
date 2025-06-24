@@ -27,10 +27,10 @@
 {@render children()}
 
 {#if navigatingDelayed}
-	<div class="absolute top-0 z-10000 h-full w-full" in:fade={{ duration: 250 }}>
-		<div class="absolute z-10 h-full w-full bg-white opacity-50 dark:bg-neutral-800"></div>
-		<div class="absolute z-20 flex h-full w-full animate-spin items-center justify-center">
-			<LoaderCircle />
-		</div>
+	<div
+		class="absolute top-0 z-1000 flex h-full w-full items-center justify-center bg-white/50 dark:bg-neutral-800/50"
+		in:fade={{ duration: 250 }}
+	>
+		<LoaderCircle class="animate-spin" />
 	</div>
 {/if}
