@@ -22,7 +22,7 @@
 			}
 		} else if (event.key === "ArrowUp") {
 			event.preventDefault();
-			selected = Math.min(10, suggestions.length - 1, selected + 1);
+			selected = Math.min(suggestions.length - 1, selected + 1);
 		} else if (event.key === "ArrowDown") {
 			event.preventDefault();
 			selected = Math.max(0, selected - 1);
@@ -73,7 +73,7 @@
 		<div
 			class="absolute bottom-9 flex max-h-64 min-w-64 flex-col-reverse overflow-y-auto rounded bg-neutral-200 p-4 shadow-xl dark:bg-neutral-700"
 		>
-			{#each suggestions.slice(0, 10) as choice, idx}
+			{#each suggestions as choice, idx}
 				{#if idx === selected}
 					<button
 						tabindex="-1"
