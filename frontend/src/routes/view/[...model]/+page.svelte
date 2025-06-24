@@ -59,7 +59,7 @@
 					<div class="table-row">
 						<div class="table-cell pr-2">identifier</div>
 						<a
-							class="ml-2 text-blue-700 hover:underline dark:text-blue-500"
+							class="ml-2 text-blue-700 hover:underline dark:text-blue-400"
 							href={`https://doi.org/${model.identifier}`}
 							target="_blank"
 							rel="noopener noreferrer"
@@ -75,7 +75,7 @@
 
 							{#if type === "orcid"}
 								<a
-									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-500"
+									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-400"
 									href={`https://orcid.org/${value}`}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -84,7 +84,7 @@
 								</a>
 							{:else if type === "url"}
 								<a
-									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-500"
+									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-400"
 									href={value}
 									target="_blank"
 									rel="noopener noreferrer"

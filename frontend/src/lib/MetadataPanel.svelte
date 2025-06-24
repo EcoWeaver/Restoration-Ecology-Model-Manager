@@ -72,7 +72,7 @@
 				<Input placeholder="doi" bind:value={identifier} />
 			{:else}
 				<a
-					class="text-blue-700 hover:underline dark:text-blue-500"
+					class="text-blue-700 hover:underline dark:text-blue-400"
 					href={`https://doi.org/${identifier}`}
 					target="_blank"
 					rel="noopener noreferrer"
