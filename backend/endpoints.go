@@ -36,7 +36,7 @@ type SearchResult struct {
 //	@Produce	json
 //	@Success	200			{object}	MetadataConfig
 //	@Failure	500			{object}	echo.HTTPError
-//	@Router		/metadata																		[get]
+//	@Router		/metadata	[get]
 func (self *State) GetMetadata(c echo.Context) error {
 	metadata, err := self.Metadata.Get(c.Logger())
 	if err != nil {
@@ -55,7 +55,7 @@ func (self *State) GetMetadata(c echo.Context) error {
 //	@Success		200			{object}	ModelRequest
 //	@Failure		404			{object}	echo.HTTPError
 //	@Failure		500			{object}	echo.HTTPError
-//	@Router			/model																											[get]
+//	@Router			/model		[get]
 func (self *State) GetModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -119,7 +119,7 @@ func (self *State) GetModel(c echo.Context) error {
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
-//	@Router			/model																		[put]
+//	@Router			/model	[put]
 func (self *State) PutModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -251,7 +251,7 @@ func (self *State) PutModel(c echo.Context) error {
 //	@Produce	json
 //	@Success	200			{object}	RelationsConfig
 //	@Failure	500			{object}	echo.HTTPError
-//	@Router		/relations																		[get]
+//	@Router		/relations	[get]
 func (self *State) GetRelations(c echo.Context) error {
 	relations, err := self.Relations.Get(c.Logger())
 	if err != nil {
@@ -268,7 +268,7 @@ func (self *State) GetRelations(c echo.Context) error {
 //	@Success		200		{object}	[]SearchResult
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
-//	@Router			/search																		[get]
+//	@Router			/search	[get]
 func (self *State) GetSearch(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -372,7 +372,7 @@ func (self *State) GetSearch(c echo.Context) error {
 //	@Param			identifier	query		string	true	"Model Identifier"
 //	@Success		200			{object}	[]SearchResult
 //	@Failure		500			{object}	echo.HTTPError
-//	@Router			/versions																		[get]
+//	@Router			/versions	[get]
 func (self *State) GetVersions(c echo.Context) error {
 	ctx := c.Request().Context()
 
