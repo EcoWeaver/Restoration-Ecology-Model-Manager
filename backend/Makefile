@@ -18,7 +18,7 @@ build:
 	go build .
 
 run:
-	swag init --parseDependency
+	go run github.com/swaggo/swag/cmd/swag@latest init --parseDependency
 	go run .
 
 backup:
