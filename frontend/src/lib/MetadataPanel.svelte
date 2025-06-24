@@ -67,12 +67,12 @@
 
 	<div class="table-row">
 		<span class="table-cell px-2 py-1">identifier</span>
-		<span class="table-cell py-1 pl-2">
+		<span class="table-cell py-1 pl-1">
 			{#if identifierEditable}
-				<Input placeholder="doi" bind:value={identifier} />
+				<span class="pl-1"><Input placeholder="doi" bind:value={identifier} /></span>
 			{:else}
 				<a
-					class="text-blue-700 hover:underline dark:text-blue-400"
+					class="block w-full pl-1 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 					href={`https://doi.org/${identifier}`}
 					target="_blank"
 					rel="noopener noreferrer"
@@ -92,7 +92,7 @@
 			{:else}
 				<select
 					bind:value={m.kind}
-					class="table-cell field-sizing-content rounded px-2 py-1 focus-within:outline-2 focus-within:outline-indigo-400"
+					class="table-cell field-sizing-content rounded px-2 py-1 outline-indigo-400 focus-visible:outline-2"
 				>
 					<option class="hidden" value="" disabled selected>-- select a kind --</option>
 					{#each Object.entries(elements) as [group, values] (group)}
@@ -111,7 +111,7 @@
 				{:else if type === "choice"}
 					<select
 						required
-						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 focus-within:outline-2 focus-within:outline-indigo-400"
+						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 outline-indigo-400 focus-visible:outline-2"
 						bind:value={m.value}
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>
@@ -143,7 +143,7 @@
 			{#if !m.mandatory}
 				<div class="relative table-cell">
 					<button
-						class="absolute top-2 left-[2px] inline h-6 cursor-pointer rounded-4xl focus-within:outline-indigo-400 focus:outline-2"
+						class="absolute top-2 left-[4px] inline h-6 cursor-pointer rounded-4xl outline-red-500 focus-visible:outline-2"
 						onclick={() => meta.splice(idx, 1)}
 					>
 						<X class="stroke-red-500" />

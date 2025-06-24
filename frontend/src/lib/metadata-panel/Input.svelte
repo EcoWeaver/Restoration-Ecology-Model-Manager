@@ -33,6 +33,6 @@
 	{onkeydown}
 	{onfocus}
 	{onblur}
-	class="h-8 w-full rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-within:outline-2"
+	class="h-8 w-full rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
 	{type}
 />

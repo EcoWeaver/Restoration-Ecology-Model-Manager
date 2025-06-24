@@ -40,16 +40,13 @@
 </script>
 
 <div
-	class:outline-2={open}
-	class:border-r-1={open}
-	class:pr-px={!open}
-	class="relative z-20 h-10 rounded-l-md border border-r-0 border-neutral-600 outline-indigo-400"
+	class="relative z-0 h-10 rounded-l-md border border-r-0 border-neutral-600 outline-indigo-400 focus-within:outline-2"
 	{onfocusout}
 >
 	<button
 		onclick={() => (open = !open)}
 		title={current.tooltip}
-		class="flex h-full cursor-pointer items-center rounded-l-md pr-2 pl-3"
+		class="flex h-full cursor-pointer items-center rounded-l-md pr-2 pl-3 outline-none"
 	>
 		<span class="pr-2">
 			<current.icon />

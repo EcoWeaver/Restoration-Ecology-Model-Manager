@@ -19,7 +19,13 @@
 </script>
 
 <div class="flex items-center gap-4 p-4" role="navigation">
-	<a title="home" href="/"><House /></a>
+	<a
+		title="home"
+		class="rounded-4xl outline-offset-4 outline-indigo-400 focus-visible:outline-2"
+		href="/"
+	>
+		<House />
+	</a>
 
 	<div class="flex min-w-0 grow">
 		<Search {params} {identifier} selectedSearch={identifier != null ? "identifier" : "metadata"} />
@@ -29,7 +35,7 @@
 		<a
 			href="/edit"
 			title="create new model"
-			class="flex h-10 items-center rounded-md bg-indigo-300 px-2 font-medium hover:bg-indigo-400 dark:bg-indigo-500"
+			class="flex h-10 items-center rounded-md bg-indigo-300 px-2 font-medium outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 		>
 			<Plus />
 			<span class="px-1">model</span>
@@ -41,6 +47,7 @@
 	<DarkLight />
 
 	<a
+		class="rounded-xl outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 		title="source"
 		href="https://git.uni-jena.de/fusion/teaching/project/2025sose/swep/restoration-ecology-model-manager/restoration-ecology-model-manager-app"
 		target="_blank"

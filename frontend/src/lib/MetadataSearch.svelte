@@ -106,7 +106,10 @@
 	});
 </script>
 
-<div class="min-w-0 grow overflow-x-auto" {onfocusout}>
+<div
+	class="min-w-0 grow overflow-x-auto focus-within:outline-2 focus-within:outline-indigo-400"
+	{onfocusout}
+>
 	<Input
 		placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
 		bind:value={input}

@@ -71,20 +71,18 @@
 	let metadataPanel: ReturnType<typeof MetadataPanel>;
 </script>
 
-<Alert bind:this={alert} />
-
 <div class="t-0 absolute z-10 w-full bg-white dark:bg-neutral-800">
 	<Header createModel={false}>
 		<button
-			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-2 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="add new node"
 			onclick={add}
 		>
 			<Plus />
-			<span class="pl-1">node</span>
+			<span class="px-1">node</span>
 		</button>
 		<button
-			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="save model"
 			onclick={save}
 		>
@@ -93,13 +91,15 @@
 		</button>
 		<a
 			href={typeof version === "undefined" ? "/" : `/view/${identifier}?version=${version}`}
-			class="flex h-10 cursor-pointer items-center rounded-md bg-red-300 px-3 hover:bg-red-400 dark:bg-red-500"
+			class="flex h-10 cursor-pointer items-center rounded-md bg-red-300 px-3 outline-offset-2 outline-red-400 hover:bg-red-400 focus-visible:outline-2 dark:bg-red-500"
 		>
 			<CircleX />
 			<span class="pl-2">cancel</span>
 		</a>
 	</Header>
 </div>
+
+<Alert bind:this={alert} />
 
 <div class="h-dvh w-dvw">
 	<Graph bind:nodes bind:edges interactive={true}>

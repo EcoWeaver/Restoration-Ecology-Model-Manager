@@ -28,14 +28,15 @@
 {#if open}
 	<div role="alert" class="t-0 absolute z-200 mt-18 flex w-full justify-center">
 		<span
-			class:bg-red-100={isError}
-			class:text-red-700={isError}
-			class:dark:text-red-100={isError}
+			class:bg-red-300={isError}
 			class:dark:bg-red-500={isError}
 			class="flex items-center rounded-md bg-indigo-300 px-5 py-3 dark:bg-indigo-500"
 		>
 			<span>{text}</span>
-			<button class="cursor-pointer pl-2" onclick={() => (open = false)}><X /></button>
+			<button
+				class="ml-3 cursor-pointer rounded-xl outline-offset-2 focus-visible:outline-2"
+				onclick={() => (open = false)}><X /></button
+			>
 		</span>
 	</div>
 {/if}

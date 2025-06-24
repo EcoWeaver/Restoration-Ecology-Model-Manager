@@ -18,7 +18,7 @@
 	}
 </script>
 
-<div class="grow">
+<div class="grow focus-within:outline-2 focus-within:outline-indigo-400">
 	<Input placeholder="search by identifier" bind:value={identifier} {onkeydown} />
 </div>
 

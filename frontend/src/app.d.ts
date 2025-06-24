@@ -10,8 +10,8 @@ declare global {
 	}
 
 	interface ObjectConstructor {
-		entries<TKey extends PropertyKey, TVal>(o: Record<TKey, TVal>): [TKey, TVal][];
-		keys<TKey extends PropertyKey>(obj: Record<TKey, unknown>): TKey[];
+		entries<K extends PropertyKey, V>(o: Record<K, V>): [K, V][];
+		keys<K extends PropertyKey>(obj: Record<K, unknown>): K[];
 	}
 }
 

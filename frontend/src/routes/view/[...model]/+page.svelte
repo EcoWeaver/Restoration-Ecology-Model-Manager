@@ -21,12 +21,10 @@
 	<title>view {model.identifier}@v{model.version}</title>
 </svelte:head>
 
-<Alert bind:this={alert} />
-
 <div class="absolute z-10 w-full bg-white dark:bg-neutral-800">
 	<Header>
 		<a
-			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="edit model"
 			href={`/edit/${model.identifier}?version=${model.version}`}
 		>
@@ -35,7 +33,7 @@
 		</a>
 
 		<button
-			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 hover:bg-indigo-400 dark:bg-indigo-500"
+			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="copy model link to clipboard"
 			onclick={share}
 		>
@@ -44,6 +42,8 @@
 		</button>
 	</Header>
 </div>
+
+<Alert bind:this={alert} />
 
 <div class="h-dvh w-dvw">
 	<Graph {nodes} {edges} interactive={false}>
@@ -59,7 +59,7 @@
 					<div class="table-row">
 						<div class="table-cell pr-2">identifier</div>
 						<a
-							class="ml-2 text-blue-700 hover:underline dark:text-blue-400"
+							class="max-2-128 table-cell pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 							href={`https://doi.org/${model.identifier}`}
 							target="_blank"
 							rel="noopener noreferrer"
@@ -75,7 +75,7 @@
 
 							{#if type === "orcid"}
 								<a
-									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-400"
+									class="table-cell max-w-128 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 									href={`https://orcid.org/${value}`}
 									target="_blank"
 									rel="noopener noreferrer"
