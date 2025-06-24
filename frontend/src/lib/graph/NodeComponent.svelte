@@ -4,6 +4,7 @@
 	import { Handle } from "@xyflow/svelte";
 	import { Move, Palette, Trash2 } from "@lucide/svelte";
 
+	// eslint-disable-next-line svelte/no-unused-props -- it's unused, but svelte-flow cannot know that
 	const { id, data }: NodeProps<Omit<Node, "dragHandle"> & { dragHandle?: string }> = $props();
 	const { updateNodeData, deleteElements } = useSvelteFlow();
 
