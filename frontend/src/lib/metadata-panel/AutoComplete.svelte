@@ -63,24 +63,35 @@
 			}
 		});
 	});
+
+	let focusedElement: HTMLButtonElement | undefined = $state(undefined);
+	$effect(() => focusedElement?.scrollIntoView({ block: "nearest" }));
 </script>
 
 <div class="relative" {onfocusout}>
 	{#if suggestions.length > 0 && focused}
 		<div
-			class="absolute bottom-9 flex min-w-64 flex-col-reverse rounded bg-neutral-200 p-4 dark:bg-neutral-700"
+			class="absolute bottom-9 flex max-h-64 min-w-64 flex-col-reverse overflow-y-auto rounded bg-neutral-200 p-4 dark:bg-neutral-700"
 		>
 			{#each suggestions.slice(0, 10) as choice, idx}
-				<button
-					tabindex="-1"
-					class:ring-2={idx === selected}
-					class:bg-neutral-300={idx === selected}
-					class:dark:bg-neutral-600={idx === selected}
-					onclick={(event) => select(event, idx)}
-					class="my-1 block w-full cursor-pointer rounded p-2 text-left ring-indigo-400 hover:bg-neutral-300 dark:hover:bg-neutral-600"
-				>
-					{choice}
-				</button>
+				{#if idx === selected}
+					<button
+						tabindex="-1"
+						onclick={(event) => select(event, idx)}
+						class="my-1 block w-full cursor-pointer rounded bg-neutral-300 p-2 text-left ring-2 ring-indigo-400 dark:bg-neutral-600"
+						bind:this={focusedElement}
+					>
+						{choice}
+					</button>
+				{:else}
+					<button
+						tabindex="-1"
+						onclick={(event) => select(event, idx)}
+						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-300 dark:hover:bg-neutral-600"
+					>
+						{choice}
+					</button>
+				{/if}
 			{/each}
 		</div>
 	{/if}
