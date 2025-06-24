@@ -8,11 +8,13 @@ const allElements = metadataElements.then((elements) =>
 
 let prevSuggestions = allElements;
 export async function suggest(value: string, selected: number): Promise<[string[], number]> {
-	let elements = await allElements;
-	let newSuggestions = elements.filter((elem) => elem.toLowerCase().includes(value.toLowerCase()));
+	const elements = await allElements;
+	const newSuggestions = elements.filter((elem) =>
+		elem.toLowerCase().includes(value.toLowerCase()),
+	);
 
 	let newSelected = value === "" ? -1 : 0;
-	let prev = await prevSuggestions;
+	const prev = await prevSuggestions;
 	if (selected > 0 && typeof prev[selected] === "string") {
 		newSelected = newSuggestions.findIndex((choice) => choice === prev[selected]);
 	}

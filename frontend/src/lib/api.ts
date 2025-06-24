@@ -85,12 +85,12 @@ export type SearchItem = {
 };
 
 export function sortVersion(a: SearchItem, b: SearchItem) {
-	let left = a.version.split(".").map((v) => Number(v));
-	let right = b.version.split(".").map((v) => Number(v));
+	const left = a.version.split(".").map((v) => Number(v));
+	const right = b.version.split(".").map((v) => Number(v));
 
-	let max = Math.min(left.length, right.length);
+	const max = Math.min(left.length, right.length);
 	for (let i = 0; i < max; i++) {
-		let cmp = left[i] - right[i];
+		const cmp = left[i] - right[i];
 		if (cmp !== 0) {
 			return cmp;
 		}

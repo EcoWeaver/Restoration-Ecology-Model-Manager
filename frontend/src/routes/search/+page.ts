@@ -10,18 +10,18 @@ export const load: PageLoad = async ({ fetch, url }) => {
 
 	const queryItems: SearchItem[] = (await res.json()) ?? [];
 
-	let order = new Map<string, number>();
-	for (let item of queryItems) {
+	const order = new Map<string, number>();
+	for (const item of queryItems) {
 		if (!order.has(item.identifier)) {
 			order.set(item.identifier, order.size);
 		}
 	}
 
 	const items = queryItems.sort((a, b) => {
-		let l = order.get(a.identifier)!;
-		let r = order.get(b.identifier)!;
+		const l = order.get(a.identifier)!;
+		const r = order.get(b.identifier)!;
 
-		let cmp = l - r;
+		const cmp = l - r;
 		if (cmp !== 0) {
 			return cmp;
 		}

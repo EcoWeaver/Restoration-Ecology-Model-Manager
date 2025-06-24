@@ -3,7 +3,7 @@ import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, params, url }) => {
-	let apiUrl = new URL("/model", apiBase);
+	const apiUrl = new URL("/model", apiBase);
 	apiUrl.searchParams.set("identifier", params.model);
 	const version = url.searchParams.get("version") ?? "";
 	apiUrl.searchParams.set("version", version);

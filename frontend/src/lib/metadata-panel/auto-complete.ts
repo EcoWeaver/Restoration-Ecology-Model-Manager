@@ -6,13 +6,13 @@ export function suggestChoices(choices: string[]) {
 			return [choices, selected];
 		}
 
-		let newChoices = choices.filter(
+		const newChoices = choices.filter(
 			(choice) => choice.toLowerCase().startsWith(value.toLowerCase()) && choice !== value,
 		);
 
 		let newSelected = 0;
 		if (selected !== 0 && typeof prevChoices[selected] === "string") {
-			let index = newChoices.findIndex((choice) => choice === prevChoices[selected]);
+			const index = newChoices.findIndex((choice) => choice === prevChoices[selected]);
 			newSelected = index === -1 ? 0 : index;
 		}
 
@@ -31,11 +31,11 @@ export async function suggestSpecies(value: string, selected: number): Promise<[
 		return [[], selected];
 	}
 
-	let response = await fetch(
+	const response = await fetch(
 		`https://api.gbif.org/v1/species/suggest?rank=SPECIES&q=${encodeURIComponent(value)}`,
 	);
-	let suggestions: SpeciesSuggestion[] = await response.json();
-	let newSuggestions = suggestions
+	const suggestions: SpeciesSuggestion[] = await response.json();
+	const newSuggestions = suggestions
 		.filter((suggestion) => suggestion.status == "ACCEPTED")
 		.map((suggestion) => suggestion.canonicalName)
 		.filter((suggestion) => typeof suggestion === "string")

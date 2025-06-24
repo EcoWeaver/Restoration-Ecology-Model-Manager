@@ -3,7 +3,7 @@ import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, params, url }) => {
-	let apiUrl = new URL("/model", apiBase);
+	const apiUrl = new URL("/model", apiBase);
 	apiUrl.searchParams.set("identifier", params.model);
 	apiUrl.searchParams.set("version", url.searchParams.get("version") ?? "");
 
@@ -16,8 +16,8 @@ export const load: PageLoad = async ({ fetch, params, url }) => {
 
 	const metadataRes = await fetch(`${apiBase}/metadata`);
 	const metadataElements: MetadataElements = await metadataRes.json();
-	let metadataMap = new Map<string, MetadataType | undefined>();
-	for (let { name, type } of Object.values(metadataElements).flat()) {
+	const metadataMap = new Map<string, MetadataType | undefined>();
+	for (const { name, type } of Object.values(metadataElements).flat()) {
 		metadataMap.set(name, type);
 	}
 
