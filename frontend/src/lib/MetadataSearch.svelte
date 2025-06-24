@@ -1,18 +1,12 @@
 <script lang="ts">
+	import { untrack } from "svelte";
 	import { goto } from "$app/navigation";
-	import { metadataElements } from "./api";
 	import Chip, { type ChipElement } from "./search/Chip.svelte";
 	import Input from "./search/Input.svelte";
 	import SearchButton from "./search/Button.svelte";
-	import { untrack } from "svelte";
+	import { suggest } from "./search/suggestions";
 
 	let { params = [] }: { params?: ChipElement[] } = $props();
-
-	const elements = metadataElements.then((e) =>
-		Object.values(e)
-			.flat()
-			.map((e) => e.name),
-	);
 
 	let input = $state("");
 	let selected = $state<number>(-1);
@@ -96,28 +90,6 @@
 	let element = $state<Element>();
 	$effect(() => element?.scrollIntoView({ block: "nearest" }));
 
-	let prevSuggestions = elements;
-	async function suggest(
-		elems: Promise<string[]>,
-		value: string,
-		selected: number,
-	): Promise<[string[], number]> {
-		let elements = await elems;
-
-		let newSuggestions = elements.filter((elem) =>
-			elem.toLowerCase().includes(value.toLowerCase()),
-		);
-
-		let newSelected = -1;
-		let prev = await prevSuggestions;
-		if (selected !== -1 && typeof prev[selected] === "string") {
-			newSelected = newSuggestions.findIndex((choice) => choice === prev[selected]);
-		}
-
-		prevSuggestions = Promise.resolve(newSuggestions);
-		return [newSuggestions, newSelected];
-	}
-
 	$effect(() => {
 		if (chip) {
 			suggestions = [];
@@ -125,7 +97,6 @@
 		}
 
 		suggest(
-			elements,
 			input,
 			untrack(() => selected),
 		).then(([newSuggestions, newSelected]) => {
