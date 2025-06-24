@@ -6,7 +6,6 @@
 	let { model, version, metadataElements } = data;
 	let { identifier, metadata } = $derived(model);
 
-	// svelte-ignore state_referenced_locally
 	let { nodes, edges } = apiToFlow(model.graph, true);
 </script>
 

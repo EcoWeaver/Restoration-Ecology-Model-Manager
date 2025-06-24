@@ -1,7 +1,8 @@
 <script lang="ts">
+	import type { MouseEventHandler } from "svelte/elements";
 	import { Search } from "@lucide/svelte";
 
-	let { onclick }: { onclick: () => any } = $props();
+	let { onclick }: { onclick: MouseEventHandler<HTMLButtonElement> } = $props();
 </script>
 
 <button

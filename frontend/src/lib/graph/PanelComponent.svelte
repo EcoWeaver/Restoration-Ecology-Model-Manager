@@ -1,9 +1,17 @@
 <script lang="ts">
 	import { type Snippet } from "svelte";
+	import type { MouseEventHandler } from "svelte/elements";
 	import { GanttChartSquare, PlusIcon } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
 
-	let { children, onmetadata }: { children: Snippet; onmetadata?: () => any } = $props();
+	let {
+		children,
+		onaddmetadata: onmetadata,
+	}: {
+		children: Snippet;
+		onaddmetadata?: MouseEventHandler<HTMLButtonElement>;
+	} = $props();
+
 	let show = $state(true);
 </script>
 

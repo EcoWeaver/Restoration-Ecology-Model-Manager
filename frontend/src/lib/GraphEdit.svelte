@@ -104,7 +104,7 @@
 <div class="h-dvh w-dvw">
 	<Graph bind:nodes bind:edges interactive={true}>
 		{#snippet panel()}
-			<PanelComponent onmetadata={() => metadataPanel.addMetadata()}>
+			<PanelComponent onaddmetadata={() => metadataPanel.addMetadata()}>
 				<MetadataPanel
 					bind:this={metadataPanel}
 					elements={metadataElements}

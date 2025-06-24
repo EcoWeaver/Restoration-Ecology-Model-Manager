@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { type Snippet } from "svelte";
+	import type { FocusEventHandler, KeyboardEventHandler } from "svelte/elements";
 
 	let {
 		children,
@@ -14,10 +15,9 @@
 		placeholder?: string;
 		value: string;
 		self?: HTMLInputElement;
-		onsubmit?: () => any;
-		onkeydown?: (key: KeyboardEvent) => any;
-		onfocus?: () => any;
-		onblur?: () => any;
+		onkeydown?: KeyboardEventHandler<HTMLInputElement>;
+		onfocus?: FocusEventHandler<HTMLInputElement>;
+		onblur?: FocusEventHandler<HTMLInputElement>;
 	} = $props();
 </script>
 
