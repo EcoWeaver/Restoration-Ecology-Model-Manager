@@ -11,7 +11,7 @@
 
 <main class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
 	<div class="text-center">
-		<p class="text-2xl font-semibold tracking-tight text-red-600">
+		<p class="text-2xl font-semibold tracking-tight text-red-500">
 			{page.status}
 			<span class="px-1">|</span>
 			{statusText}
@@ -22,7 +22,7 @@
 		<div class="mt-10 items-center">
 			<a
 				href="/"
-				class="rounded-md bg-red-500 px-5 py-2.5 text-lg font-semibold text-white hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:bg-red-600 dark:hover:bg-red-500"
+				class="rounded-md bg-red-300 px-5 py-2.5 text-lg font-semibold hover:bg-red-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400 dark:bg-red-500"
 				>go home</a
 			>
 		</div>
