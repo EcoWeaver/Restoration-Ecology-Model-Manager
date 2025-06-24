@@ -1,8 +1,10 @@
 package main
 
 import (
+	_ "backend/docs"
 	"backend/verify"
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -10,9 +12,17 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"golang.org/x/time/rate"
 )
 
+// @title Restoration Ecology Model Manager API
+// @version 1.0
+
+// @license.name AGPL-3.0
+// @license.url https://www.gnu.org/licenses/agpl-3.0.en.html
+
+// @host localhost:8080
 func main() {
 	e := echo.New()
 
@@ -55,6 +65,11 @@ func main() {
 	e.GET("/relations", state.GetRelations)
 
 	e.GET("/search", state.GetSearch)
+
+	e.GET("/swagger", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.GET("/versions", state.GetVersions)
 

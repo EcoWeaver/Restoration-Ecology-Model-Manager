@@ -107,7 +107,7 @@ func (self Graph) verify(s *State, l echo.Logger) error {
 			return verify.Error{E: fmt.Errorf("encountered invalid relation to %d", re.To)}
 		}
 		pair := Relation{re.From, re.To}
-		if _, ok := e[pair]; ok {
+		if _, ok := e[pair]; ok || re.From == re.To {
 			return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
 		}
 		e[pair] = struct{}{}

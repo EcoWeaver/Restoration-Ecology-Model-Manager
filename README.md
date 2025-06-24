@@ -16,12 +16,14 @@ make up
 
 2. Run Backend
 
-The backend is built with Go, using the Echo web framework. It can be started with the following commands and is available on http://localhost:8080.
+The backend is built with Go, using the Echo web framework, and echo-swagger and swag for API documentation. It can be started with the following commands and is available on http://localhost:8080.
 
 ```sh
 cd backend
 make run
 ```
+
+The documentation can then be viewed at http://localhost:8080/swagger.
 
 3. Run Frontend
 

@@ -18,6 +18,7 @@ build:
 	go build .
 
 run:
+	swag init --parseDependency
 	go run .
 
 backup:

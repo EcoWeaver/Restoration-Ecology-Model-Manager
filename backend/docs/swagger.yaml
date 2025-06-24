@@ -1,0 +1,265 @@
+definitions:
+  echo.HTTPError:
+    properties:
+      message: {}
+    type: object
+  main.Choice:
+    properties:
+      label:
+        type: string
+      ontology:
+        type: string
+    type: object
+  main.Graph:
+    properties:
+      nodes:
+        items:
+          $ref: '#/definitions/main.Node'
+        type: array
+      relations:
+        items:
+          $ref: '#/definitions/main.Relation'
+        type: array
+    type: object
+  main.Metadata:
+    properties:
+      kind:
+        type: string
+      value:
+        type: string
+    type: object
+  main.MetadataConfig:
+    properties:
+      mandatory:
+        items:
+          $ref: '#/definitions/main.MetadataEntry'
+        type: array
+      optional:
+        items:
+          $ref: '#/definitions/main.MetadataEntry'
+        type: array
+      recommended:
+        items:
+          $ref: '#/definitions/main.MetadataEntry'
+        type: array
+    type: object
+  main.MetadataEntry:
+    properties:
+      choices:
+        items:
+          $ref: '#/definitions/main.Choice'
+        type: array
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  main.ModelRequest:
+    properties:
+      graph:
+        $ref: '#/definitions/main.Graph'
+      identifier:
+        type: string
+      metadata:
+        items:
+          $ref: '#/definitions/main.Metadata'
+        type: array
+      version:
+        type: string
+    type: object
+  main.Node:
+    properties:
+      body:
+        type: string
+      color:
+        type: string
+      position:
+        $ref: '#/definitions/main.Point'
+    type: object
+  main.Point:
+    properties:
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  main.Relation:
+    properties:
+      from:
+        type: integer
+      kind:
+        type: string
+      to:
+        type: integer
+    type: object
+  main.RelationsConfig:
+    properties:
+      causal:
+        items:
+          type: string
+        type: array
+      noncausal:
+        items:
+          type: string
+        type: array
+    type: object
+  main.SearchResult:
+    properties:
+      identifier:
+        type: string
+      title:
+        type: string
+      version:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  license:
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+  title: Restoration Ecology Model Manager API
+  version: "1.0"
+paths:
+  /metadata:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.MetadataConfig'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get list of currently accepted metadata kinds, types and obligations
+  /model:
+    get:
+      description: Gets a model by its identifier and version
+      parameters:
+      - description: Model Identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      - description: Model Version
+        in: path
+        name: version
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.ModelRequest'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get a model
+    put:
+      consumes:
+      - application/json
+      description: Saves a model. The `version` field in the `ModelRequest` is to
+        be set to the version this model bases on if it's an edit, or null otherwise.
+        The returned model will be identical, except for the `version` field, which
+        is updated to the version this model was saved as.
+      parameters:
+      - description: Model
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/main.ModelRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.ModelRequest'
+        "304":
+          description: Not Modified
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Save a model
+  /relations:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.RelationsConfig'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get list of currently accepted relation kinds and types
+  /search:
+    get:
+      description: Searches for models that match at least one of the provided queries
+        per metadata kind.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.SearchResult'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Search for models
+  /versions:
+    get:
+      description: Gets all versions of a model by its identifier
+      parameters:
+      - description: Model Identifier
+        in: path
+        name: identifier
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.SearchResult'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/echo.HTTPError'
+      summary: Get versions of a model
+swagger: "2.0"

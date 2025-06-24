@@ -1,0 +1,401 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Restoration Ecology Model Manager API",
+        "contact": {},
+        "license": {
+            "name": "AGPL-3.0",
+            "url": "https://www.gnu.org/licenses/agpl-3.0.en.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/metadata": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get list of currently accepted metadata kinds, types and obligations",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.MetadataConfig"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/model": {
+            "get": {
+                "description": "Gets a model by its identifier and version",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a model",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model Identifier",
+                        "name": "identifier",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Model Version",
+                        "name": "version",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.ModelRequest"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Saves a model. The `version` field in the `ModelRequest` is to be set to the version this model bases on if it's an edit, or null otherwise. The returned model will be identical, except for the `version` field, which is updated to the version this model was saved as.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Save a model",
+                "parameters": [
+                    {
+                        "description": "Model",
+                        "name": "model",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ModelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.ModelRequest"
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/relations": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get list of currently accepted relation kinds and types",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.RelationsConfig"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/search": {
+            "get": {
+                "description": "Searches for models that match at least one of the provided queries per metadata kind.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Search for models",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.SearchResult"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/versions": {
+            "get": {
+                "description": "Gets all versions of a model by its identifier",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get versions of a model",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Model Identifier",
+                        "name": "identifier",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.SearchResult"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "echo.HTTPError": {
+            "type": "object",
+            "properties": {
+                "message": {}
+            }
+        },
+        "main.Choice": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "ontology": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.Graph": {
+            "type": "object",
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Node"
+                    }
+                },
+                "relations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Relation"
+                    }
+                }
+            }
+        },
+        "main.Metadata": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.MetadataConfig": {
+            "type": "object",
+            "properties": {
+                "mandatory": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.MetadataEntry"
+                    }
+                },
+                "optional": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.MetadataEntry"
+                    }
+                },
+                "recommended": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.MetadataEntry"
+                    }
+                }
+            }
+        },
+        "main.MetadataEntry": {
+            "type": "object",
+            "properties": {
+                "choices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Choice"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.ModelRequest": {
+            "type": "object",
+            "properties": {
+                "graph": {
+                    "$ref": "#/definitions/main.Graph"
+                },
+                "identifier": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Metadata"
+                    }
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.Node": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "position": {
+                    "$ref": "#/definitions/main.Point"
+                }
+            }
+        },
+        "main.Point": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "integer"
+                },
+                "y": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.Relation": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "integer"
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.RelationsConfig": {
+            "type": "object",
+            "properties": {
+                "causal": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "noncausal": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "main.SearchResult": {
+            "type": "object",
+            "properties": {
+                "identifier": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
