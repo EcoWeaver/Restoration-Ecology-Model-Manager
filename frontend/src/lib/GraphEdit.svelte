@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { Plus, Save } from "@lucide/svelte";
+	import { CircleX, Plus, Save } from "@lucide/svelte";
 	import Graph from "$lib/Graph.svelte";
 	import { saveModel } from "$lib/model.js";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
-	import { goto } from "$app/navigation";
+	import { beforeNavigate, goto } from "$app/navigation";
 	import type { BackendError, Metadata, MetadataElements } from "./api";
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
@@ -57,10 +57,19 @@
 		nodes = [...nodes, node];
 	}
 
+	beforeNavigate((nav) => {
+		if (nav.type === "leave") {
+			nav.cancel();
+		} else {
+			let doNavigate = confirm("Leave site? Unsaved changes will be lost.");
+			if (!doNavigate) {
+				nav.cancel();
+			}
+		}
+	});
+
 	let metadataPanel: ReturnType<typeof MetadataPanel>;
 </script>
-
-<svelte:window onbeforeunload={(event) => event.preventDefault()} />
 
 <Alert bind:this={alert} />
 
@@ -82,6 +91,13 @@
 			<Save />
 			<span class="pl-2">save</span>
 		</button>
+		<a
+			href={typeof version === "undefined" ? "/" : `/view/${identifier}?version=${version}`}
+			class="flex h-10 cursor-pointer items-center rounded-md bg-red-300 px-3 hover:bg-red-400 dark:bg-red-500"
+		>
+			<CircleX />
+			<span class="pl-2">cancel</span>
+		</a>
 	</Header>
 </div>
 

@@ -22,7 +22,7 @@
 		<div class="mt-10 items-center">
 			<a
 				href="/"
-				class="rounded-md bg-red-600 px-5 py-2.5 text-lg font-semibold text-white hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+				class="rounded-md bg-red-500 px-5 py-2.5 text-lg font-semibold text-white hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 dark:bg-red-600 dark:hover:bg-red-500"
 				>go home</a
 			>
 		</div>
