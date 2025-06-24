@@ -118,10 +118,10 @@
 				bind:value
 				class="field-sizing-content h-10 cursor-pointer rounded-full bg-neutral-200 px-2 text-center dark:bg-neutral-700"
 			>
-				{#await relationElements then es}
-					{#each Object.entries(es) as [key, values]}
-						<optgroup label={key} style:font-size={`${getZoom()}em`}>
-							{#each values as value}
+				{#await relationElements then relationElements}
+					{#each Object.entries(relationElements) as [group, values] (group)}
+						<optgroup label={group} style:font-size={`${getZoom()}em`}>
+							{#each values as value (value)}
 								<option {value}>{value}</option>
 							{/each}
 						</optgroup>

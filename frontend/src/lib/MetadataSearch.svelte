@@ -114,7 +114,7 @@
 		onkeydown={key}
 		onfocus={() => (focused = true)}
 	>
-		{#each chips as chip}
+		{#each chips as chip, idx (idx)}
 			<Chip {chip} />
 		{/each}
 		{#if chip}
@@ -127,7 +127,7 @@
 			tabindex="-1"
 			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 bg-white p-2 py-1 shadow-xl dark:bg-neutral-800"
 		>
-			{#each suggestions as suggestion, idx}
+			{#each suggestions as suggestion, idx (suggestion)}
 				{#if idx === selected}
 					<button
 						tabindex="-1"

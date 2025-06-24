@@ -83,7 +83,7 @@
 		</span>
 	</div>
 
-	{#each meta as m, i (m)}
+	{#each meta as m, idx (idx)}
 		{@const { type, choices } = flatMetadata.get(m.kind) || {}}
 
 		<div class="table-row">
@@ -95,9 +95,9 @@
 					class="table-cell field-sizing-content rounded px-2 py-1 focus-within:outline-2 focus-within:outline-indigo-400"
 				>
 					<option class="hidden" value="" disabled selected>-- select a kind --</option>
-					{#each Object.entries(elements) as [type, values]}
-						<optgroup label={type}>
-							{#each values as { name: kind }}
+					{#each Object.entries(elements) as [group, values] (group)}
+						<optgroup label={group}>
+							{#each values as { name: kind } (kind)}
 								<option value={kind}>{kind}</option>
 							{/each}
 						</optgroup>
@@ -115,7 +115,7 @@
 						bind:value={m.value}
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>
-						{#each choices! as choice}
+						{#each choices! as choice (choice)}
 							<option class="cursor-pointer" value={choice}>{choice}</option>
 						{/each}
 					</select>
@@ -144,7 +144,7 @@
 				<div class="relative table-cell">
 					<button
 						class="absolute top-2 left-[2px] inline h-6 cursor-pointer rounded-4xl focus-within:outline-indigo-400 focus:outline-2"
-						onclick={() => meta.splice(i, 1)}
+						onclick={() => meta.splice(idx, 1)}
 					>
 						<X class="stroke-red-500" />
 					</button>

@@ -73,7 +73,7 @@
 		<div
 			class="absolute bottom-9 flex max-h-64 min-w-64 flex-col-reverse overflow-y-auto rounded bg-neutral-200 p-4 shadow-xl dark:bg-neutral-700"
 		>
-			{#each suggestions as choice, idx}
+			{#each suggestions as choice, idx (choice)}
 				{#if idx === selected}
 					<button
 						tabindex="-1"

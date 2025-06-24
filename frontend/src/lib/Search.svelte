@@ -66,9 +66,9 @@
 		<div
 			class="absolute mt-2 -ml-4 rounded-md border border-neutral-600 bg-white px-2 py-1 shadow-xl dark:bg-neutral-800"
 		>
-			{#each Object.entries(searches) as [value, { icon: Icon, tooltip }]}
+			{#each Object.entries(searches) as [value, { icon: Icon, tooltip }] (value)}
 				<button
-					onclick={() => select(value as "metadata" | "identifier")}
+					onclick={() => select(value)}
 					class="my-1 flex w-full cursor-pointer rounded-md p-2 hover:bg-neutral-200 dark:hover:bg-neutral-700"
 					title={tooltip}
 				>

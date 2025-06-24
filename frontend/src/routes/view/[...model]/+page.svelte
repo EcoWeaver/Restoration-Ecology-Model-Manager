@@ -67,7 +67,7 @@
 							{model.identifier}
 						</a>
 					</div>
-					{#each model.metadata as { kind, value }}
+					{#each model.metadata as { kind, value }, idx (idx)}
 						{@const type = metadataMap.get(kind)}
 
 						<div class="table-row">

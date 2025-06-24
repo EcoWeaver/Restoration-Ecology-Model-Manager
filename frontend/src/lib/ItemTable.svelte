@@ -12,7 +12,7 @@
 				<span class="table-cell p-3 font-semibold">version</span>
 				<span class="table-cell p-3 font-semibold">identifier</span>
 			</div>
-			{#each items as { identifier, version, title }}
+			{#each items as { identifier, version, title }, idx (idx)}
 				<a
 					href={`/view/${identifier}?version=${version}`}
 					class="table-row border-b-1 border-neutral-300 last:border-none hover:bg-neutral-200 dark:hover:bg-neutral-700"

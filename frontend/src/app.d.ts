@@ -8,6 +8,11 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	interface ObjectConstructor {
+		entries<TKey extends PropertyKey, TVal>(o: Record<TKey, TVal>): [TKey, TVal][];
+		keys<TKey extends PropertyKey>(obj: Record<TKey, unknown>): TKey[];
+	}
 }
 
 export {};
