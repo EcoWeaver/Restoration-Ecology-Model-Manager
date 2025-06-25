@@ -7,6 +7,10 @@
 	--color-on-accent: AccentColorText;
 }
 
+:root.dark {
+	color-scheme: dark;
+}
+
 .svelte-flow {
 	--xy-edge-label-background-color: #00000000;
 }
