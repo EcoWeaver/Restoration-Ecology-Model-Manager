@@ -15,11 +15,13 @@
 	--xy-background-color: theme(--color-neutral-800);
 }
 
-.svelte-flow__node.selectable {
-	border-radius: 8px;
+.svelte-flow__node {
+	cursor: unset !important;
+	border-radius: var(--radius-lg);
 }
 
-.svelte-flow__node.selectable:focus {
+.svelte-flow__node:focus-visible {
+	outline: none;
 	box-shadow: 0 0px 0px 2px theme(--color-indigo-400);
 }
 

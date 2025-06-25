@@ -115,7 +115,6 @@ func (self *State) GetModel(c echo.Context) error {
 //	@Produce		json
 //	@Param			model	body		ModelRequest	true	"Model"
 //	@Success		201		{object}	ModelRequest
-//	@Failure		304		{object}	echo.HTTPError
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
@@ -181,7 +180,7 @@ func (self *State) PutModel(c echo.Context) error {
 		if slices.Equal(r.Graph.Nodes, graph.Nodes) && slices.Equal(r.Graph.Relations, graph.Relations) && slices.Equal(r.Metadata, metadata) {
 			err = fmt.Errorf("model with identifier '%s' at version '%s' wasn't changed", r.Identifier, r.Version)
 			c.Logger().Warn(err)
-			return c.JSON(http.StatusNotModified, echo.HTTPError{Message: err.Error()})
+			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		}
 
 		query = `

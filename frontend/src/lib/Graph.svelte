@@ -44,10 +44,12 @@
 	connectionLineType={ConnectionLineType.Straight}
 	connectionMode={ConnectionMode.Loose}
 	defaultEdgeOptions={defaultEdge}
-	edgesFocusable={false}
+	elevateEdgesOnSelect={false}
 	nodesConnectable={interactive}
 	nodesDraggable={interactive}
 	elementsSelectable={interactive}
+	nodesFocusable={interactive}
+	edgesFocusable={interactive}
 	deleteKey={["Delete", "Backspace"]}
 	fitView
 	fitViewOptions={{ padding: { right: 1000 } }}

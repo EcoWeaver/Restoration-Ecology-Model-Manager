@@ -8,7 +8,7 @@
 <button
 	{onclick}
 	title="search"
-	class="flex h-10 cursor-pointer place-items-center rounded-r-md border border-l-0 border-neutral-600 px-3 outline-indigo-400 hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
+	class="flex h-10 cursor-pointer place-items-center rounded-r-md border border-l-0 border-neutral-600 px-3 outline-indigo-400 focus-visible:outline-2"
 >
 	<Search />
 </button>
