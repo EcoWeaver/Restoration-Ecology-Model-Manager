@@ -14,11 +14,11 @@
 .svelte-flow {
 	--xy-edge-label-background-color: transparent;
 	--xy-edge-stroke-width: 3;
-	--xy-edge-stroke: theme(--color-neutral-500);
+	--xy-edge-stroke: var(--color-neutral-500);
 }
 
 .dark .svelte-flow {
-	--xy-background-color: theme(--color-neutral-800);
+	--xy-background-color: var(--color-neutral-800);
 }
 
 .svelte-flow__arrowhead polyline {
@@ -33,7 +33,7 @@
 
 .svelte-flow__node:focus-visible {
 	outline: none;
-	box-shadow: 0 0px 0px 2px theme(--color-indigo-400);
+	box-shadow: 0 0px 0px 2px var(--color-indigo-400);
 }
 
 .svelte-flow__node.selectable.selected {
