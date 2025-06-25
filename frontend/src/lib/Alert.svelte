@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { X } from "@lucide/svelte";
+	import { fly } from "svelte/transition";
 
 	let open = $state(false);
 	let text = $state("");
@@ -26,7 +27,11 @@
 </script>
 
 {#if open}
-	<div role="alert" class="t-0 absolute z-200 mt-18 flex w-full justify-center">
+	<div
+		transition:fly={{ duration: 100, y: -50 }}
+		role="alert"
+		class="t-0 absolute z-200 mt-18 flex w-full justify-center"
+	>
 		<span
 			class:bg-red-300={isError}
 			class:dark:bg-red-500={isError}
