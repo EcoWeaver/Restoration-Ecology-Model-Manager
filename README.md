@@ -41,7 +41,11 @@ This project uses static analysis tools to ensure correctness and idiomatic code
 
 ### Backend
 
-The backend uses [`golangci-lint`](https://golangci-lint.run/) to run multiple formatting and linting checks in parallel. Formatting checks can be run with `make fmt` and linting checks can be run with `make check`.
+The backend uses [`golangci-lint`](https://golangci-lint.run/) to run formatting and linting checks. Formatting can be run with `make fmt` and linting checks can be run with `make check`.
+
+### Frontend
+
+The frontend uses [`Prettier`](https://prettier.io/) for formatting, [`TypeScript`](https://www.typescriptlang.org/) for type checks and [`ESLint`](https://eslint.org/) for linting checks. Formatting can be run with `npm run format`, type checks can be run with `npm run check` and linting checks can be run with `npm run lint`.
 
 ## API documentation
 
