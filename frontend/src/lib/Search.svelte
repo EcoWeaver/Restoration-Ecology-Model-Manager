@@ -66,7 +66,7 @@
 			{#each Object.entries(searches) as [value, { icon: Icon, tooltip }] (value)}
 				<button
 					onclick={() => select(value)}
-					class="my-1 flex w-full cursor-pointer rounded-md p-2 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+					class="my-1 flex w-full cursor-pointer rounded-md p-2 outline-indigo-400 hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
 					title={tooltip}
 				>
 					<Icon />
