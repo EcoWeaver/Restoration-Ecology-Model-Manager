@@ -35,7 +35,7 @@
 	}
 </script>
 
-<div class="relative rounded-lg px-4 py-2" style:background-color={color}>
+<div class="relative rounded-lg px-3 py-2" style:background-color={color}>
 	<Handle
 		type="source"
 		position={Position.Top}
@@ -43,7 +43,7 @@
 	/>
 	{#if data.editable}
 		<div
-			class="relative max-w-[30ch] cursor-text rounded text-center wrap-break-word outline-indigo-400 focus-visible:outline-2"
+			class="relative max-w-[30ch] cursor-text rounded px-2 py-1 text-center wrap-break-word outline-indigo-400 focus-visible:outline-2"
 			contenteditable
 			class:text-black={light}
 			class:text-white={!light}
@@ -66,7 +66,7 @@
 		</div>
 	{:else}
 		<div
-			class="max-w-[30ch] text-center wrap-break-word"
+			class="max-w-[30ch] px-2 py-1 text-center wrap-break-word"
 			class:text-black={light}
 			class:text-white={!light}
 		>
