@@ -1,0 +1,22 @@
+stages:
+  - check
+
+backend:
+  stage: check
+  image: golang:latest
+  before_script:
+    - apt-get update
+    - apt-get install -y make
+  script:
+    - cd backend
+    - make build
+    - make check
+
+frontend:
+  stage: check
+  image: node:latest
+  script:
+    - cd frontend
+    - npm install
+    - npm run check
+    - npm run lint
