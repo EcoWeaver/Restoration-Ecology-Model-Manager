@@ -67,12 +67,12 @@
 
 	<div class="table-row">
 		<span class="table-cell px-2 py-1">identifier</span>
-		<span class="table-cell py-1 pl-1">
+		<span class:pl-2={identifierEditable} class="table-cell py-1">
 			{#if identifierEditable}
-				<span class="pl-1"><Input placeholder="doi" bind:value={identifier} /></span>
+				<Input placeholder="doi" bind:value={identifier} />
 			{:else}
 				<a
-					class="block w-full pl-1 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+					class="ml-1 block w-full pl-1 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 					href={`https://doi.org/${identifier}`}
 					target="_blank"
 					rel="noopener noreferrer"
@@ -88,22 +88,26 @@
 
 		<div class="table-row">
 			{#if m.mandatory}
-				<span class="table-cell px-2 py-1">{m.kind}</span>
+				<div class="table-cell align-top">
+					<div class="px-2 py-1">{m.kind}</div>
+				</div>
 			{:else}
-				<select
-					bind:value={m.kind}
-					title={m.kind}
-					class="table-cell field-sizing-content rounded px-2 py-1 outline-indigo-400 focus-visible:outline-2"
-				>
-					<option class="hidden" value="" disabled selected>-- select a kind --</option>
-					{#each Object.entries(elements) as [group, values] (group)}
-						<optgroup class="dark:bg-neutral-700" label={group}>
-							{#each values as { name: kind } (kind)}
-								<option class="dark:bg-neutral-700" value={kind}>{kind}</option>
-							{/each}
-						</optgroup>
-					{/each}
-				</select>
+				<div class="table-cell align-top">
+					<select
+						bind:value={m.kind}
+						title={m.kind}
+						class="field-sizing-content rounded px-2 py-1 outline-indigo-400 focus-visible:outline-2"
+					>
+						<option class="hidden" value="" disabled selected>-- select a kind --</option>
+						{#each Object.entries(elements) as [group, values] (group)}
+							<optgroup class="dark:bg-neutral-700" label={group}>
+								{#each values as { name: kind } (kind)}
+									<option class="dark:bg-neutral-700" value={kind}>{kind}</option>
+								{/each}
+							</optgroup>
+						{/each}
+					</select>
+				</div>
 			{/if}
 
 			<span class="table-cell py-0.75 pl-2">
@@ -113,7 +117,7 @@
 					<select
 						bind:value={m.value}
 						title={m.value}
-						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 outline-indigo-400 focus-visible:outline-2"
+						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
 						required
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>
@@ -138,7 +142,12 @@
 						bind:value={m.value}
 					/>
 				{:else}
-					<Input placeholder={type || m.kind} bind:value={m.value} />
+					<textarea
+						class="field-sizing-content min-h-8 w-full max-w-128 rounded border border-neutral-600 py-1 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
+						rows="1"
+						placeholder={m.kind}
+						bind:value={m.value}
+					></textarea>
 				{/if}
 			</span>
 

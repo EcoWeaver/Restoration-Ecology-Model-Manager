@@ -48,7 +48,7 @@
 
 	<a
 		class="rounded-xl outline-offset-4 outline-indigo-400 focus-visible:outline-2"
-		title="source"
+		title="source code"
 		href="https://git.uni-jena.de/fusion/teaching/project/2025sose/swep/restoration-ecology-model-manager/restoration-ecology-model-manager-app"
 		target="_blank"
 		rel="noopener noreferrer"
