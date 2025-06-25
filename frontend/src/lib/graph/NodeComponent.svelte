@@ -56,12 +56,12 @@
 			<button
 				class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 				onclick={changeColor}
-				title="Change color"><Palette /></button
+				title="change color"><Palette /></button
 			>
 			<button
 				class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 				onclick={deleteSelf}
-				title="Delete"><Trash2 /></button
+				title="delete"><Trash2 /></button
 			>
 		</div>
 	{:else}

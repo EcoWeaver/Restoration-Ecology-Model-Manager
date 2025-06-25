@@ -91,6 +91,7 @@
 		</button>
 		<a
 			href={typeof version === "undefined" ? "/" : `/view/${identifier}?version=${version}`}
+			title="cancel editing"
 			class="flex h-10 cursor-pointer items-center rounded-md bg-red-300 px-3 outline-offset-2 outline-red-400 hover:bg-red-400 focus-visible:outline-2 dark:bg-red-500"
 		>
 			<CircleX />

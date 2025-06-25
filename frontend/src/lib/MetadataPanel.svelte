@@ -92,6 +92,7 @@
 			{:else}
 				<select
 					bind:value={m.kind}
+					title={m.kind}
 					class="table-cell field-sizing-content rounded px-2 py-1 outline-indigo-400 focus-visible:outline-2"
 				>
 					<option class="hidden" value="" disabled selected>-- select a kind --</option>
@@ -110,9 +111,10 @@
 					<Input value="" disabled placeholder="please select a metadata kind" />
 				{:else if type === "choice"}
 					<select
-						required
-						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 outline-indigo-400 focus-visible:outline-2"
 						bind:value={m.value}
+						title={m.value}
+						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 px-2 outline-indigo-400 focus-visible:outline-2"
+						required
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>
 						{#each choices! as choice (choice)}
