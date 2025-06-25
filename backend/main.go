@@ -4,7 +4,6 @@ import (
 	_ "backend/docs"
 	"backend/verify"
 	"context"
-	"net/http"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -66,9 +65,6 @@ func main() {
 
 	e.GET("/search", state.GetSearch)
 
-	e.GET("/swagger", func(c echo.Context) error {
-		return c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
-	})
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.GET("/versions", state.GetVersions)

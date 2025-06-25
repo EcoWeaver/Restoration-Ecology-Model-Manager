@@ -42,3 +42,7 @@ This project uses static analysis tools to ensure correctness and idiomatic code
 ### Backend
 
 The backend uses [`golangci-lint`](https://golangci-lint.run/) to run multiple formatting and linting checks in parallel. Formatting checks can be run with `make fmt` and linting checks can be run with `make check`.
+
+## API documentation
+
+API documentation is built with Swagger, and is available through the frontend by manually navigating to http://localhost:5173/api.
