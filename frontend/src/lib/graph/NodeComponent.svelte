@@ -43,7 +43,7 @@
 	/>
 	{#if data.editable}
 		<div
-			class="relative max-w-prose cursor-text rounded wrap-break-word outline-indigo-400 focus-visible:outline-2"
+			class="relative max-w-[30ch] cursor-text rounded text-center wrap-break-word outline-indigo-400 focus-visible:outline-2"
 			contenteditable
 			class:text-black={light}
 			class:text-white={!light}
@@ -65,7 +65,11 @@
 			>
 		</div>
 	{:else}
-		<div class="max-w-prose wrap-break-word" class:text-black={light} class:text-white={!light}>
+		<div
+			class="max-w-[30ch] text-center wrap-break-word"
+			class:text-black={light}
+			class:text-white={!light}
+		>
 			{body}
 		</div>
 	{/if}
