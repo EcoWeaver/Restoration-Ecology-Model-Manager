@@ -8,9 +8,25 @@
 }
 
 .svelte-flow {
-	--xy-edge-label-background-color: #ffffff00;
+	--xy-edge-label-background-color: #00000000;
 }
 
 .dark .svelte-flow {
 	--xy-background-color: theme(--color-neutral-800);
+}
+
+.svelte-flow__node.selectable {
+	border-radius: 8px;
+}
+
+.svelte-flow__node.selectable:focus {
+	box-shadow: 0 0px 0px 2px theme(--color-indigo-400);
+}
+
+.svelte-flow__node.selectable.selected {
+	box-shadow: 0 0px 0px 2px black;
+}
+
+.dark .svelte-flow__node.selectable.selected {
+	box-shadow: 0 0px 0px 2px white;
 }

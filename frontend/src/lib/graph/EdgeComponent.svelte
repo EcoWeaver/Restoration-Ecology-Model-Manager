@@ -116,7 +116,7 @@
 		<div class="flex">
 			<select
 				bind:value
-				class="field-sizing-content h-10 cursor-pointer rounded-full bg-neutral-200 px-2 text-center dark:bg-neutral-700"
+				class="field-sizing-content h-10 cursor-pointer rounded-full bg-neutral-200 px-2 text-center outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 			>
 				{#await relationElements then relationElements}
 					{#each Object.entries(relationElements) as [group, values] (group)}
@@ -129,7 +129,7 @@
 				{/await}
 			</select>
 			<button
-				class="ml-1 cursor-pointer rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
+				class="ml-1 cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 				onclick={deleteSelf}
 				title="Delete"><Trash2 /></button
 			>

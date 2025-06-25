@@ -44,7 +44,7 @@
 	connectionLineType={ConnectionLineType.Straight}
 	connectionMode={ConnectionMode.Loose}
 	defaultEdgeOptions={defaultEdge}
-	elevateEdgesOnSelect={false}
+	edgesFocusable={false}
 	nodesConnectable={interactive}
 	nodesDraggable={interactive}
 	elementsSelectable={interactive}
