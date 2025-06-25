@@ -9,7 +9,9 @@
 .svelte-flow {
 	--xy-edge-label-background-color: transparent;
 	--xy-edge-stroke-width: 3;
+	--xy-connectionline-stroke-width: 3;
 	--xy-edge-stroke: var(--color-neutral-500);
+	--xy-connectionline-stroke: var(--color-neutral-500);
 }
 
 .dark .svelte-flow {
