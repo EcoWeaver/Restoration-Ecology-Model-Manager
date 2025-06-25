@@ -19,7 +19,7 @@
 	<div
 		transition:slide={{ duration: 100 }}
 		tabindex="-1"
-		class="m-3 mb-2 max-h-[55vh] overflow-y-auto rounded-xl bg-neutral-200/60 py-6 pr-10 pl-6 backdrop-blur-sm dark:bg-neutral-700/60"
+		class="m-3 mb-2 max-h-[55vh] overflow-y-auto rounded-xl bg-neutral-200/72 py-6 pr-10 pl-6 backdrop-blur dark:bg-neutral-700/72"
 	>
 		{@render children()}
 	</div>
