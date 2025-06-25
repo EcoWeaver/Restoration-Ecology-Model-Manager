@@ -96,9 +96,9 @@
 				>
 					<option class="hidden" value="" disabled selected>-- select a kind --</option>
 					{#each Object.entries(elements) as [group, values] (group)}
-						<optgroup label={group}>
+						<optgroup class="dark:bg-neutral-700" label={group}>
 							{#each values as { name: kind } (kind)}
-								<option value={kind}>{kind}</option>
+								<option class="dark:bg-neutral-700" value={kind}>{kind}</option>
 							{/each}
 						</optgroup>
 					{/each}
@@ -116,7 +116,7 @@
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>
 						{#each choices! as choice (choice)}
-							<option class="cursor-pointer" value={choice}>{choice}</option>
+							<option class="cursor-pointer dark:bg-neutral-700" value={choice}>{choice}</option>
 						{/each}
 					</select>
 				{:else if type === "date"}
