@@ -51,8 +51,7 @@
 	nodesFocusable={interactive}
 	edgesFocusable={interactive}
 	deleteKey={["Delete", "Backspace"]}
-	fitView
-	fitViewOptions={{ padding: { right: 1000 } }}
+	fitView={nodes.length > 0}
 >
 	<Panel position="bottom-right">
 		{@render panel()}
