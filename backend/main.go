@@ -42,6 +42,11 @@ func main() {
 	}
 
 	verify.REQ = os.Getenv("REMMA_NO_VERIFY_REQ") != "yes"
+	if !verify.REQ {
+		e.Logger.Warn("'REMMA_NO_VERIFY_REQ' is set!")
+		e.Logger.Warn("This means metadata verification will not hit verification APIs!")
+		e.Logger.Warn("This must be disabled in a production environment!")
+	}
 
 	dbPool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
