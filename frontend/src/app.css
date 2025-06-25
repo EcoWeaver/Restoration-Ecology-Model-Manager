@@ -12,11 +12,18 @@
 }
 
 .svelte-flow {
-	--xy-edge-label-background-color: #00000000;
+	--xy-edge-label-background-color: transparent;
+	--xy-edge-stroke-width: 3;
+	--xy-edge-stroke: theme(--color-neutral-500);
 }
 
 .dark .svelte-flow {
 	--xy-background-color: theme(--color-neutral-800);
+}
+
+.svelte-flow__arrowhead polyline {
+	stroke: var(--xy-edge-stroke);
+	fill: var(--xy-edge-stroke);
 }
 
 .svelte-flow__node {
