@@ -22,6 +22,7 @@ check:
 	go run $(golangci-lint) run
 
 build:
+	go run $(swag) init --parseDependency
 	go build .
 
 run:
