@@ -15,21 +15,21 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^5.2.12",
-		"@sveltejs/kit": "^2.21.5",
+		"@sveltejs/kit": "^2.22.0",
 		"@sveltejs/vite-plugin-svelte": "^5.1.0",
 		"@tailwindcss/vite": "^4.1.10",
-		"prettier": "^3.5.3",
+		"prettier": "^3.6.1",
 		"prettier-plugin-svelte": "^3.4.0",
-		"prettier-plugin-tailwindcss": "^0.6.12",
-		"svelte": "^5.34.6",
-		"svelte-check": "^4.2.1",
+		"prettier-plugin-tailwindcss": "^0.6.13",
+		"svelte": "^5.34.8",
+		"svelte-check": "^4.2.2",
 		"tailwindcss": "^4.1.10",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5"
 	},
 	"dependencies": {
-		"@lucide/svelte": "^0.517.0",
-		"@xyflow/svelte": "^1.1.0",
+		"@lucide/svelte": "^0.523.0",
+		"@xyflow/svelte": "^1.1.1",
 		"http-status-codes": "^2.3.0"
 	}
 }
