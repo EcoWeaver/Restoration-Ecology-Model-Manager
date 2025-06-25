@@ -57,9 +57,9 @@
 	});
 </script>
 
-<h2 class="px-2 text-xl">Metadata</h2>
+<h2 class="mb-1 px-2 text-xl font-bold">Metadata</h2>
 
-<div class="table">
+<div class="px table">
 	<div class="mb-2 table-row">
 		<span class="table-cell px-2 py-2 font-bold">kind</span>
 		<span class="table-cell py-2 pl-2 font-bold">value</span>
@@ -105,7 +105,7 @@
 				</select>
 			{/if}
 
-			<span class="table-cell py-1 pl-2">
+			<span class="table-cell py-0.75 pl-2">
 				{#if m.kind === ""}
 					<Input value="" disabled placeholder="please select a metadata kind" />
 				{:else if type === "choice"}

@@ -49,17 +49,17 @@
 	<Graph {nodes} {edges} interactive={false}>
 		{#snippet panel()}
 			<PanelComponent>
-				<h2 class="text-xl">Metadata</h2>
+				<h2 class="mb-1 text-xl font-bold">Metadata</h2>
 
 				<div class="table">
 					<div class="table-row">
-						<div class="table-cell pr-2 pb-1 font-bold">kind</div>
-						<div class="table-cell pb-1 pl-2 font-bold">value</div>
+						<div class="text-l table-cell py-1 pr-2 font-bold">kind</div>
+						<div class="text-l table-cell py-1 pl-2 font-bold">value</div>
 					</div>
 					<div class="table-row">
-						<div class="table-cell pr-2">identifier</div>
+						<div class="table-cell py-1 pr-2">identifier</div>
 						<a
-							class="max-2-128 table-cell pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+							class="max-2-128 table-cell py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 							href={`https://doi.org/${model.identifier}`}
 							target="_blank"
 							rel="noopener noreferrer"
@@ -71,11 +71,11 @@
 						{@const type = metadataMap.get(kind)}
 
 						<div class="table-row">
-							<div class="table-cell pr-2">{kind}</div>
+							<div class="table-cell py-1 pr-2">{kind}</div>
 
 							{#if type === "orcid"}
 								<a
-									class="table-cell max-w-128 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+									class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 									href={`https://orcid.org/${value}`}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -84,7 +84,7 @@
 								</a>
 							{:else if type === "url"}
 								<a
-									class="table-cell max-w-128 pl-2 text-blue-700 hover:underline dark:text-blue-400"
+									class="table-cell max-w-128 py-1 pl-2 text-blue-700 hover:underline dark:text-blue-400"
 									href={value}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -92,7 +92,7 @@
 									{value}
 								</a>
 							{:else}
-								<div class="table-cell max-w-128 pl-2">{value}</div>
+								<div class="table-cell max-w-128 py-1 pl-2">{value}</div>
 							{/if}
 						</div>
 					{/each}
