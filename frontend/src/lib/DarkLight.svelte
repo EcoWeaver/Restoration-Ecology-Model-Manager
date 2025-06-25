@@ -33,6 +33,7 @@
 
 <button
 	class="dark-light mr-1 cursor-pointer rounded-xl outline-offset-4 outline-indigo-400 focus-visible:outline-2"
+	title="toggle dark/light theme"
 	onclick={toggle}
 >
 	<span class="sun hidden"><Sun /></span>
