@@ -23,8 +23,6 @@ cd backend
 make run
 ```
 
-The documentation can then be viewed at http://localhost:8080/swagger.
-
 3. Run Frontend
 
 The frontend is built with Svelte, using SvelteFlow for node-based user interfaces. It can be started with the following commands and is available on http://localhost:5173/.

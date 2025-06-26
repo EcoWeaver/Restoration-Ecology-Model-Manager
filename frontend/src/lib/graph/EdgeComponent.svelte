@@ -21,6 +21,8 @@
 	const targetNode = useInternalNode(target);
 
 	function nodeIntersection(intersectionNode: InternalNode, targetNode: InternalNode) {
+		// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
+
 		const w = intersectionNode.measured.width! / 2;
 		const h = intersectionNode.measured.height! / 2;
 
@@ -37,7 +39,42 @@
 		const x = w * (xx3 + yy3) + x2;
 		const y = h * (-xx3 + yy3) + y2;
 
-		return { x, y };
+		const cr = 8;
+		const offx = w - cr;
+		const offy = h - cr;
+
+		if ((x >= x2 - offx && x <= x2 + offx) || (y >= y2 - offy && y <= y2 + offy)) {
+			return { x, y };
+		}
+
+		const ccx = x < x2 - offx ? x2 - offx : x2 + offx;
+		const ccy = y < y2 - offy ? y2 - offy : y2 + offy;
+
+		// https://www.bluebill.net/circle_ray_intersection.html
+
+		let dx = x1 - x2;
+		let dy = y1 - y2;
+		const dl = Math.sqrt(dx * dx + dy * dy);
+		dx /= dl;
+		dy /= dl;
+
+		const ux = ccx - x2;
+		const uy = ccy - y2;
+
+		const u1d = ux * dx + uy * dy;
+		const u1x = u1d * dx;
+		const u1y = u1d * dy;
+
+		const u2x = ux - u1x;
+		const u2y = uy - u1y;
+
+		const d = Math.sqrt(u2x * u2x + u2y * u2y);
+		const m = Math.sqrt(cr * cr - d * d);
+
+		return {
+			x: x2 + u1x + m * dx,
+			y: y2 + u1y + m * dy,
+		};
 	}
 
 	function edgePosition(node: InternalNode, intersectionPoint: XYPosition) {
