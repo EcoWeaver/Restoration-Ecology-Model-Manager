@@ -30,9 +30,7 @@ func main() {
 
 	e.Use(middleware.BodyLimit("2M"))
 	e.Use(middleware.CORS())
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "${time_rfc3339} ${remote_ip} ${method} ${status} ${uri} ${latency_human} ${error}\n",
-	}))
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: "${time_rfc3339} ${remote_ip} ${method} ${status} ${uri} ${latency_human} ${error}\n"}))
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
