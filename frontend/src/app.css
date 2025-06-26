@@ -18,7 +18,8 @@
 	--xy-background-color: var(--color-neutral-800);
 }
 
-.svelte-flow__arrowhead polyline {
+.svelte-flow__arrowhead polyline,
+.svelte-flow__remma-custom-linecap {
 	stroke: var(--xy-edge-stroke);
 	fill: var(--xy-edge-stroke);
 }

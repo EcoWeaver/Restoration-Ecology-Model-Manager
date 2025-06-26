@@ -14,8 +14,9 @@
 	import type { Edge } from "$lib/model";
 	import { relationElements } from "$lib/api";
 	import { Trash2 } from "@lucide/svelte";
+	import LineCap from "./LineCap.svelte";
 
-	let { id, data, source, target, markerEnd }: EdgeProps<Edge> = $props();
+	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
 
 	const sourceNode = useInternalNode(source);
 	const targetNode = useInternalNode(target);
@@ -135,7 +136,10 @@
 			updateEdge(
 				id,
 				{
-					markerEnd: re.causal.includes(v) ? { type: MarkerType.ArrowClosed } : undefined,
+					markerStart: `linecap-s-${source}-${target}`,
+					markerEnd: re.causal.includes(v)
+						? { type: MarkerType.ArrowClosed }
+						: `linecap-e-${source}-${target}`,
 					data: { kind: value, editable: data!.editable },
 				},
 				{ replace: true },
@@ -148,7 +152,15 @@
 	}
 </script>
 
-<BaseEdge {id} {path} {markerEnd} />
+<LineCap id={`linecap-s-${source}-${target}`} />
+
+{#await relationElements then re}
+	{#if !re.causal.includes(value)}
+		<LineCap id={`linecap-e-${source}-${target}`} />
+	{/if}
+{/await}
+
+<BaseEdge {id} {path} {markerStart} {markerEnd} />
 <EdgeLabel x={labelX} y={labelY} class="!text-base">
 	{#if data!.editable}
 		<div class="flex">
