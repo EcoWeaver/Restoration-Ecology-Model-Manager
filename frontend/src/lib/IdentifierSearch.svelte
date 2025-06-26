@@ -6,7 +6,7 @@
 	let { identifier }: { identifier: string } = $props();
 
 	async function submit() {
-		let query = new URLSearchParams();
+		const query = new URLSearchParams();
 		query.set("identifier", identifier);
 		await goto(`/versions?${query}`);
 	}

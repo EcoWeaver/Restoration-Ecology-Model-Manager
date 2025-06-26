@@ -12,12 +12,12 @@
 	let selected = $state<number>(-1);
 	let suggestions = $state<string[]>([]);
 
-	let chips = $state<ChipElement[]>(params);
+	const chips = $state<ChipElement[]>(params);
 	let chip = $state<ChipElement | undefined>(undefined);
 
 	let focused = $state(false);
 	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {
-		let { relatedTarget, currentTarget } = event;
+		const { relatedTarget, currentTarget } = event;
 		if (relatedTarget instanceof HTMLElement && currentTarget.contains(relatedTarget)) {
 			return;
 		}
@@ -36,8 +36,8 @@
 	}
 
 	async function submit() {
-		let query = new URLSearchParams();
-		for (let { kind, value } of chips) {
+		const query = new URLSearchParams();
+		for (const { kind, value } of chips) {
 			query.append(kind, value!);
 		}
 

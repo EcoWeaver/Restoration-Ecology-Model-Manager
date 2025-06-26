@@ -9,7 +9,7 @@
 
 		let digits = 0;
 		let clusters = 0;
-		for (let t of v) {
+		for (const t of v) {
 			if (digits === 4) {
 				if (t !== "-") return;
 			} else if (t < "0" || t > "9") {

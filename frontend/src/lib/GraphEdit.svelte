@@ -61,7 +61,7 @@
 		if (nav.type === "leave" || nav.willUnload) {
 			nav.cancel();
 		} else if (nav.type !== "goto" || nav.to?.route.id !== "/view/[...model]") {
-			let doNavigate = confirm("Leave site? Unsaved changes will be lost.");
+			const doNavigate = confirm("Leave site? Unsaved changes will be lost.");
 			if (!doNavigate) {
 				nav.cancel();
 			}

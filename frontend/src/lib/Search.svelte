@@ -16,7 +16,7 @@
 	} = $props();
 
 	type Search = { icon: Component; tooltip: string };
-	let searches: Record<"metadata" | "identifier", Search> = {
+	const searches: Record<"metadata" | "identifier", Search> = {
 		metadata: { icon: BookMarked, tooltip: "search by metadata" },
 		identifier: { icon: Fingerprint, tooltip: "search by identifier" },
 	};
@@ -30,7 +30,7 @@
 	}
 
 	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {
-		let { currentTarget, relatedTarget } = event;
+		const { currentTarget, relatedTarget } = event;
 		if (relatedTarget instanceof HTMLElement && currentTarget.contains(relatedTarget)) {
 			return;
 		}

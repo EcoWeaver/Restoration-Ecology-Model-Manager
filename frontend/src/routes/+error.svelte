@@ -2,7 +2,7 @@
 	import { page } from "$app/state";
 	import { getReasonPhrase } from "http-status-codes";
 
-	let statusText = getReasonPhrase(page.status).toLowerCase();
+	const statusText = getReasonPhrase(page.status).toLowerCase();
 </script>
 
 <svelte:head>

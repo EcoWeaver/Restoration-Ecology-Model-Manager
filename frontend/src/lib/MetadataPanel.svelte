@@ -25,26 +25,26 @@
 		choices?: string[];
 	};
 
-	let flatMetadata = new Map<string, FlatMeta>();
-	for (let { name, type, choices: c } of Object.values(elements).flat()) {
-		let choices = c?.map(({ label }) => label);
+	const flatMetadata = new Map<string, FlatMeta>();
+	for (const { name, type, choices: c } of Object.values(elements).flat()) {
+		const choices = c?.map(({ label }) => label);
 		flatMetadata.set(name, { type, choices });
 	}
 
-	let meta: (Metadata & { mandatory: boolean })[] = $state([]);
+	const meta: (Metadata & { mandatory: boolean })[] = $state([]);
 
-	let initialMetadata = $state.snapshot(metadata);
-	for (let kind of elements.mandatory) {
-		let index = initialMetadata.findIndex((m) => m.kind === kind.name);
+	const initialMetadata = $state.snapshot(metadata);
+	for (const kind of elements.mandatory) {
+		const index = initialMetadata.findIndex((m) => m.kind === kind.name);
 		if (index >= 0) {
-			let value = initialMetadata[index].value;
+			const value = initialMetadata[index].value;
 			initialMetadata.splice(index, 1);
 			meta.push({ mandatory: true, kind: kind.name, value });
 		} else {
 			meta.push({ mandatory: true, kind: kind.name, value: "" });
 		}
 	}
-	for (let { kind, value } of initialMetadata) {
+	for (const { kind, value } of initialMetadata) {
 		meta.push({ mandatory: false, kind, value });
 	}
 

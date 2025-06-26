@@ -3,7 +3,7 @@
 	import { Moon, Sun } from "@lucide/svelte";
 	import { MediaQuery } from "svelte/reactivity";
 
-	let preference = new MediaQuery("prefers-color-scheme: dark");
+	const preference = new MediaQuery("prefers-color-scheme: dark");
 	let storage = $state(browser ? (localStorage?.getItem("theme") ?? "system") : null);
 	let current = $derived(storage === "dark" || (storage === "system" && preference.current));
 
@@ -12,7 +12,7 @@
 	}
 
 	function toggle() {
-		let preferred = preference.current ? "dark" : "light";
+		const preferred = preference.current ? "dark" : "light";
 		if (storage === "system") {
 			storage = invertTheme(preferred);
 		} else if (storage !== preferred) {

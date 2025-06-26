@@ -42,7 +42,7 @@
 	}
 
 	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {
-		let { relatedTarget, currentTarget } = event;
+		const { relatedTarget, currentTarget } = event;
 		if (relatedTarget instanceof HTMLElement && currentTarget.contains(relatedTarget)) {
 			return;
 		}

@@ -9,7 +9,7 @@
 		}
 
 		let digits = 4;
-		for (let t of v) {
+		for (const t of v) {
 			if (digits === 0) {
 				if (t !== "-") return;
 			} else if (t < "0" || t > "9") {

@@ -3,10 +3,10 @@
 	import GraphEdit from "$lib/GraphEdit.svelte";
 
 	let { data } = $props();
-	let { model, version, metadataElements } = data;
+	const { model, version, metadataElements } = data;
 	let { identifier, metadata } = $derived(model);
 
-	let { nodes, edges } = apiToFlow(model.graph, true);
+	const { nodes, edges } = apiToFlow(model.graph, true);
 </script>
 
 <svelte:head>
