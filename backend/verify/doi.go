@@ -1,6 +1,7 @@
 package verify
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 
 var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
 
-func doi(s string) error {
+func doi(s string, ctx context.Context) error {
 	if s == "" {
 		return Error{E: errors.New("no doi provided")}
 	}
@@ -23,7 +24,13 @@ func doi(s string) error {
 		return nil
 	}
 
-	res, err := http.Get("https://doi.org/" + url.QueryEscape(s))
+	api := "https://doi.org/" + url.QueryEscape(s)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}

@@ -1,22 +1,23 @@
 package verify
 
 import (
+	"context"
 	"sync"
 )
 
 type Cache struct {
-	get   func(string) error
+	get   func(string, context.Context) error
 	cache sync.Map
 }
 
-func (self *Cache) Verify(key string) error {
-	if _, ok := self.cache.Load(key); ok {
+func (self *Cache) Verify(s string, ctx context.Context) error {
+	if _, ok := self.cache.Load(s); ok {
 		return nil
 	}
 
-	err := self.get(key)
+	err := self.get(s, ctx)
 	if err == nil {
-		self.cache.Store(key, struct{}{})
+		self.cache.Store(s, struct{}{})
 	}
 	return err
 }

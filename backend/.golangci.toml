@@ -8,7 +8,16 @@ rewrite-rules = [
 ]
 
 [linters]
-enable = ["tagliatelle"]
+enable = [
+    "asasalint",
+    "bodyclose",
+    "contextcheck",
+    "gosec",
+    "noctx",
+    "perfsprint",
+    "tagliatelle",
+    "usestdlibvars",
+]
 
 [linters.settings.errcheck]
 exclude-functions = [

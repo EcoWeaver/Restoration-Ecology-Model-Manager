@@ -1,6 +1,7 @@
 package verify
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,7 +10,7 @@ import (
 	"net/url"
 )
 
-func species(s string) error {
+func species(s string, ctx context.Context) error {
 	if s == "" {
 		return Error{E: errors.New("no species provided")}
 	}
@@ -18,7 +19,13 @@ func species(s string) error {
 		return nil
 	}
 
-	res, err := http.Get("https://api.gbif.org/v1/species/match?rank=SPECIES&name=" + url.QueryEscape(s))
+	api := "https://api.gbif.org/v1/species/match?rank=SPECIES&name=" + url.QueryEscape(s)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
 	}

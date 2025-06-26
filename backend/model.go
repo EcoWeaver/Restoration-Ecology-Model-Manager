@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/verify"
+	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -46,8 +47,8 @@ type Point struct {
 	Y int `json:"y"`
 }
 
-func (self ModelRequest) verify(s *State, l echo.Logger) error {
-	if err := s.DOICache.Verify(self.Identifier); err != nil {
+func (self ModelRequest) verify(s *State, l echo.Logger, ctx context.Context) error {
+	if err := s.DOICache.Verify(self.Identifier, ctx); err != nil {
 		return err
 	}
 
@@ -69,7 +70,7 @@ func (self ModelRequest) verify(s *State, l echo.Logger) error {
 		e[me.Name] = struct{}{}
 	}
 	for _, me := range self.Metadata {
-		if err = me.verify(s, m, l); err != nil {
+		if err = me.verify(s, m, l, ctx); err != nil {
 			return err
 		}
 		delete(e, me.Kind)
@@ -126,7 +127,7 @@ const Year = "2006"
 const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
-func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger) error {
+func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx context.Context) error {
 	if self.Kind == "" {
 		if self.Value == "" {
 			return verify.Error{E: errors.New("encountered unset metadata kind with unset value")}
@@ -173,7 +174,7 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger) error {
 					return nil
 				}
 			case "orcid":
-				if err := s.ORCIDCache.Verify(self.Value); err != nil {
+				if err := s.ORCIDCache.Verify(self.Value, ctx); err != nil {
 					if _, ok := err.(verify.Error); !ok {
 						return err
 					}
@@ -181,7 +182,7 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger) error {
 					return nil
 				}
 			case "species":
-				if err := s.SpeciesCache.Verify(self.Value); err != nil {
+				if err := s.SpeciesCache.Verify(self.Value, ctx); err != nil {
 					if _, ok := err.(verify.Error); !ok {
 						return err
 					}
