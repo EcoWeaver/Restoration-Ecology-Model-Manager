@@ -36,7 +36,7 @@ export async function suggestSpecies(value: string, selected: number): Promise<[
 	);
 	const suggestions: SpeciesSuggestion[] = await response.json();
 	const newSuggestions = suggestions
-		.filter((suggestion) => suggestion.status == "ACCEPTED")
+		.filter((suggestion) => suggestion.status === "ACCEPTED")
 		.map((suggestion) => suggestion.canonicalName)
 		.filter((suggestion) => typeof suggestion === "string")
 		.filter((suggestion) => suggestion !== value);

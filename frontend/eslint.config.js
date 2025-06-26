@@ -33,4 +33,9 @@ export default ts.config(
 			},
 		},
 	},
+	{
+		rules: {
+			eqeqeq: ["error", "always", { null: "ignore" }],
+		},
+	},
 );
