@@ -25,19 +25,18 @@
 
 		const w = intersectionNode.measured.width! / 2;
 		const h = intersectionNode.measured.height! / 2;
-
 		const x2 = intersectionNode.internals.positionAbsolute.x + w;
 		const y2 = intersectionNode.internals.positionAbsolute.y + h;
 		const x1 = targetNode.internals.positionAbsolute.x + targetNode.measured.width! / 2;
 		const y1 = targetNode.internals.positionAbsolute.y + targetNode.measured.height! / 2;
 
-		const xx1 = (x1 - x2) / (2 * w) - (y1 - y2) / (2 * h);
-		const yy1 = (x1 - x2) / (2 * w) + (y1 - y2) / (2 * h);
-		const a = 1 / (Math.abs(xx1) + Math.abs(yy1));
-		const xx3 = a * xx1;
-		const yy3 = a * yy1;
-		const x = w * (xx3 + yy3) + x2;
-		const y = h * (-xx3 + yy3) + y2;
+		const x1_ = (x1 - x2) / (2 * w) - (y1 - y2) / (2 * h);
+		const y1_ = (x1 - x2) / (2 * w) + (y1 - y2) / (2 * h);
+		const a = 1 / (Math.abs(x1_) + Math.abs(y1_));
+		const x3 = a * x1_;
+		const y3 = a * y1_;
+		const x = w * (x3 + y3) + x2;
+		const y = h * (-x3 + y3) + y2;
 
 		const cr = 8;
 		const offx = w - cr;
@@ -68,8 +67,8 @@
 		const u2x = ux - u1x;
 		const u2y = uy - u1y;
 
-		const d = Math.sqrt(u2x * u2x + u2y * u2y);
-		const m = Math.sqrt(cr * cr - d * d);
+		const d_2 = u2x * u2x + u2y * u2y;
+		const m = Math.sqrt(cr * cr - d_2);
 
 		return {
 			x: x2 + u1x + m * dx,
