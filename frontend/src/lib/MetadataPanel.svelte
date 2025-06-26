@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { X } from "@lucide/svelte";
 	import { type Metadata, type MetadataElements, type MetadataType } from "$lib/api";
-	import YearInput from "./metadata-panel/YearInput.svelte";
-	import DateInput from "./metadata-panel/DateInput.svelte";
-	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
-	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
-	import { suggestChoices, suggestSpecies } from "./metadata-panel/auto-complete";
 	import Input from "./metadata-panel/Input.svelte";
+	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
+	import DateInput from "./metadata-panel/DateInput.svelte";
+	import DoiInput from "./metadata-panel/DoiInput.svelte";
+	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
+	import YearInput from "./metadata-panel/YearInput.svelte";
+	import { suggestChoices, suggestSpecies } from "./metadata-panel/auto-complete";
 
 	let {
 		elements,
@@ -69,7 +70,7 @@
 		<span class="table-cell px-2 py-1">identifier</span>
 		<span class:pl-2={identifierEditable} class="table-cell py-1">
 			{#if identifierEditable}
-				<Input placeholder="doi" bind:value={identifier} />
+				<DoiInput bind:value={identifier} />
 			{:else}
 				<a
 					class="ml-1 block w-full pl-1 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"

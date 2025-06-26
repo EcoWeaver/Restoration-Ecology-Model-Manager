@@ -1,9 +1,12 @@
 <script lang="ts">
 	import Input from "./Input.svelte";
+	import { stripURL } from "./util";
 
 	let { value = $bindable() }: { value: string } = $props();
 
 	function set(v: string) {
+		v = stripURL(v, "https://orcid.org/");
+
 		if (v.length > 19) return;
 		v = v.toUpperCase();
 
