@@ -26,10 +26,6 @@ func DOICache() Cache {
 	return Cache{get: doi}
 }
 
-func ORCIDCache() Cache {
-	return Cache{get: orcid}
-}
-
 func SpeciesCache() Cache {
 	return Cache{get: species}
 }

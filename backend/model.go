@@ -174,7 +174,7 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 					return nil
 				}
 			case "orcid":
-				if err := s.ORCIDCache.Verify(self.Value, ctx); err != nil {
+				if err := verify.ORCID(self.Value, ctx); err != nil {
 					if _, ok := err.(verify.Error); !ok {
 						return err
 					}

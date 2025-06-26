@@ -55,7 +55,6 @@ func main() {
 	state := State{
 		DBPool:       dbPool,
 		DOICache:     verify.DOICache(),
-		ORCIDCache:   verify.ORCIDCache(),
 		SpeciesCache: verify.SpeciesCache(),
 	}
 
