@@ -11,6 +11,10 @@ backend:
     - cd backend
     - make build
     - make check
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
 
 frontend:
   stage: check
@@ -20,3 +24,7 @@ frontend:
     - npm install
     - npm run check
     - npm run lint
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
