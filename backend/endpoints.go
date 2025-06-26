@@ -259,21 +259,44 @@ func (self *State) GetRelations(c echo.Context) error {
 	return c.JSON(http.StatusOK, relations)
 }
 
-// GetSearch godoc
+// PostSearch godoc
 //
 //	@Summary		Search for models
 //	@Description	Searches for models that match at least one of the provided queries per metadata kind.
+//	@Accept			json
 //	@Produce		json
+//	@Param			queries	body		[]Metadata	true	"Search Queries"
 //	@Success		200		{object}	[]SearchResult
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
-//	@Router			/search	[get]
-func (self *State) GetSearch(c echo.Context) error {
+//	@Router			/search	[post]
+func (self *State) PostSearch(c echo.Context) error {
 	ctx := c.Request().Context()
+
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return err
+	}
+
+	var r []Metadata
+	if err = json.Unmarshal(body, &r); err != nil {
+		c.Logger().Warn(err)
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+	}
 
 	metadata, err := self.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
+	}
+
+	params := map[string][]string{}
+	for _, q := range r {
+		if _, ok := params[q.Kind]; !ok && !metadata.IsMetadataKind(q.Kind) {
+			err = fmt.Errorf("encountered invalid metadata kind '%s'", q.Kind)
+			c.Logger().Warn(err)
+			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+		}
+		params[q.Kind] = append(params[q.Kind], q.Value)
 	}
 
 	query := `
@@ -288,16 +311,9 @@ func (self *State) GetSearch(c echo.Context) error {
 			metadata.kind = 'title'`
 
 	var args []any
-	params := c.QueryParams()
 	if len(params) != 0 {
 		var conds []string
 		for k, v := range params {
-			if !metadata.IsMetadataKind(k) {
-				err = fmt.Errorf("encountered invalid metadata kind '%s'", k)
-				c.Logger().Warn(err)
-				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
-			}
-
 			args = append(args, k)
 			conj := fmt.Sprintf("(metadata.kind = $%d AND (", len(args))
 

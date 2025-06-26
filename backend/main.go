@@ -68,7 +68,7 @@ func main() {
 
 	e.GET("/relations", state.GetRelations)
 
-	e.GET("/search", state.GetSearch)
+	e.POST("/search", state.PostSearch)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
