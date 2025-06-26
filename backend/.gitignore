@@ -11,5 +11,4 @@ Thumbs.db
 !.env.test
 
 docs/
-postgresql/data/
 postgresql/backup/
