@@ -21,6 +21,8 @@
 	const targetNode = useInternalNode(target);
 
 	function nodeIntersection(intersectionNode: InternalNode, targetNode: InternalNode) {
+		/* eslint-disable camelcase -- maths isn't camelcase */
+
 		// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
 
 		const w = intersectionNode.measured.width! / 2;

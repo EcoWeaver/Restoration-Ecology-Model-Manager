@@ -35,7 +35,14 @@ export default ts.config(
 	},
 	{
 		rules: {
+			"array-callback-return": "error",
+			camelcase: "error",
 			eqeqeq: ["error", "always", { null: "ignore" }],
+			"no-duplicate-imports": "error",
+			"no-nested-ternary": "error",
+			"no-unneeded-ternary": "error",
+			"no-var": "error",
+			"object-shorthand": "error",
 		},
 	},
 );

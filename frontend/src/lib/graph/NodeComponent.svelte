@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { type NodeProps, Position, useSvelteFlow } from "@xyflow/svelte";
-	import type { Node } from "$lib/model";
-	import { Handle } from "@xyflow/svelte";
+	import { type NodeProps, Handle, Position, useSvelteFlow } from "@xyflow/svelte";
 	import { Move, Palette, Trash2 } from "@lucide/svelte";
+	import type { Node } from "$lib/model";
 
 	// eslint-disable-next-line svelte/no-unused-props -- it's unused, but svelte-flow cannot know that
 	const { id, data }: NodeProps<Omit<Node, "dragHandle"> & { dragHandle?: string }> = $props();
