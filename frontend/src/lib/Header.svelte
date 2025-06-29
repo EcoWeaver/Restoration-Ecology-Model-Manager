@@ -1,21 +1,15 @@
 <script lang="ts">
 	import { CodeXml, House, Plus } from "@lucide/svelte";
-	import Search from "./Search.svelte";
 	import type { ChipElement } from "./search/Chip.svelte";
 	import type { Snippet } from "svelte";
 	import DarkLight from "./DarkLight.svelte";
+	import MetadataSearch from "./MetadataSearch.svelte";
 
 	let {
 		params,
-		identifier,
 		children,
 		createModel = true,
-	}: {
-		params?: ChipElement[];
-		identifier?: string;
-		createModel?: boolean;
-		children?: Snippet;
-	} = $props();
+	}: { params?: ChipElement[]; createModel?: boolean; children?: Snippet } = $props();
 </script>
 
 <div class="flex items-center gap-4 p-4" role="navigation">
@@ -28,7 +22,7 @@
 	</a>
 
 	<div class="flex min-w-0 grow">
-		<Search {params} {identifier} selectedSearch={identifier != null ? "identifier" : "metadata"} />
+		<MetadataSearch {params} />
 	</div>
 
 	{#if createModel}

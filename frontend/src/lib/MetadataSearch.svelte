@@ -2,19 +2,14 @@
 	import { untrack } from "svelte";
 	import { goto } from "$app/navigation";
 	import Chip, { type ChipElement } from "./search/Chip.svelte";
-	import Input from "./search/Input.svelte";
-	import SearchButton from "./search/Button.svelte";
 	import { suggest } from "./search/suggestions";
+	import { Search as SearchIcon } from "@lucide/svelte";
 
-	let {
-		input = $bindable(),
-		chips = $bindable(),
-		chip = $bindable(),
-	}: {
-		chips: ChipElement[];
-		input: string;
-		chip: undefined | ChipElement;
-	} = $props();
+	let { params = [] }: { params?: ChipElement[] } = $props();
+
+	let input = $state("");
+	const chips = $state(params);
+	let chip = $state<undefined | ChipElement>(undefined);
 
 	let selected = $state<number>(-1);
 	let suggestions = $state<string[]>([]);
@@ -111,23 +106,27 @@
 </script>
 
 <div
-	class="min-w-0 grow overflow-x-auto focus-within:outline-2 focus-within:outline-indigo-400"
+	class="min-w-0 grow overflow-x-auto rounded-l-md focus-within:outline-2 focus-within:outline-indigo-400"
 	{onfocusout}
 >
-	<Input
-		placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
-		bind:value={input}
-		bind:self={inputElement}
-		onkeydown={key}
-		onfocus={() => (focused = true)}
-	>
+	<span class="relative z-10 flex h-10 overflow-x-auto rounded-l-md border border-neutral-600">
 		{#each chips as chip, idx (idx)}
 			<Chip {chip} />
 		{/each}
 		{#if chip}
 			<Chip {chip} />
 		{/if}
-	</Input>
+
+		<input
+			class="block field-sizing-content min-w-16 grow px-2 py-1 focus-visible:outline-none"
+			placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
+			bind:this={inputElement}
+			bind:value={input}
+			onkeydown={key}
+			onfocus={() => (focused = true)}
+			type="text"
+		/>
+	</span>
 
 	{#if focused && suggestions.length !== 0}
 		<div
@@ -158,10 +157,14 @@
 	{/if}
 </div>
 
-<SearchButton
+<button
+	class="flex h-10 cursor-pointer place-items-center rounded-r-md border border-l-0 border-neutral-600 px-3 outline-indigo-400 focus-visible:outline-2"
+	title="search"
 	onclick={() => {
 		if (selected === -1 && input.length === 0) {
 			submit();
 		}
 	}}
-/>
+>
+	<SearchIcon />
+</button>

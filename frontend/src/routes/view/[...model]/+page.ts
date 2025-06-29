@@ -2,10 +2,9 @@ import { apiBase, type MetadataElements, type MetadataType, type ModelRequest } 
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
-export const load: PageLoad = async ({ fetch, params, url }) => {
+export const load: PageLoad = async ({ fetch, params }) => {
 	const apiUrl = new URL("/model", apiBase);
-	apiUrl.searchParams.set("identifier", params.model);
-	apiUrl.searchParams.set("version", url.searchParams.get("version") ?? "");
+	apiUrl.searchParams.set("uuid", params.model);
 
 	const modelRes = await fetch(apiUrl);
 	if (!modelRes.ok) {
@@ -13,7 +12,6 @@ export const load: PageLoad = async ({ fetch, params, url }) => {
 	}
 
 	const model: ModelRequest = await modelRes.json();
-
 	const metadataRes = await fetch(`${apiBase}/metadata`);
 	const metadataElements: MetadataElements = await metadataRes.json();
 	const metadataMap = new Map<string, MetadataType | undefined>();

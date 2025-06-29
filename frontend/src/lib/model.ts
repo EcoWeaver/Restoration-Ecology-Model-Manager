@@ -6,6 +6,7 @@ import {
 	type Graph,
 	type Metadata,
 	type ModelRequest,
+	type SaveModel,
 } from "./api";
 
 export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & {
@@ -37,11 +38,10 @@ export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edg
 }
 
 export async function saveModel(
-	identifier: string,
+	parent: string | undefined,
 	metadata: Metadata[],
 	n: Node[],
 	e: Edge[],
-	version?: string,
 ): Promise<ModelRequest> {
 	const nodes: ApiNode[] = n.map((n) => {
 		const { body, color } = n.data;
@@ -64,9 +64,8 @@ export async function saveModel(
 	});
 
 	const graph = { nodes, relations };
-	const request: ModelRequest = {
-		identifier,
-		version: version ?? "",
+	const request: SaveModel = {
+		parent,
 		metadata,
 		graph,
 	};

@@ -11,17 +11,13 @@
 	import Alert from "./Alert.svelte";
 
 	let {
-		version = undefined,
-		identifier = $bindable(),
-		identifierEditable,
+		uuid,
 		metadata = $bindable(),
 		metadataElements,
 		nodes: initialNodes,
 		edges: initialEdges,
 	}: {
-		version?: string;
-		identifier: string;
-		identifierEditable: boolean;
+		uuid?: string;
 		metadata: Metadata[];
 		metadataElements: MetadataElements;
 		nodes: Node[];
@@ -34,8 +30,8 @@
 	let alert: ReturnType<typeof Alert>;
 	async function save() {
 		try {
-			const model = await saveModel(identifier, metadata, nodes, edges, version);
-			await goto(`/view/${model.identifier}?version=${model.version}`);
+			const model = await saveModel(uuid, metadata, nodes, edges);
+			await goto(`/view/${model.uuid}`);
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
@@ -90,7 +86,7 @@
 			<span class="pl-2">save</span>
 		</button>
 		<a
-			href={typeof version === "undefined" ? "/" : `/view/${identifier}?version=${version}`}
+			href={`/view/${uuid}`}
 			title="cancel editing"
 			class="flex h-10 cursor-pointer items-center rounded-md bg-red-300 px-3 outline-offset-2 outline-red-400 hover:bg-red-400 focus-visible:outline-2 dark:bg-red-500"
 		>
@@ -106,13 +102,7 @@
 	<Graph bind:nodes bind:edges interactive={true}>
 		{#snippet panel()}
 			<PanelComponent onaddmetadata={() => metadataPanel.addMetadata()}>
-				<MetadataPanel
-					bind:this={metadataPanel}
-					elements={metadataElements}
-					bind:identifier
-					{identifierEditable}
-					bind:metadata
-				/>
+				<MetadataPanel bind:this={metadataPanel} elements={metadataElements} bind:metadata />
 			</PanelComponent>
 		{/snippet}
 	</Graph>

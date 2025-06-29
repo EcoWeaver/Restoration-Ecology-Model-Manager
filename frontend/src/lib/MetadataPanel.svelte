@@ -9,17 +9,8 @@
 	import YearInput from "./metadata-panel/YearInput.svelte";
 	import { suggestChoices, suggestSpecies } from "./metadata-panel/auto-complete";
 
-	let {
-		elements,
-		identifier = $bindable(),
-		identifierEditable = true,
-		metadata = $bindable(),
-	}: {
-		elements: MetadataElements;
-		identifier: string;
-		identifierEditable?: boolean;
-		metadata: Metadata[];
-	} = $props();
+	let { elements, metadata = $bindable() }: { elements: MetadataElements; metadata: Metadata[] } =
+		$props();
 
 	type FlatMeta = {
 		type?: MetadataType;
@@ -66,24 +57,6 @@
 		<span class="table-cell py-2 pl-2 font-bold">value</span>
 	</div>
 
-	<div class="table-row">
-		<span class="table-cell px-2 py-1">identifier</span>
-		<span class:pl-2={identifierEditable} class="table-cell py-1">
-			{#if identifierEditable}
-				<DoiInput bind:value={identifier} />
-			{:else}
-				<a
-					class="ml-1 block w-full pl-1 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-					href={`https://doi.org/${identifier}`}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{identifier}
-				</a>
-			{/if}
-		</span>
-	</div>
-
 	{#each meta as m, idx (idx)}
 		{@const { type, choices } = flatMetadata.get(m.kind) || {}}
 
@@ -126,6 +99,8 @@
 							<option class="cursor-pointer dark:bg-neutral-700" value={choice}>{choice}</option>
 						{/each}
 					</select>
+				{:else if type === "doi"}
+					<DoiInput bind:value={m.value} />
 				{:else if type === "date"}
 					<DateInput bind:value={m.value} />
 				{:else if type === "orcid"}

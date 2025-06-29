@@ -5,8 +5,6 @@
 	import { type Metadata } from "$lib/api";
 
 	let { data }: PageProps = $props();
-
-	let identifier = $state("");
 	let metadata = $state<Metadata[]>([]);
 </script>
 
@@ -14,11 +12,4 @@
 	<title>create new model</title>
 </svelte:head>
 
-<GraphEdit
-	bind:identifier
-	identifierEditable={true}
-	bind:metadata
-	metadataElements={data.metadataElements}
-	nodes={[]}
-	edges={[]}
-/>
+<GraphEdit bind:metadata metadataElements={data.metadataElements} nodes={[]} edges={[]} />

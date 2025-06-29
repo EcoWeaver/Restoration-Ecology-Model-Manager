@@ -37,7 +37,7 @@ export function metadataElements(): Promise<MetadataElements> {
 	return metadataElementsCache;
 }
 
-export function putModel(model: ModelRequest): Promise<ModelRequest> {
+export function putModel(model: SaveModel): Promise<ModelRequest> {
 	return req<ModelRequest>("PUT", "model", model);
 }
 
@@ -45,9 +45,15 @@ export type BackendError = {
 	message: string;
 };
 
+export type SaveModel = {
+	parent?: string;
+	graph: Graph;
+	metadata: Metadata[];
+};
+
 export type ModelRequest = {
-	identifier: string;
-	version: string;
+	uuid: string;
+	parent?: string;
 	graph: Graph;
 	metadata: Metadata[];
 };
@@ -67,7 +73,15 @@ export type Choice = {
 	ontology?: string;
 };
 
-export type MetadataType = "choice" | "date" | "ietf-bcp-47" | "orcid" | "species" | "url" | "year";
+export type MetadataType =
+	| "choice"
+	| "date"
+	| "doi"
+	| "ietf-bcp-47"
+	| "orcid"
+	| "species"
+	| "url"
+	| "year";
 
 export type MetadataElement = {
 	name: string;
@@ -95,22 +109,7 @@ export type Point = {
 };
 
 export type SearchItem = {
+	uuid: string;
 	identifier: string;
-	version: string;
 	title: string;
 };
-
-export function sortVersion(a: SearchItem, b: SearchItem) {
-	const left = a.version.split(".").map((v) => Number(v));
-	const right = b.version.split(".").map((v) => Number(v));
-
-	const max = Math.min(left.length, right.length);
-	for (let i = 0; i < max; i++) {
-		const cmp = left[i] - right[i];
-		if (cmp !== 0) {
-			return cmp;
-		}
-	}
-
-	return left.length - right.length;
-}

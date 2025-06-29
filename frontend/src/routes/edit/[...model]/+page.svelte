@@ -3,22 +3,14 @@
 	import GraphEdit from "$lib/GraphEdit.svelte";
 
 	let { data } = $props();
-	const { model, version, metadataElements } = data;
-	let { identifier, metadata } = $derived(model);
+	const { model, metadataElements } = data;
+	let { uuid, metadata } = $derived(model);
 
 	const { nodes, edges } = apiToFlow(model.graph, true);
 </script>
 
 <svelte:head>
-	<title>edit {model.identifier}@v{model.version}</title>
+	<title>editing {metadata.find(({ kind }) => kind === "title")?.value ?? uuid}</title>
 </svelte:head>
 
-<GraphEdit
-	{version}
-	bind:identifier
-	identifierEditable={false}
-	bind:metadata
-	{metadataElements}
-	{nodes}
-	{edges}
-/>
+<GraphEdit {uuid} bind:metadata {metadataElements} {nodes} {edges} />
