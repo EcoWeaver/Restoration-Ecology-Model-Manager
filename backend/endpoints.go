@@ -178,7 +178,7 @@ func (self *State) PutModel(c echo.Context) error {
 		}
 
 		if slices.Equal(m.Graph.Nodes, graph.Nodes) && slices.Equal(m.Graph.Relations, graph.Relations) && slices.Equal(m.Metadata, metadata) {
-			err = fmt.Errorf("model with uuid '%s' wasn't changed", m.UUID)
+			err = fmt.Errorf("model with uuid '%s' wasn't changed", m.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		}
