@@ -38,11 +38,11 @@ type SearchResult struct {
 //	@Failure	500			{object}	echo.HTTPError
 //	@Router		/metadata	[get]
 func (self *State) GetMetadata(c echo.Context) error {
-	metadata, err := self.Metadata.Get(c.Logger())
+	m, err := self.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, metadata)
+	return c.JSON(http.StatusOK, m)
 }
 
 // GetModel godoc
@@ -101,15 +101,15 @@ func (self *State) GetModel(c echo.Context) error {
 		return err
 	}
 
-	r := Model{&modelID, graph, metadata, parent}
+	m := Model{&modelID, graph, metadata, parent}
 
 	go func() {
-		if err, ok := r.verify(self, c.Logger(), ctx).(verify.Error); ok {
+		if err, ok := m.verify(self, c.Logger(), ctx).(verify.Error); ok {
 			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with uuid '%s': %w", modelID, err))
 		}
 	}()
 
-	return c.JSON(http.StatusOK, r)
+	return c.JSON(http.StatusOK, m)
 }
 
 // PutModel godoc
@@ -132,13 +132,13 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	var r Model
-	if err = json.Unmarshal(body, &r); err != nil {
+	var m Model
+	if err = json.Unmarshal(body, &m); err != nil {
 		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = r.verify(self, c.Logger(), ctx); err != nil {
+	if err = m.verify(self, c.Logger(), ctx); err != nil {
 		if _, ok := err.(verify.Error); ok {
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
@@ -152,7 +152,7 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	if r.Parent != nil {
+	if m.Parent != nil {
 		query := `
 		SELECT
 			models.graph,
@@ -167,9 +167,9 @@ func (self *State) PutModel(c echo.Context) error {
 
 		var graph Graph
 		var metadata []Metadata
-		if err = conn.QueryRow(ctx, query, r.Parent).Scan(&graph, &metadata); err != nil {
+		if err = conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
 			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", r.Parent)
+				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", m.Parent)
 				c.Logger().Warn(err)
 				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 			} else {
@@ -177,8 +177,8 @@ func (self *State) PutModel(c echo.Context) error {
 			}
 		}
 
-		if slices.Equal(r.Graph.Nodes, graph.Nodes) && slices.Equal(r.Graph.Relations, graph.Relations) && slices.Equal(r.Metadata, metadata) {
-			err = fmt.Errorf("model with uuid '%s' wasn't changed", r.UUID)
+		if slices.Equal(m.Graph.Nodes, graph.Nodes) && slices.Equal(m.Graph.Relations, graph.Relations) && slices.Equal(m.Metadata, metadata) {
+			err = fmt.Errorf("model with uuid '%s' wasn't changed", m.UUID)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		}
@@ -193,16 +193,16 @@ func (self *State) PutModel(c echo.Context) error {
 			model_id`
 
 	var modelID uuid.UUID
-	if err = conn.QueryRow(ctx, query, r.Graph, r.Parent).Scan(&modelID); err != nil {
+	if err = conn.QueryRow(ctx, query, m.Graph, m.Parent).Scan(&modelID); err != nil {
 		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == "23503" {
-			err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", r.Parent)
+			err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", m.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
 		}
 	}
-	r.UUID = &modelID
+	m.UUID = &modelID
 
 	query = `
 		INSERT INTO
@@ -211,12 +211,12 @@ func (self *State) PutModel(c echo.Context) error {
 			`
 
 	args := []any{modelID}
-	var ins []string
-	for _, me := range r.Metadata {
+	var vals []string
+	for _, me := range m.Metadata {
 		args = append(args, me.Kind, me.Value)
-		ins = append(ins, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
 	}
-	query += strings.Join(ins, `,
+	query += strings.Join(vals, `,
 			`)
 
 	if _, err = conn.Exec(ctx, query, args...); err != nil {
@@ -227,7 +227,7 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, r)
+	return c.JSON(http.StatusCreated, m)
 }
 
 // GetRelations godoc
@@ -238,11 +238,11 @@ func (self *State) PutModel(c echo.Context) error {
 //	@Failure	500			{object}	echo.HTTPError
 //	@Router		/relations	[get]
 func (self *State) GetRelations(c echo.Context) error {
-	relations, err := self.Relations.Get(c.Logger())
+	r, err := self.Relations.Get(c.Logger())
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, relations)
+	return c.JSON(http.StatusOK, r)
 }
 
 // PostSearch godoc
@@ -264,25 +264,25 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	var r []Metadata
-	if err = json.Unmarshal(body, &r); err != nil {
+	var mqs []Metadata
+	if err = json.Unmarshal(body, &mqs); err != nil {
 		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	metadata, err := self.Metadata.Get(c.Logger())
+	m, err := self.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}
 
-	params := map[string][]string{}
-	for _, q := range r {
-		if _, ok := params[q.Kind]; !ok && !metadata.IsMetadataKind(q.Kind) {
-			err = fmt.Errorf("encountered invalid metadata kind '%s'", q.Kind)
+	qs := map[string][]string{}
+	for _, mq := range mqs {
+		if _, ok := qs[mq.Kind]; !ok && !m.IsMetadataKind(mq.Kind) {
+			err = fmt.Errorf("encountered invalid metadata kind '%s'", mq.Kind)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		}
-		params[q.Kind] = append(params[q.Kind], q.Value)
+		qs[mq.Kind] = append(qs[mq.Kind], mq.Value)
 	}
 
 	query := `
@@ -295,9 +295,9 @@ func (self *State) PostSearch(c echo.Context) error {
 			JOIN metadata ON models.model_id = metadata.model_id`
 
 	var args []any
-	if len(params) != 0 {
+	if len(qs) != 0 {
 		var conds []string
-		for k, v := range params {
+		for k, v := range qs {
 			args = append(args, k)
 			conj := fmt.Sprintf("(metadata.kind = $%d AND (", len(args))
 
@@ -320,8 +320,8 @@ func (self *State) PostSearch(c echo.Context) error {
 					` + strings.Join(conds, `
 					OR `)
 
-		if len(params) != 1 {
-			args = append(args, len(params))
+		if len(qs) != 1 {
+			args = append(args, len(qs))
 
 			innerQuery += fmt.Sprintf(`
 				GROUP BY
@@ -353,9 +353,9 @@ func (self *State) PostSearch(c echo.Context) error {
 
 	var modelID uuid.UUID
 	var identifier, title string
-	var idents []SearchResult
+	var sr []SearchResult
 	_, err = pgx.ForEachRow(rows, []any{&modelID, &identifier, &title}, func() error {
-		idents = append(idents, SearchResult{modelID, identifier, title})
+		sr = append(sr, SearchResult{modelID, identifier, title})
 		return nil
 	})
 	if err != nil {
@@ -366,5 +366,5 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, idents)
+	return c.JSON(http.StatusOK, sr)
 }
