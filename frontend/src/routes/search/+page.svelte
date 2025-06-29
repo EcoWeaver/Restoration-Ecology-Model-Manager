@@ -19,8 +19,8 @@
 		<div class="table w-full border-collapse p-2 text-lg">
 			<div class="mb-2 table-row border-b-1 border-neutral-300">
 				<span class="table-cell p-3 font-semibold">title</span>
-				<span class="table-cell p-3 font-semibold">version</span>
 				<span class="table-cell p-3 font-semibold">identifier</span>
+				<span class="table-cell p-3 font-semibold">uuid</span>
 			</div>
 			{#each items as { uuid, identifier, title }, idx (idx)}
 				<a
@@ -29,6 +29,7 @@
 				>
 					<span class="table-cell p-3">{title}</span>
 					<span class="table-cell p-3">{identifier}</span>
+					<span class="table-cell p-3">...{uuid.slice(-8)}</span>
 				</a>
 			{/each}
 		</div>
