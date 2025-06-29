@@ -21,8 +21,9 @@ frontend:
   image: node:latest
   script:
     - cd frontend
-    - npm install
+    - npm ci
     - npm run check
+    - npm run build
     - npm run lint
   rules:
     - changes:

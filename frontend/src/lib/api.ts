@@ -15,11 +15,27 @@ async function req<T>(method: string, path: string, body?: unknown | undefined):
 	}
 }
 
-export const relationElements = req<RelationElements>("GET", "relations");
 export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>;
 
-export const metadataElements = req<MetadataElements>("GET", "metadata");
+let relationElementsCache: Promise<RelationElements> | undefined;
+export function relationElements(): Promise<RelationElements> {
+	if (!relationElementsCache) {
+		relationElementsCache = req<RelationElements>("GET", "relations");
+	}
+
+	return relationElementsCache;
+}
+
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
+
+let metadataElementsCache: Promise<MetadataElements> | undefined;
+export function metadataElements(): Promise<MetadataElements> {
+	if (metadataElementsCache == null) {
+		metadataElementsCache = req<MetadataElements>("GET", "metadata");
+	}
+
+	return metadataElementsCache;
+}
 
 export function putModel(model: ModelRequest): Promise<ModelRequest> {
 	return req<ModelRequest>("PUT", "model", model);

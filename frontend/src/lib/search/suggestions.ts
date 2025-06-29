@@ -1,6 +1,6 @@
 import { metadataElements } from "$lib/api";
 
-const allElements = metadataElements.then((elements) =>
+const allElements = metadataElements().then((elements) =>
 	Object.values(elements)
 		.flat()
 		.map((element) => element.name),

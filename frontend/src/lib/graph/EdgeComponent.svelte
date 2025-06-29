@@ -12,11 +12,12 @@
 		type XYPosition,
 	} from "@xyflow/svelte";
 	import type { Edge } from "$lib/model";
-	import { relationElements } from "$lib/api";
+	import { relationElements as getRelationElements } from "$lib/api";
 	import { Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
+	const relationElements = getRelationElements();
 
 	const sourceNode = useInternalNode(source);
 	const targetNode = useInternalNode(target);
