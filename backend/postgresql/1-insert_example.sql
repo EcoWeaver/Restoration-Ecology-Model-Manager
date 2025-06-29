@@ -4,12 +4,13 @@ INSERT INTO metadata (model_id, kind, value) VALUES
 ('00000000-0000-0000-0000-000000000000', 'creator', '0000-0001-6699-1845'),
 ('00000000-0000-0000-0000-000000000000', 'title', 'Fuzzy logic modelling of anadromous Arctic char spawning habitat from Nunavik Inuit knowledge'),
 ('00000000-0000-0000-0000-000000000000', 'publisher', '0000-0001-9161-4742'),
-('00000000-0000-0000-0000-000000000000', 'publisher', '0000-0003-2413-6810'),
 ('00000000-0000-0000-0000-000000000000', 'publication-year', '2022'),
+('00000000-0000-0000-0000-000000000000', 'resource-type', 'Model'),
+('00000000-0000-0000-0000-000000000000', 'model-type', 'Rule-based Fuzzy Logic Model'),
+('00000000-0000-0000-0000-000000000000', 'publisher', '0000-0003-2413-6810'),
 ('00000000-0000-0000-0000-000000000000', 'subject', 'Reproduction habitat; Arctic char habitat; Expert systems; Indigenous knowledge; Inuit Qaujimajatuqangit; Fish habitat model; Arctic fish'),
 ('00000000-0000-0000-0000-000000000000', 'date', '2022-12-20'),
 ('00000000-0000-0000-0000-000000000000', 'language', 'en'),
-('00000000-0000-0000-0000-000000000000', 'resource-type', 'Model'),
 ('00000000-0000-0000-0000-000000000000', 'ecological-domain', 'Freshwater biome'),
 ('00000000-0000-0000-0000-000000000000', 'format', 'XLSX'),
 ('00000000-0000-0000-0000-000000000000', 'version', '1.0'),
@@ -21,5 +22,4 @@ INSERT INTO metadata (model_id, kind, value) VALUES
 ('00000000-0000-0000-0000-000000000000', 'output-data', 'Habitat suitability indices'),
 ('00000000-0000-0000-0000-000000000000', 'performance-metric', 'Cohen''s Kappa'),
 ('00000000-0000-0000-0000-000000000000', 'performance-metric', 'Recall'),
-('00000000-0000-0000-0000-000000000000', 'performance-metric', 'Specificity'),
-('00000000-0000-0000-0000-000000000000', 'model-type', 'Rule-based Fuzzy Logic Model');
+('00000000-0000-0000-0000-000000000000', 'performance-metric', 'Specificity');
