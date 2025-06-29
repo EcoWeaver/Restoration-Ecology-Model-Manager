@@ -37,26 +37,23 @@ export function metadataElements(): Promise<MetadataElements> {
 	return metadataElementsCache;
 }
 
-export function putModel(model: SaveModel): Promise<ModelRequest> {
-	return req<ModelRequest>("PUT", "model", model);
+export function putModel(model: UnsavedModel): Promise<Model> {
+	return req<Model>("PUT", "model", model);
 }
 
 export type BackendError = {
 	message: string;
 };
 
-export type SaveModel = {
-	parent?: string;
-	graph: Graph;
-	metadata: Metadata[];
-};
-
-export type ModelRequest = {
+export interface Model extends UnsavedModel {
 	uuid: string;
-	parent?: string;
+}
+
+export interface UnsavedModel {
 	graph: Graph;
 	metadata: Metadata[];
-};
+	parent?: string;
+}
 
 export type Graph = {
 	nodes: Node[];

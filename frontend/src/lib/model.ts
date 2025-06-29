@@ -5,8 +5,8 @@ import {
 	type Relation as ApiRelation,
 	type Graph,
 	type Metadata,
-	type ModelRequest,
-	type SaveModel,
+	type Model,
+	type UnsavedModel,
 } from "./api";
 
 export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & {
@@ -42,7 +42,7 @@ export async function saveModel(
 	metadata: Metadata[],
 	n: Node[],
 	e: Edge[],
-): Promise<ModelRequest> {
+): Promise<Model> {
 	const nodes: ApiNode[] = n.map((n) => {
 		const { body, color } = n.data;
 		return {
@@ -64,10 +64,10 @@ export async function saveModel(
 	});
 
 	const graph = { nodes, relations };
-	const request: SaveModel = {
-		parent,
+	const request: UnsavedModel = {
 		metadata,
 		graph,
+		parent,
 	};
 
 	return await putModel(request);

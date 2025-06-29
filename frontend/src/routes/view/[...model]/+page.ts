@@ -1,4 +1,4 @@
-import { apiBase, type MetadataElements, type MetadataType, type ModelRequest } from "$lib/api";
+import { apiBase, type MetadataElements, type MetadataType, type Model } from "$lib/api";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
@@ -11,7 +11,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
 		return error(modelRes.status, await modelRes.json());
 	}
 
-	const model: ModelRequest = await modelRes.json();
+	const model: Model = await modelRes.json();
 	const metadataRes = await fetch(`${apiBase}/metadata`);
 	const metadataElements: MetadataElements = await metadataRes.json();
 	const metadataMap = new Map<string, MetadataType | undefined>();

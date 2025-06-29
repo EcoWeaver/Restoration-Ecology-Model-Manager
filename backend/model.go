@@ -15,7 +15,11 @@ import (
 )
 
 type Model struct {
-	UUID     *uuid.UUID `json:"uuid"`
+	UUID uuid.UUID `json:"uuid"`
+	UnsavedModel
+}
+
+type UnsavedModel struct {
 	Graph    Graph      `json:"graph"`
 	Metadata []Metadata `json:"metadata"`
 	Parent   *uuid.UUID `json:"parent"`
@@ -48,7 +52,7 @@ type Point struct {
 	Y int `json:"y"`
 }
 
-func (self Model) verify(s *State, l echo.Logger, ctx context.Context) error {
+func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) error {
 	if err := self.Graph.verify(s, l); err != nil {
 		return err
 	}

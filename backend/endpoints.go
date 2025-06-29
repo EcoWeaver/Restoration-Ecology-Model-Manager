@@ -32,11 +32,12 @@ type SearchResult struct {
 
 // GetMetadata godoc
 //
-//	@Summary	Get list of currently accepted metadata kinds, types and obligations
-//	@Produce	json
-//	@Success	200			{object}	MetadataConfig
-//	@Failure	500			{object}	echo.HTTPError
-//	@Router		/metadata	[get]
+//	@Summary		Get the metadata
+//	@Description	Gets the list of currently accepted metadata kinds, types and obligations.
+//	@Produce		json
+//	@Success		200			{object}	MetadataConfig
+//	@Failure		500			{object}	echo.HTTPError
+//	@Router			/metadata	[get]
 func (self *State) GetMetadata(c echo.Context) error {
 	m, err := self.Metadata.Get(c.Logger())
 	if err != nil {
@@ -48,9 +49,9 @@ func (self *State) GetMetadata(c echo.Context) error {
 // GetModel godoc
 //
 //	@Summary		Get a model
-//	@Description	Gets a model by its uuid
+//	@Description	Gets a model by its UUID.
 //	@Produce		json
-//	@Param			uuid	query		string	true	"Model UUID"
+//	@Param			uuid	query		string	true	"uuid"
 //	@Success		200		{object}	Model
 //	@Failure		404		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
@@ -101,7 +102,7 @@ func (self *State) GetModel(c echo.Context) error {
 		return err
 	}
 
-	m := Model{&modelID, graph, metadata, parent}
+	m := Model{modelID, UnsavedModel{graph, metadata, parent}}
 
 	go func() {
 		if err, ok := m.verify(self, c.Logger(), ctx).(verify.Error); ok {
@@ -115,10 +116,10 @@ func (self *State) GetModel(c echo.Context) error {
 // PutModel godoc
 //
 //	@Summary		Save a model
-//	@Description	Saves a model. The `parent` field in the `Model` is set if it's an edit, null otherwise. The returned model will be identical, except for the `uuid` field, which is updated to the uuid this model was saved as.
+//	@Description	Saves a model. Returns the same model but with an assigned UUID.
 //	@Accept			json
 //	@Produce		json
-//	@Param			model	body		Model	true	"Model"
+//	@Param			model	body		UnsavedModel	true	"model"
 //	@Success		201		{object}	Model
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
@@ -132,13 +133,13 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	var m Model
-	if err = json.Unmarshal(body, &m); err != nil {
+	var um UnsavedModel
+	if err = json.Unmarshal(body, &um); err != nil {
 		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = m.verify(self, c.Logger(), ctx); err != nil {
+	if err = um.verify(self, c.Logger(), ctx); err != nil {
 		if _, ok := err.(verify.Error); ok {
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
@@ -152,7 +153,7 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	if m.Parent != nil {
+	if um.Parent != nil {
 		query := `
 		SELECT
 			models.graph,
@@ -167,9 +168,9 @@ func (self *State) PutModel(c echo.Context) error {
 
 		var graph Graph
 		var metadata []Metadata
-		if err = conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
+		if err = conn.QueryRow(ctx, query, um.Parent).Scan(&graph, &metadata); err != nil {
 			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", m.Parent)
+				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", um.Parent)
 				c.Logger().Warn(err)
 				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 			} else {
@@ -177,8 +178,8 @@ func (self *State) PutModel(c echo.Context) error {
 			}
 		}
 
-		if slices.Equal(m.Graph.Nodes, graph.Nodes) && slices.Equal(m.Graph.Relations, graph.Relations) && slices.Equal(m.Metadata, metadata) {
-			err = fmt.Errorf("model with uuid '%s' wasn't changed", m.Parent)
+		if slices.Equal(um.Graph.Nodes, graph.Nodes) && slices.Equal(um.Graph.Relations, graph.Relations) && slices.Equal(um.Metadata, metadata) {
+			err = fmt.Errorf("model with uuid '%s' wasn't changed", um.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		}
@@ -193,16 +194,16 @@ func (self *State) PutModel(c echo.Context) error {
 			model_id`
 
 	var modelID uuid.UUID
-	if err = conn.QueryRow(ctx, query, m.Graph, m.Parent).Scan(&modelID); err != nil {
+	if err = conn.QueryRow(ctx, query, um.Graph, um.Parent).Scan(&modelID); err != nil {
 		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == "23503" {
-			err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", m.Parent)
+			err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", um.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
 		}
 	}
-	m.UUID = &modelID
+	m := Model{modelID, um}
 
 	query = `
 		INSERT INTO
@@ -232,7 +233,8 @@ func (self *State) PutModel(c echo.Context) error {
 
 // GetRelations godoc
 //
-//	@Summary	Get list of currently accepted relation kinds and types
+//	@Summary	Get the relations
+//	@Summary	Gets the list of currently accepted relation kinds and types.
 //	@Produce	json
 //	@Success	200			{object}	RelationsConfig
 //	@Failure	500			{object}	echo.HTTPError
@@ -251,7 +253,7 @@ func (self *State) GetRelations(c echo.Context) error {
 //	@Description	Searches for models that match at least one of the provided queries per metadata kind.
 //	@Accept			json
 //	@Produce		json
-//	@Param			queries	body		[]Metadata	true	"Search Queries"
+//	@Param			queries	body		[]Metadata	true	"queries"
 //	@Success		200		{object}	[]SearchResult
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
