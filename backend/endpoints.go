@@ -178,7 +178,7 @@ func (self *State) PutModel(c echo.Context) error {
 			}
 		}
 
-		if slices.Equal(um.Graph.Nodes, graph.Nodes) && slices.Equal(um.Graph.Relations, graph.Relations) && slices.Equal(um.Metadata, metadata) {
+		if slices.Equal(um.Graph.Nodes, graph.Nodes) && slicesEqualUnordered(um.Graph.Relations, graph.Relations) && slicesEqualUnordered(um.Metadata, metadata) {
 			err = fmt.Errorf("model with uuid '%s' wasn't changed", um.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
@@ -369,4 +369,27 @@ func (self *State) PostSearch(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, sr)
+}
+
+func slicesEqualUnordered[T comparable](a, b []T) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	e := map[T]int{}
+	for _, v := range a {
+		e[v]++
+	}
+
+	for _, v := range b {
+		e[v]--
+	}
+
+	for _, v := range e {
+		if v != 0 {
+			return false
+		}
+	}
+
+	return true
 }
