@@ -1,15 +1,12 @@
 CREATE TABLE IF NOT EXISTS models (
-    model_id SERIAL PRIMARY KEY,
-    identifier TEXT NOT NULL,
+    model_id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     graph JSONB NOT NULL,
-    version TEXT NOT NULL,
-    num_derivatives INT NOT NULL DEFAULT 0,
-    UNIQUE (identifier, version)
+    parent UUID REFERENCES models (model_id)
 );
 
 CREATE TABLE IF NOT EXISTS metadata (
     metadata_id SERIAL PRIMARY KEY,
-    model_id INT NOT NULL REFERENCES models (model_id),
+    model_id UUID NOT NULL REFERENCES models (model_id),
     kind TEXT NOT NULL,
     value TEXT NOT NULL
 );

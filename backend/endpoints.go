@@ -9,6 +9,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -24,9 +25,9 @@ type State struct {
 }
 
 type SearchResult struct {
-	Identifier string `json:"identifier"`
-	Version    string `json:"version"`
-	Title      string `json:"title"`
+	UUID       uuid.UUID `json:"uuid"`
+	Identifier string    `json:"identifier"`
+	Title      string    `json:"title"`
 }
 
 // GetMetadata godoc
@@ -47,31 +48,35 @@ func (self *State) GetMetadata(c echo.Context) error {
 // GetModel godoc
 //
 //	@Summary		Get a model
-//	@Description	Gets a model by its identifier and version
+//	@Description	Gets a model by its uuid
 //	@Produce		json
-//	@Param			identifier	query		string	true	"Model Identifier"
-//	@Param			version		query		string	true	"Model Version"
-//	@Success		200			{object}	ModelRequest
-//	@Failure		404			{object}	echo.HTTPError
-//	@Failure		500			{object}	echo.HTTPError
-//	@Router			/model		[get]
+//	@Param			uuid	query		string	true	"Model UUID"
+//	@Success		200		{object}	Model
+//	@Failure		404		{object}	echo.HTTPError
+//	@Failure		500		{object}	echo.HTTPError
+//	@Router			/model	[get]
 func (self *State) GetModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	identifier := c.QueryParam("identifier")
-	version := c.QueryParam("version")
+	modelID, err := uuid.Parse(c.QueryParam("uuid"))
+	if err != nil {
+		c.Logger().Warn(err)
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	query := `
 		SELECT
 			models.graph,
+			models.parent,
 			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
 		FROM
 			models
 			JOIN metadata ON models.model_id = metadata.model_id
 		WHERE
-			models.identifier = $1 AND models.version = $2
+			models.model_id = $1
 		GROUP BY
-			models.graph`
+			models.graph,
+			models.parent`
 
 	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
@@ -80,10 +85,11 @@ func (self *State) GetModel(c echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	var graph Graph
+	var parent *uuid.UUID
 	var metadata []Metadata
-	if err = conn.QueryRow(ctx, query, identifier, version).Scan(&graph, &metadata); err != nil {
+	if err = conn.QueryRow(ctx, query, modelID).Scan(&graph, &parent, &metadata); err != nil {
 		if err == pgx.ErrNoRows {
-			err = fmt.Errorf("model with identifier '%s' at version '%s' not found", identifier, version)
+			err = fmt.Errorf("model with uuid '%s' not found", modelID)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 		} else {
@@ -95,11 +101,11 @@ func (self *State) GetModel(c echo.Context) error {
 		return err
 	}
 
-	r := ModelRequest{identifier, graph, version, metadata}
+	r := Model{&modelID, graph, metadata, parent}
 
 	go func() {
 		if err, ok := r.verify(self, c.Logger(), ctx).(verify.Error); ok {
-			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with identifier '%s' at version '%s': %w", identifier, version, err))
+			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with uuid '%s': %w", modelID, err))
 		}
 	}()
 
@@ -109,11 +115,11 @@ func (self *State) GetModel(c echo.Context) error {
 // PutModel godoc
 //
 //	@Summary		Save a model
-//	@Description	Saves a model. The `version` field in the `ModelRequest` is to be set to the version this model bases on if it's an edit, or null otherwise. The returned model will be identical, except for the `version` field, which is updated to the version this model was saved as.
+//	@Description	Saves a model. The `parent` field in the `Model` is set if it's an edit, null otherwise. The returned model will be identical, except for the `uuid` field, which is updated to the uuid this model was saved as.
 //	@Accept			json
 //	@Produce		json
-//	@Param			model	body		ModelRequest	true	"Model"
-//	@Success		201		{object}	ModelRequest
+//	@Param			model	body		Model	true	"Model"
+//	@Success		201		{object}	Model
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
@@ -126,15 +132,10 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	var r ModelRequest
+	var r Model
 	if err = json.Unmarshal(body, &r); err != nil {
 		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
-	}
-
-	isDerivative := r.Version != ""
-	if !isDerivative {
-		r.Version = "1"
 	}
 
 	if err = r.verify(self, c.Logger(), ctx); err != nil {
@@ -151,7 +152,7 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	if isDerivative {
+	if r.Parent != nil {
 		query := `
 		SELECT
 			models.graph,
@@ -160,15 +161,15 @@ func (self *State) PutModel(c echo.Context) error {
 			models
 			JOIN metadata ON models.model_id = metadata.model_id
 		WHERE
-			models.identifier = $1 AND models.version = $2
+			models.model_id = $1
 		GROUP BY
 			models.graph`
 
 		var graph Graph
 		var metadata []Metadata
-		if err = conn.QueryRow(ctx, query, r.Identifier, r.Version).Scan(&graph, &metadata); err != nil {
+		if err = conn.QueryRow(ctx, query, r.Parent).Scan(&graph, &metadata); err != nil {
 			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("model with identifier '%s' at version '%s' not found", r.Identifier, r.Version)
+				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", r.Parent)
 				c.Logger().Warn(err)
 				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 			} else {
@@ -177,45 +178,31 @@ func (self *State) PutModel(c echo.Context) error {
 		}
 
 		if slices.Equal(r.Graph.Nodes, graph.Nodes) && slices.Equal(r.Graph.Relations, graph.Relations) && slices.Equal(r.Metadata, metadata) {
-			err = fmt.Errorf("model with identifier '%s' at version '%s' wasn't changed", r.Identifier, r.Version)
+			err = fmt.Errorf("model with uuid '%s' wasn't changed", r.UUID)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		}
-
-		query = `
-		UPDATE models
-			SET num_derivatives = num_derivatives + 1
-		WHERE
-			identifier = $1 AND version = $2
-		RETURNING
-			num_derivatives`
-
-		var numDerivatives int
-		if err = conn.QueryRow(ctx, query, r.Identifier, r.Version).Scan(&numDerivatives); err != nil {
-			return err
-		}
-
-		r.Version += fmt.Sprintf(".%d", numDerivatives)
 	}
 
 	query := `
 		INSERT INTO
-			models (identifier, graph, version)
+			models (graph, parent)
 		VALUES
-			($1, $2, $3)
+			($1, $2)
 		RETURNING
 			model_id`
 
-	var modelID int
-	if err = conn.QueryRow(ctx, query, r.Identifier, r.Graph, r.Version).Scan(&modelID); err != nil {
-		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == "23505" {
-			err = fmt.Errorf("encountered non-unique model identifier '%s' at version '%s'", r.Identifier, r.Version)
+	var modelID uuid.UUID
+	if err = conn.QueryRow(ctx, query, r.Graph, r.Parent).Scan(&modelID); err != nil {
+		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == "23503" {
+			err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", r.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
 		}
 	}
+	r.UUID = &modelID
 
 	query = `
 		INSERT INTO
@@ -300,14 +287,12 @@ func (self *State) PostSearch(c echo.Context) error {
 
 	query := `
 		SELECT
-			models.identifier,
-			models.version,
-			metadata.value
+			models.model_id,
+			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
+			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
 		FROM
 			models
-			JOIN metadata ON models.model_id = metadata.model_id
-		WHERE
-			metadata.kind = 'title'`
+			JOIN metadata ON models.model_id = metadata.model_id`
 
 	var args []any
 	if len(params) != 0 {
@@ -346,9 +331,14 @@ func (self *State) PostSearch(c echo.Context) error {
 		}
 
 		query += `
-			AND models.model_id IN (` + innerQuery + `
+		WHERE
+			models.model_id IN (` + innerQuery + `
 			)`
 	}
+
+	query += `
+		GROUP BY
+			models.model_id`
 
 	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
@@ -361,62 +351,11 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	var identifier, version, title string
+	var modelID uuid.UUID
+	var identifier, title string
 	var idents []SearchResult
-	_, err = pgx.ForEachRow(rows, []any{&identifier, &version, &title}, func() error {
-		idents = append(idents, SearchResult{identifier, version, title})
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	if err = conn.Commit(ctx); err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, idents)
-}
-
-// GetVersions godoc
-//
-//	@Summary		Get versions of a model
-//	@Description	Gets all versions of a model by its identifier
-//	@Produce		json
-//	@Param			identifier	query		string	true	"Model Identifier"
-//	@Success		200			{object}	[]SearchResult
-//	@Failure		500			{object}	echo.HTTPError
-//	@Router			/versions	[get]
-func (self *State) GetVersions(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	identifier := c.QueryParam("identifier")
-
-	query := `
-		SELECT
-			models.version,
-			metadata.value
-		FROM
-			models
-			JOIN metadata ON models.model_id = metadata.model_id
-		WHERE
-			models.identifier = $1 AND metadata.kind = 'title'`
-
-	conn, err := self.DBPool.Begin(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Rollback(ctx)
-
-	rows, err := conn.Query(ctx, query, identifier)
-	if err != nil {
-		return err
-	}
-
-	var version, title string
-	var idents []SearchResult
-	_, err = pgx.ForEachRow(rows, []any{&version, &title}, func() error {
-		idents = append(idents, SearchResult{identifier, version, title})
+	_, err = pgx.ForEachRow(rows, []any{&modelID, &identifier, &title}, func() error {
+		idents = append(idents, SearchResult{modelID, identifier, title})
 		return nil
 	})
 	if err != nil {

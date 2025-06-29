@@ -9,15 +9,16 @@ import (
 	"slices"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/language"
 )
 
-type ModelRequest struct {
-	Identifier string     `json:"identifier"`
-	Graph      Graph      `json:"graph"`
-	Version    string     `json:"version"`
-	Metadata   []Metadata `json:"metadata"`
+type Model struct {
+	UUID     *uuid.UUID `json:"uuid"`
+	Graph    Graph      `json:"graph"`
+	Metadata []Metadata `json:"metadata"`
+	Parent   *uuid.UUID `json:"parent"`
 }
 
 type Graph struct {
@@ -47,15 +48,7 @@ type Point struct {
 	Y int `json:"y"`
 }
 
-func (self ModelRequest) verify(s *State, l echo.Logger, ctx context.Context) error {
-	if err := s.DOICache.Verify(self.Identifier, ctx); err != nil {
-		return err
-	}
-
-	if err := verify.Version(self.Version); err != nil {
-		return err
-	}
-
+func (self Model) verify(s *State, l echo.Logger, ctx context.Context) error {
 	if err := self.Graph.verify(s, l); err != nil {
 		return err
 	}
@@ -76,7 +69,11 @@ func (self ModelRequest) verify(s *State, l echo.Logger, ctx context.Context) er
 		delete(e, me.Kind)
 	}
 	if len(e) != 0 {
-		return verify.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", e)}
+		err := "missing mandatory metadata elements"
+		for me := range e {
+			err += " '" + me + "'"
+		}
+		return verify.Error{E: errors.New(err)}
 	}
 
 	return nil
@@ -175,6 +172,14 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 				}
 			case "orcid":
 				if err := verify.ORCID(self.Value, ctx); err != nil {
+					if _, ok := err.(verify.Error); !ok {
+						return err
+					}
+				} else {
+					return nil
+				}
+			case "doi":
+				if err := s.DOICache.Verify(self.Value, ctx); err != nil {
 					if _, ok := err.(verify.Error); !ok {
 						return err
 					}

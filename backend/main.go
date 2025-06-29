@@ -69,8 +69,6 @@ func main() {
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	e.GET("/versions", state.GetVersions)
-
 	if err = e.Start(":8080"); err != nil {
 		e.Logger.Fatal(err)
 	}
