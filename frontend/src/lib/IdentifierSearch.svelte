@@ -3,7 +3,7 @@
 	import Input from "./search/Input.svelte";
 	import SearchButton from "./search/Button.svelte";
 
-	let { identifier }: { identifier: string } = $props();
+	let { identifier = $bindable() }: { identifier: string } = $props();
 
 	async function submit() {
 		const query = new URLSearchParams();

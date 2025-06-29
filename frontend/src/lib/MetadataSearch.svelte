@@ -6,14 +6,18 @@
 	import SearchButton from "./search/Button.svelte";
 	import { suggest } from "./search/suggestions";
 
-	let { params = [] }: { params?: ChipElement[] } = $props();
+	let {
+		input = $bindable(),
+		chips = $bindable(),
+		chip = $bindable(),
+	}: {
+		chips: ChipElement[];
+		input: string;
+		chip: undefined | ChipElement;
+	} = $props();
 
-	let input = $state("");
 	let selected = $state<number>(-1);
 	let suggestions = $state<string[]>([]);
-
-	const chips = $state<ChipElement[]>(params);
-	let chip = $state<ChipElement | undefined>(undefined);
 
 	let focused = $state(false);
 	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {

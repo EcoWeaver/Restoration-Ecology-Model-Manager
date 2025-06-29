@@ -15,6 +15,13 @@
 		selectedSearch: "metadata" | "identifier";
 	} = $props();
 
+	// for persisent state for the <MetadataSearch /> component
+	// to keep the current input when the component is unmounted
+	// and remounted
+	let chips = $state(params);
+	let currentChip = $state(undefined);
+	let metadataValue = $state("");
+
 	type Search = { icon: Component; tooltip: string };
 	const searches: Record<"metadata" | "identifier", Search> = {
 		metadata: { icon: BookMarked, tooltip: "search by metadata" },
@@ -78,7 +85,7 @@
 </div>
 
 {#if selected === "metadata"}
-	<MetadataSearch {params} />
+	<MetadataSearch bind:input={metadataValue} bind:chip={currentChip} bind:chips />
 {:else if selected === "identifier"}
-	<IdentifierSearch {identifier} />
+	<IdentifierSearch bind:identifier />
 {/if}
