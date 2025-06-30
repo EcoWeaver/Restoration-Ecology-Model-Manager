@@ -9,9 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 )
@@ -25,9 +23,9 @@ type State struct {
 }
 
 type SearchResult struct {
-	UUID       uuid.UUID `json:"uuid"`
-	Identifier string    `json:"identifier"`
-	Title      string    `json:"title"`
+	UUID       string `json:"uuid"`
+	Identifier string `json:"identifier"`
+	Title      string `json:"title"`
 }
 
 // GetMetadata godoc
@@ -53,16 +51,17 @@ func (self *State) GetMetadata(c echo.Context) error {
 //	@Produce		json
 //	@Param			uuid	query		string	true	"uuid"
 //	@Success		200		{object}	Model
+//	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
 //	@Router			/model	[get]
 func (self *State) GetModel(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	modelID, err := uuid.Parse(c.QueryParam("uuid"))
-	if err != nil {
+	modelID := c.QueryParam("uuid")
+	if err := verify.UUID(modelID); err != nil {
 		c.Logger().Warn(err)
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
 	query := `
@@ -86,7 +85,7 @@ func (self *State) GetModel(c echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	var graph Graph
-	var parent *uuid.UUID
+	var parent *string
 	var metadata []Metadata
 	if err = conn.QueryRow(ctx, query, modelID).Scan(&graph, &parent, &metadata); err != nil {
 		if err == pgx.ErrNoRows {
@@ -170,7 +169,7 @@ func (self *State) PutModel(c echo.Context) error {
 		var metadata []Metadata
 		if err = conn.QueryRow(ctx, query, um.Parent).Scan(&graph, &metadata); err != nil {
 			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", um.Parent)
+				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", *um.Parent)
 				c.Logger().Warn(err)
 				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 			} else {
@@ -179,7 +178,7 @@ func (self *State) PutModel(c echo.Context) error {
 		}
 
 		if slices.Equal(um.Graph.Nodes, graph.Nodes) && slicesEqualUnordered(um.Graph.Relations, graph.Relations) && slicesEqualUnordered(um.Metadata, metadata) {
-			err = fmt.Errorf("model with uuid '%s' wasn't changed", um.Parent)
+			err = fmt.Errorf("model with uuid '%s' wasn't changed", *um.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		}
@@ -193,15 +192,9 @@ func (self *State) PutModel(c echo.Context) error {
 		RETURNING
 			model_id`
 
-	var modelID uuid.UUID
+	var modelID string
 	if err = conn.QueryRow(ctx, query, um.Graph, um.Parent).Scan(&modelID); err != nil {
-		if e, ok := err.(*pgconn.PgError); ok && e.SQLState() == "23503" {
-			err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", um.Parent)
-			c.Logger().Warn(err)
-			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
-		} else {
-			return err
-		}
+		return err
 	}
 	m := Model{modelID, um}
 
@@ -353,8 +346,7 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	var modelID uuid.UUID
-	var identifier, title string
+	var modelID, identifier, title string
 	var sr []SearchResult
 	_, err = pgx.ForEachRow(rows, []any{&modelID, &identifier, &title}, func() error {
 		sr = append(sr, SearchResult{modelID, identifier, title})

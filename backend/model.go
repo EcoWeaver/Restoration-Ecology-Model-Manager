@@ -9,20 +9,19 @@ import (
 	"slices"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/language"
 )
 
 type Model struct {
-	UUID uuid.UUID `json:"uuid"`
+	UUID string `json:"uuid"`
 	UnsavedModel
 }
 
 type UnsavedModel struct {
 	Graph    Graph      `json:"graph"`
 	Metadata []Metadata `json:"metadata"`
-	Parent   *uuid.UUID `json:"parent"`
+	Parent   *string    `json:"parent"`
 }
 
 type Graph struct {
@@ -78,6 +77,12 @@ func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) er
 			err += " '" + me + "'"
 		}
 		return verify.Error{E: errors.New(err)}
+	}
+
+	if self.Parent != nil {
+		if err := verify.UUID(*self.Parent); err != nil {
+			return err
+		}
 	}
 
 	return nil
