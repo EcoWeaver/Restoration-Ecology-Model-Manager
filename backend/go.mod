@@ -9,7 +9,6 @@ require (
 	github.com/labstack/gommon v0.4.2
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.4
-	golang.org/x/oauth2 v0.30.0
 	golang.org/x/text v0.26.0
 	golang.org/x/time v0.12.0
 )

@@ -22,7 +22,7 @@ func doi(s string, ctx context.Context) error {
 		return nil
 	}
 
-	api := "https://doi.org/" + url.QueryEscape(s)
+	api := "https://doi.org/api/handles/" + url.QueryEscape(s)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
 	if err != nil {
 		return err
