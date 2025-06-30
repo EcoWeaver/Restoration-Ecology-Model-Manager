@@ -51,6 +51,7 @@ export type SaveResult = {
 
 export type Model = {
 	uuid: string;
+	created: string;
 	graph: Graph;
 	metadata: Metadata[];
 	parent?: SearchItem;
@@ -114,6 +115,7 @@ export type Point = {
 
 export type SearchItem = {
 	uuid: string;
+	created: string;
 	identifier: string;
 	title: string;
 };

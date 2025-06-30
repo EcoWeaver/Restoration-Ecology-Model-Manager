@@ -12,6 +12,7 @@ export const load: PageLoad = async ({ fetch, params }) => {
 	}
 
 	const model: Model = await modelRes.json();
+
 	const metadataRes = await fetch(`${apiBase}/metadata`);
 	const metadataElements: MetadataElements = await metadataRes.json();
 	const metadataMap = new Map<string, MetadataType | undefined>();
