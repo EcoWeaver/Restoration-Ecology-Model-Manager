@@ -2,6 +2,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@layer utilities {
+	.scrollbar-neutral-400 {
+		scrollbar-color: var(--color-neutral-400) transparent;
+	}
+}
+
 :root.dark {
 	color-scheme: dark;
 }

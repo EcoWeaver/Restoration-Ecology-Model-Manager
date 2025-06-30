@@ -106,10 +106,10 @@
 </script>
 
 <div
-	class="min-w-0 grow overflow-x-auto rounded-l-md focus-within:outline-2 focus-within:outline-indigo-400"
+	class="scrollbar-neutral-400 h-10 min-w-0 grow overflow-x-auto overflow-y-clip rounded-l-md border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
 	{onfocusout}
 >
-	<span class="relative z-10 flex h-10 overflow-x-auto rounded-l-md border border-neutral-600">
+	<span class="relative z-10 flex h-full items-center gap-1.5 px-1">
 		{#each chips as chip, idx (idx)}
 			<Chip {chip} />
 		{/each}
@@ -118,7 +118,7 @@
 		{/if}
 
 		<input
-			class="block field-sizing-content min-w-16 grow px-2 py-1 focus-visible:outline-none"
+			class="block field-sizing-content min-w-24 grow pl-1 focus-visible:outline-none"
 			placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
 			bind:this={inputElement}
 			bind:value={input}
