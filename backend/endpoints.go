@@ -19,6 +19,7 @@ type State struct {
 	Metadata     LiveMetadataConfig
 	Relations    LiveRelationsConfig
 	DOICache     verify.Cache
+	ORCIDCache   verify.Cache
 	SpeciesCache verify.Cache
 }
 

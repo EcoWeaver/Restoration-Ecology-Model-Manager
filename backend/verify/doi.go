@@ -2,8 +2,6 @@ package verify
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -13,11 +11,11 @@ var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
 
 func doi(s string, ctx context.Context) error {
 	if s == "" {
-		return Error{E: errors.New("no doi provided")}
+		return errNotProvided("doi")
 	}
 
 	if !doiRegexp.MatchString(s) {
-		return Error{E: fmt.Errorf("encountered invalid doi '%s'", s)}
+		return errInvalid("doi")
 	}
 
 	if !REQ {
@@ -37,7 +35,7 @@ func doi(s string, ctx context.Context) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return Error{E: fmt.Errorf("encountered unregistered doi '%s'", s)}
+		return errUnregistered("doi")
 	}
 
 	return nil

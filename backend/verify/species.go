@@ -3,8 +3,6 @@ package verify
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -12,7 +10,7 @@ import (
 
 func species(s string, ctx context.Context) error {
 	if s == "" {
-		return Error{E: errors.New("no species provided")}
+		return errNotProvided("species")
 	}
 
 	if !REQ {
@@ -47,7 +45,7 @@ func species(s string, ctx context.Context) error {
 	}
 
 	if r.Status != "ACCEPTED" || r.MatchType != "EXACT" {
-		return Error{E: fmt.Errorf("encountered unregistered species '%s'", s)}
+		return errUnregistered("species")
 	}
 
 	return nil

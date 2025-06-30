@@ -152,6 +152,8 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 				continue
 			}
 
+			var err error
+
 			switch me.Type {
 			case "":
 				return nil
@@ -181,28 +183,16 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 				if _, err := url.ParseRequestURI(self.Value); err == nil {
 					return nil
 				}
-			case "orcid":
-				if err := verify.ORCID(self.Value, ctx); err != nil {
-					if _, ok := err.(verify.Error); !ok {
-						return err
-					}
-				} else {
+			case "doi":
+				if err = s.DOICache.Verify(self.Value, ctx); err == nil {
 					return nil
 				}
-			case "doi":
-				if err := s.DOICache.Verify(self.Value, ctx); err != nil {
-					if _, ok := err.(verify.Error); !ok {
-						return err
-					}
-				} else {
+			case "orcid":
+				if err = s.ORCIDCache.Verify(self.Value, ctx); err == nil {
 					return nil
 				}
 			case "species":
-				if err := s.SpeciesCache.Verify(self.Value, ctx); err != nil {
-					if _, ok := err.(verify.Error); !ok {
-						return err
-					}
-				} else {
+				if err = s.SpeciesCache.Verify(self.Value, ctx); err == nil {
 					return nil
 				}
 			default:
@@ -210,7 +200,13 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 				return nil
 			}
 
-			return verify.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
+			if err == nil {
+				return verify.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
+			} else if _, ok := err.(verify.Error); ok {
+				return verify.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s': %w", self.Value, self.Kind, err)}
+			} else {
+				return err
+			}
 		}
 	}
 
