@@ -2,18 +2,16 @@ package verify
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"regexp"
-	"strings"
+
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 var orcidRegexp = regexp.MustCompile(`^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$`)
-var orcidAccessToken *string
+var orcidOAuth2Config *clientcredentials.Config
 
 func orcid(s string, ctx context.Context) error {
 	if s == "" {
@@ -28,40 +26,13 @@ func orcid(s string, ctx context.Context) error {
 		return nil
 	}
 
-	if orcidAccessToken == nil {
-		type AccessToken struct {
-			AccessToken string `json:"access_token"`
+	if orcidOAuth2Config == nil {
+		orcidOAuth2Config = &clientcredentials.Config{
+			ClientID:     os.Getenv("ORCID_CLIENT_ID"),
+			ClientSecret: os.Getenv("ORCID_CLIENT_SECRET"),
+			TokenURL:     "https://pub.orcid.org/oauth/token",
+			Scopes:       []string{"/read-public"},
 		}
-
-		reqBody := make(url.Values)
-		reqBody.Add("client_id", os.Getenv("ORCID_CLIENT_ID"))
-		reqBody.Add("client_secret", os.Getenv("ORCID_CLIENT_SECRET"))
-		reqBody.Add("grant_type", os.Getenv("cli"))
-
-		api := "https://pub.orcid.org/oauth/token"
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, api, strings.NewReader(reqBody.Encode()))
-		if err != nil {
-			return err
-		}
-
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-
-		body, err := io.ReadAll(res.Body)
-		if err != nil {
-			return err
-		}
-
-		var t AccessToken
-		if err := json.Unmarshal(body, &t); err != nil {
-			return err
-		}
-
-		at := fmt.Sprintf("Bearer %s", t.AccessToken)
-		orcidAccessToken = &at
 	}
 
 	api := fmt.Sprintf("https://pub.orcid.org/v2.1/%s/record", s)
@@ -69,9 +40,8 @@ func orcid(s string, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	req.Header.Add("Authorization", *orcidAccessToken)
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := orcidOAuth2Config.Client(ctx).Do(req)
 	if err != nil {
 		return err
 	}
