@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -28,9 +29,10 @@ type SaveResult struct {
 }
 
 type SearchResult struct {
-	UUID       string `json:"uuid"`
-	Identifier string `json:"identifier"`
-	Title      string `json:"title"`
+	UUID       string    `json:"uuid"`
+	Created    time.Time `json:"created"`
+	Identifier string    `json:"identifier"`
+	Title      string    `json:"title"`
 }
 
 // GetMetadata godoc
@@ -71,6 +73,7 @@ func (self *State) GetModel(c echo.Context) error {
 
 	query := `
 		SELECT
+			models.created,
 			models.graph,
 			models.parent,
 			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
@@ -80,6 +83,7 @@ func (self *State) GetModel(c echo.Context) error {
 		WHERE
 			models.model_id = $1
 		GROUP BY
+			models.created,
 			models.graph,
 			models.parent`
 
@@ -89,10 +93,11 @@ func (self *State) GetModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
+	var created time.Time
 	var graph Graph
 	var parent *string
 	var metadata []Metadata
-	if err = conn.QueryRow(ctx, query, modelID).Scan(&graph, &parent, &metadata); err != nil {
+	if err = conn.QueryRow(ctx, query, modelID).Scan(&created, &graph, &parent, &metadata); err != nil {
 		if err == pgx.ErrNoRows {
 			err = fmt.Errorf("model with uuid '%s' not found", modelID)
 			c.Logger().Warn(err)
@@ -106,7 +111,7 @@ func (self *State) GetModel(c echo.Context) error {
 	if parent != nil {
 		query = `
 		SELECT
-			models.model_id,
+			models.created,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
 			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
 		FROM
@@ -115,14 +120,15 @@ func (self *State) GetModel(c echo.Context) error {
 		WHERE
 			models.model_id = $1
 		GROUP BY
-			models.model_id`
+			models.created`
 
-		var modelID, identifier, title string
-		if err := conn.QueryRow(ctx, query, *parent).Scan(&modelID, &identifier, &title); err != nil {
+		var created time.Time
+		var identifier, title string
+		if err := conn.QueryRow(ctx, query, *parent).Scan(&created, &identifier, &title); err != nil {
 			return err
 		}
 
-		parentRes = &SearchResult{modelID, identifier, title}
+		parentRes = &SearchResult{*parent, created, identifier, title}
 	}
 
 	if err = conn.Commit(ctx); err != nil {
@@ -130,12 +136,12 @@ func (self *State) GetModel(c echo.Context) error {
 	}
 
 	go func() {
-		if err, ok := (UnsavedModel{graph, metadata, parent}).verify(self, c.Logger(), ctx).(verify.Error); ok {
+		if err, ok := (UnsavedModel{graph, parent, metadata}).verify(self, c.Logger(), ctx).(verify.Error); ok {
 			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with uuid '%s': %w", modelID, err))
 		}
 	}()
 
-	return c.JSON(http.StatusOK, Model{modelID, graph, metadata, parentRes})
+	return c.JSON(http.StatusOK, Model{modelID, created, graph, parentRes, metadata})
 }
 
 // PutModel godoc
@@ -309,6 +315,7 @@ func (self *State) PostSearch(c echo.Context) error {
 	query := `
 		SELECT
 			models.model_id,
+			models.created,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
 			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
 		FROM
@@ -359,7 +366,8 @@ func (self *State) PostSearch(c echo.Context) error {
 
 	query += `
 		GROUP BY
-			models.model_id`
+			models.model_id,
+			models.created`
 
 	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
@@ -373,9 +381,10 @@ func (self *State) PostSearch(c echo.Context) error {
 	}
 
 	var modelID, identifier, title string
+	var created time.Time
 	var sr []SearchResult
-	_, err = pgx.ForEachRow(rows, []any{&modelID, &identifier, &title}, func() error {
-		sr = append(sr, SearchResult{modelID, identifier, title})
+	_, err = pgx.ForEachRow(rows, []any{&modelID, &created, &identifier, &title}, func() error {
+		sr = append(sr, SearchResult{modelID, created, identifier, title})
 		return nil
 	})
 	if err != nil {

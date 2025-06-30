@@ -15,15 +15,16 @@ import (
 
 type Model struct {
 	UUID     string        `json:"uuid"`
+	Created  time.Time     `json:"created"`
 	Graph    Graph         `json:"graph"`
-	Metadata []Metadata    `json:"metadata"`
 	Parent   *SearchResult `json:"parent"`
+	Metadata []Metadata    `json:"metadata"`
 }
 
 type UnsavedModel struct {
 	Graph    Graph      `json:"graph"`
-	Metadata []Metadata `json:"metadata"`
 	Parent   *string    `json:"parent"`
+	Metadata []Metadata `json:"metadata"`
 }
 
 type Graph struct {
