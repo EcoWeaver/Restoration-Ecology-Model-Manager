@@ -382,13 +382,10 @@ func slicesEqualUnordered[T comparable](a, b []T) bool {
 	}
 
 	for _, v := range b {
-		e[v]--
-	}
-
-	for _, v := range e {
-		if v != 0 {
+		if e[v] == 0 {
 			return false
 		}
+		e[v]--
 	}
 
 	return true
