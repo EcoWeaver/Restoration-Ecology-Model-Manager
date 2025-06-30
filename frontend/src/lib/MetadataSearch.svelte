@@ -89,7 +89,25 @@
 	let element = $state<Element>();
 	$effect(() => element?.scrollIntoView({ block: "nearest" }));
 
+	let containerElement: HTMLDivElement;
+	let inputElementOffset = $state<number | undefined>();
+	function computeInputElementOffset() {
+		const inputElementRect = inputElement?.getBoundingClientRect();
+		if (!inputElementRect) {
+			inputElementOffset = undefined;
+			return;
+		}
+
+		const containerRect = containerElement.getBoundingClientRect();
+		const max = containerRect.x + containerRect.width - inputElementRect.width;
+
+		inputElementOffset = Math.min(inputElementRect.x, max);
+	}
+
 	$effect(() => {
+		inputElement?.scrollIntoView();
+		computeInputElementOffset();
+
 		if (chip) {
 			suggestions = [];
 			return;
@@ -106,7 +124,10 @@
 </script>
 
 <div
+	bind:this={containerElement}
 	class="scrollbar-neutral-400 h-10 min-w-0 grow overflow-x-auto overflow-y-clip rounded-l-md border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
+	onscroll={() => computeInputElementOffset()}
+	onresize={() => computeInputElementOffset()}
 	{onfocusout}
 >
 	<span class="relative z-10 flex h-full items-center gap-1.5 px-1">
@@ -130,8 +151,9 @@
 
 	{#if focused && suggestions.length !== 0}
 		<div
-			tabindex="-1"
+			style={inputElementOffset ? `left: ${inputElementOffset}px` : undefined}
 			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 bg-white p-2 py-1 shadow-xl dark:bg-neutral-800"
+			tabindex="-1"
 		>
 			{#each suggestions as suggestion, idx (suggestion)}
 				{#if idx === selected}
