@@ -76,6 +76,3 @@ initialisms = [
     "GND",
 ]
 http-status-code-whitelist = []
-
-[linters.settings.tagliatelle.case]
-overrides = [{ pkg = "zenodo", rules = { json = "snake" } }]
