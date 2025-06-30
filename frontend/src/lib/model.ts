@@ -5,7 +5,7 @@ import {
 	type Relation as ApiRelation,
 	type Graph,
 	type Metadata,
-	type Model,
+	type SaveResult,
 	type UnsavedModel,
 } from "./api";
 
@@ -42,7 +42,7 @@ export async function saveModel(
 	metadata: Metadata[],
 	n: Node[],
 	e: Edge[],
-): Promise<Model> {
+): Promise<SaveResult> {
 	const nodes: ApiNode[] = n.map((n) => {
 		const { body, color } = n.data;
 		return {

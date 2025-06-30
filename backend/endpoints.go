@@ -22,6 +22,10 @@ type State struct {
 	SpeciesCache verify.Cache
 }
 
+type SaveResult struct {
+	UUID string `json:"uuid"`
+}
+
 type SearchResult struct {
 	UUID       string `json:"uuid"`
 	Identifier string `json:"identifier"`
@@ -97,31 +101,53 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}
 
+	var parentRes *SearchResult
+	if parent != nil {
+		query = `
+		SELECT
+			models.model_id,
+			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
+			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
+		FROM
+			models
+			JOIN metadata ON models.model_id = metadata.model_id
+		WHERE
+			models.model_id = $1
+		GROUP BY
+			models.model_id`
+
+		var modelID, identifier, title string
+		if err := conn.QueryRow(ctx, query, *parent).Scan(&modelID, &identifier, &title); err != nil {
+			return err
+		}
+
+		parentRes = &SearchResult{modelID, identifier, title}
+	}
+
 	if err = conn.Commit(ctx); err != nil {
 		return err
 	}
 
-	m := Model{modelID, UnsavedModel{graph, metadata, parent}}
-
 	go func() {
-		if err, ok := m.verify(self, c.Logger(), ctx).(verify.Error); ok {
+		if err, ok := (UnsavedModel{graph, metadata, parent}).verify(self, c.Logger(), ctx).(verify.Error); ok {
 			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with uuid '%s': %w", modelID, err))
 		}
 	}()
 
-	return c.JSON(http.StatusOK, m)
+	return c.JSON(http.StatusOK, Model{modelID, graph, metadata, parentRes})
 }
 
 // PutModel godoc
 //
 //	@Summary		Save a model
-//	@Description	Saves a model. Returns the same model but with an assigned UUID.
+//	@Description	Saves a model. Returns the UUID assigned to that model.
 //	@Accept			json
 //	@Produce		json
 //	@Param			model	body		UnsavedModel	true	"model"
-//	@Success		201		{object}	Model
+//	@Success		201		{object}	SaveResult
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
+//	@Failure		409		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
 //	@Router			/model	[put]
 func (self *State) PutModel(c echo.Context) error {
@@ -132,13 +158,13 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	var um UnsavedModel
-	if err = json.Unmarshal(body, &um); err != nil {
+	var m UnsavedModel
+	if err = json.Unmarshal(body, &m); err != nil {
 		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = um.verify(self, c.Logger(), ctx); err != nil {
+	if err = m.verify(self, c.Logger(), ctx); err != nil {
 		if _, ok := err.(verify.Error); ok {
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
@@ -152,7 +178,7 @@ func (self *State) PutModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	if um.Parent != nil {
+	if m.Parent != nil {
 		query := `
 		SELECT
 			models.graph,
@@ -167,9 +193,9 @@ func (self *State) PutModel(c echo.Context) error {
 
 		var graph Graph
 		var metadata []Metadata
-		if err = conn.QueryRow(ctx, query, um.Parent).Scan(&graph, &metadata); err != nil {
+		if err = conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
 			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", *um.Parent)
+				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", *m.Parent)
 				c.Logger().Warn(err)
 				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 			} else {
@@ -177,10 +203,10 @@ func (self *State) PutModel(c echo.Context) error {
 			}
 		}
 
-		if slices.Equal(um.Graph.Nodes, graph.Nodes) && slicesEqualUnordered(um.Graph.Relations, graph.Relations) && slicesEqualUnordered(um.Metadata, metadata) {
-			err = fmt.Errorf("model with uuid '%s' wasn't changed", *um.Parent)
+		if slices.Equal(m.Graph.Nodes, graph.Nodes) && slicesEqualUnordered(m.Graph.Relations, graph.Relations) && slicesEqualUnordered(m.Metadata, metadata) {
+			err = fmt.Errorf("model with uuid '%s' wasn't changed", *m.Parent)
 			c.Logger().Warn(err)
-			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+			return c.JSON(http.StatusConflict, echo.HTTPError{Message: err.Error()})
 		}
 	}
 
@@ -193,10 +219,9 @@ func (self *State) PutModel(c echo.Context) error {
 			model_id`
 
 	var modelID string
-	if err = conn.QueryRow(ctx, query, um.Graph, um.Parent).Scan(&modelID); err != nil {
+	if err = conn.QueryRow(ctx, query, m.Graph, m.Parent).Scan(&modelID); err != nil {
 		return err
 	}
-	m := Model{modelID, um}
 
 	query = `
 		INSERT INTO
@@ -221,7 +246,7 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, m)
+	return c.JSON(http.StatusCreated, SaveResult{modelID})
 }
 
 // GetRelations godoc

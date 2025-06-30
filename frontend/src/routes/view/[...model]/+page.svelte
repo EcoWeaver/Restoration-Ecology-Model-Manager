@@ -53,13 +53,16 @@
 					<div class="table-row">
 						<h2 class="mb-2 table-cell text-xl font-bold">Metadata</h2>
 						{#if model.parent}
-							<span class="mb-2 table-cell px-2 pt-1">
+							<span
+								class="mb-2 table-cell max-w-128 overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap"
+							>
 								based on
 								<a
 									class="mb-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-									href="/view/{model.parent}"
+									title={model.parent.title}
+									href="/view/{model.parent.uuid}"
 								>
-									model
+									"{model.parent.title}"
 								</a>
 							</span>
 						{/if}

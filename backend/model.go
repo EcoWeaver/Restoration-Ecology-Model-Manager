@@ -14,8 +14,10 @@ import (
 )
 
 type Model struct {
-	UUID string `json:"uuid"`
-	UnsavedModel
+	UUID     string        `json:"uuid"`
+	Graph    Graph         `json:"graph"`
+	Metadata []Metadata    `json:"metadata"`
+	Parent   *SearchResult `json:"parent"`
 }
 
 type UnsavedModel struct {

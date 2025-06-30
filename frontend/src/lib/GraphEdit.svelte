@@ -30,8 +30,8 @@
 	let alert: ReturnType<typeof Alert>;
 	async function save() {
 		try {
-			const model = await saveModel(uuid, metadata, nodes, edges);
-			await goto(`/view/${model.uuid}`);
+			const res = await saveModel(uuid, metadata, nodes, edges);
+			await goto(`/view/${res.uuid}`);
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
