@@ -35,7 +35,7 @@
 		<span
 			class:bg-red-300={isError}
 			class:dark:bg-red-500={isError}
-			class="flex items-center rounded-md bg-indigo-300 px-5 py-3 dark:bg-indigo-500"
+			class="flex max-w-[60%] items-center rounded-md bg-indigo-300 px-5 py-3 dark:bg-indigo-500"
 		>
 			<span>{text}</span>
 			<button

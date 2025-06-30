@@ -9,6 +9,7 @@
 	import type { BackendError, Metadata, MetadataElements } from "./api";
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
+	import { clearNavigate, startNavigate } from "./navigating.svelte";
 
 	let {
 		uuid,
@@ -30,11 +31,14 @@
 	let alert: ReturnType<typeof Alert>;
 	async function save() {
 		try {
+			startNavigate();
 			const res = await saveModel(uuid, metadata, nodes, edges);
 			await goto(`/view/${res.uuid}`);
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
+		} finally {
+			clearNavigate();
 		}
 	}
 
