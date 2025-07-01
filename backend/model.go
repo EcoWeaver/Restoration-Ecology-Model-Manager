@@ -15,7 +15,7 @@ import (
 
 type Model struct {
 	UUID     string        `json:"uuid"`
-	Created  time.Time     `json:"created"`
+	Uploaded time.Time     `json:"uploaded"`
 	Graph    Graph         `json:"graph"`
 	Parent   *SearchResult `json:"parent"`
 	Metadata []Metadata    `json:"metadata"`

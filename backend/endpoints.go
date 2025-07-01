@@ -30,7 +30,7 @@ type SaveResult struct {
 
 type SearchResult struct {
 	UUID       string    `json:"uuid"`
-	Created    time.Time `json:"created"`
+	Uploaded   time.Time `json:"uploaded"`
 	Identifier string    `json:"identifier"`
 	Title      string    `json:"title"`
 }
@@ -73,7 +73,7 @@ func (self *State) GetModel(c echo.Context) error {
 
 	query := `
 		SELECT
-			models.created,
+			models.uploaded,
 			models.graph,
 			models.parent,
 			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
@@ -83,7 +83,7 @@ func (self *State) GetModel(c echo.Context) error {
 		WHERE
 			models.model_id = $1
 		GROUP BY
-			models.created,
+			models.uploaded,
 			models.graph,
 			models.parent`
 
@@ -93,11 +93,11 @@ func (self *State) GetModel(c echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	var created time.Time
+	var uploaded time.Time
 	var graph Graph
 	var parent *string
 	var metadata []Metadata
-	if err = conn.QueryRow(ctx, query, modelID).Scan(&created, &graph, &parent, &metadata); err != nil {
+	if err = conn.QueryRow(ctx, query, modelID).Scan(&uploaded, &graph, &parent, &metadata); err != nil {
 		if err == pgx.ErrNoRows {
 			err = fmt.Errorf("model with uuid '%s' not found", modelID)
 			c.Logger().Warn(err)
@@ -111,7 +111,7 @@ func (self *State) GetModel(c echo.Context) error {
 	if parent != nil {
 		query = `
 		SELECT
-			models.created,
+			models.uploaded,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
 			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
 		FROM
@@ -120,15 +120,15 @@ func (self *State) GetModel(c echo.Context) error {
 		WHERE
 			models.model_id = $1
 		GROUP BY
-			models.created`
+			models.uploaded`
 
-		var created time.Time
+		var uploaded time.Time
 		var identifier, title string
-		if err := conn.QueryRow(ctx, query, *parent).Scan(&created, &identifier, &title); err != nil {
+		if err := conn.QueryRow(ctx, query, *parent).Scan(&uploaded, &identifier, &title); err != nil {
 			return err
 		}
 
-		parentRes = &SearchResult{*parent, created, identifier, title}
+		parentRes = &SearchResult{*parent, uploaded, identifier, title}
 	}
 
 	if err = conn.Commit(ctx); err != nil {
@@ -141,7 +141,7 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}()
 
-	return c.JSON(http.StatusOK, Model{modelID, created, graph, parentRes, metadata})
+	return c.JSON(http.StatusOK, Model{modelID, uploaded, graph, parentRes, metadata})
 }
 
 // PutModel godoc
@@ -315,7 +315,7 @@ func (self *State) PostSearch(c echo.Context) error {
 	query := `
 		SELECT
 			models.model_id,
-			models.created,
+			models.uploaded,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
 			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
 		FROM
@@ -367,7 +367,7 @@ func (self *State) PostSearch(c echo.Context) error {
 	query += `
 		GROUP BY
 			models.model_id,
-			models.created`
+			models.uploaded`
 
 	conn, err := self.DBPool.Begin(ctx)
 	if err != nil {
@@ -381,10 +381,10 @@ func (self *State) PostSearch(c echo.Context) error {
 	}
 
 	var modelID, identifier, title string
-	var created time.Time
+	var uploaded time.Time
 	var sr []SearchResult
-	_, err = pgx.ForEachRow(rows, []any{&modelID, &created, &identifier, &title}, func() error {
-		sr = append(sr, SearchResult{modelID, created, identifier, title})
+	_, err = pgx.ForEachRow(rows, []any{&modelID, &uploaded, &identifier, &title}, func() error {
+		sr = append(sr, SearchResult{modelID, uploaded, identifier, title})
 		return nil
 	})
 	if err != nil {

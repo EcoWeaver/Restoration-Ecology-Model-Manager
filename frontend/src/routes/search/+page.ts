@@ -13,12 +13,12 @@ export const load: PageLoad = async ({ fetch, url }) => {
 
 	// map from identifier => oldest date for that identifier
 	const order = new Map<string, string>();
-	for (const { identifier, created } of queryItems) {
+	for (const { identifier, uploaded } of queryItems) {
 		const prev = order.get(identifier);
-		if (prev == null || prev > created) {
+		if (prev == null || prev > uploaded) {
 			// set to the current if there is none
-			// or replace if the current created date is older
-			order.set(identifier, created);
+			// or replace if the current uploaded date is older
+			order.set(identifier, uploaded);
 		}
 	}
 
@@ -35,10 +35,10 @@ export const load: PageLoad = async ({ fetch, url }) => {
 			return r.localeCompare(l, "en");
 		}
 
-		// if they have the same identifier sort their created dates
+		// if they have the same identifier sort their uploaded dates
 		// don't sort in reverse (a cmp b) to have ascending creation
 		// dates per identifier
-		return a.created.localeCompare(b.created, "en");
+		return a.uploaded.localeCompare(b.uploaded, "en");
 	});
 
 	const params = Array.from(url.searchParams.entries());

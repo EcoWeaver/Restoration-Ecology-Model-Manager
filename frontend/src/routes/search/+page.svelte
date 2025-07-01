@@ -49,10 +49,10 @@
 				<div class="mb-2 table-row border-b-1 border-neutral-300">
 					<span class="table-cell p-3 font-semibold">title</span>
 					<span class="table-cell p-3 font-semibold">identifier</span>
-					<span class="table-cell p-3 font-semibold">created</span>
+					<span class="table-cell p-3 font-semibold">uploaded</span>
 				</div>
-				{#each items as { uuid, created, identifier, title } (uuid)}
-					{@const date = new Date(created)}
+				{#each items as { uuid, uploaded, identifier, title } (uuid)}
+					{@const date = new Date(uploaded)}
 					<a
 						href={`/view/${uuid}`}
 						class="table-row border-b-1 border-neutral-300 outline-indigo-400 last:border-none hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
