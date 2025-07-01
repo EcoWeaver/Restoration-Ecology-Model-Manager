@@ -1,15 +1,18 @@
 <script lang="ts">
-	import { type NodeProps, Handle, Position, useSvelteFlow } from "@xyflow/svelte";
+	import { type NodeProps, Handle, Position, useConnection, useSvelteFlow } from "@xyflow/svelte";
 	import { Move, Palette, Trash2 } from "@lucide/svelte";
 	import type { Node } from "$lib/model";
 
-	// eslint-disable-next-line svelte/no-unused-props -- it's unused, but svelte-flow cannot know that
+	// dragHandle is used internally by svelte-flow to make this node draggable only on .drag-handle elements
+	// eslint-disable-next-line svelte/no-unused-props
 	const { id, data }: NodeProps<Omit<Node, "dragHandle"> & { dragHandle?: string }> = $props();
 	const { updateNodeData, deleteElements } = useSvelteFlow();
 
 	let body = $state(data.body);
 	let color = $state(data.color);
 	$effect(() => updateNodeData(id, { body, color }));
+
+	const connection = useConnection();
 
 	function isLight(s: string) {
 		const rgb = parseInt(s.slice(1), 16);
@@ -39,7 +42,7 @@
 	<Handle
 		type="source"
 		position={Position.Top}
-		class="!absolute !inset-0 !size-full !transform-none !rounded-none !border-0 opacity-0"
+		class={`!absolute !inset-0 !size-full !transform-none !rounded-none !border-0 opacity-0 ${connection.current.inProgress ? "z-10" : ""}`}
 	/>
 	{#if data.editable}
 		<div

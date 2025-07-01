@@ -183,8 +183,10 @@
 			<button
 				class="ml-1 cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 				onclick={deleteSelf}
-				title="delete"><Trash2 /></button
+				title="delete"
 			>
+				<Trash2 />
+			</button>
 		</div>
 	{:else}
 		<div class="flex h-10 items-center rounded-full bg-neutral-200 px-2 dark:bg-neutral-700">
