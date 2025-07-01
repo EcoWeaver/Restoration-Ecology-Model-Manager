@@ -43,6 +43,7 @@ export default ts.config(
 			"array-callback-return": "error",
 			camelcase: "error",
 			eqeqeq: ["error", "always", { null: "ignore" }],
+			"no-console": "error",
 			"no-duplicate-imports": "error",
 			"no-nested-ternary": "error",
 			"no-unneeded-ternary": "error",
