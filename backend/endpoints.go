@@ -33,6 +33,7 @@ type SearchResult struct {
 	Uploaded   time.Time `json:"uploaded"`
 	Identifier string    `json:"identifier"`
 	Title      string    `json:"title"`
+	ModelType  string    `json:"modelType"`
 }
 
 // GetMetadata godoc
@@ -113,7 +114,8 @@ func (self *State) GetModel(c echo.Context) error {
 		SELECT
 			models.uploaded,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
+			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END),
+			MAX(CASE WHEN metadata.kind = 'model-type' THEN metadata.value END)
 		FROM
 			models
 			JOIN metadata ON models.model_id = metadata.model_id
@@ -123,12 +125,12 @@ func (self *State) GetModel(c echo.Context) error {
 			models.uploaded`
 
 		var uploaded time.Time
-		var identifier, title string
-		if err := conn.QueryRow(ctx, query, *parent).Scan(&uploaded, &identifier, &title); err != nil {
+		var identifier, title, modelType string
+		if err := conn.QueryRow(ctx, query, *parent).Scan(&uploaded, &identifier, &title, &modelType); err != nil {
 			return err
 		}
 
-		parentRes = &SearchResult{*parent, uploaded, identifier, title}
+		parentRes = &SearchResult{*parent, uploaded, identifier, title, modelType}
 	}
 
 	if err = conn.Commit(ctx); err != nil {
@@ -317,7 +319,8 @@ func (self *State) PostSearch(c echo.Context) error {
 			models.model_id,
 			models.uploaded,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END)
+			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END),
+			MAX(CASE WHEN metadata.kind = 'model-type' THEN metadata.value END)
 		FROM
 			models
 			JOIN metadata ON models.model_id = metadata.model_id`
@@ -380,11 +383,11 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	var modelID, identifier, title string
+	var modelID, identifier, title, modelType string
 	var uploaded time.Time
 	var sr []SearchResult
-	_, err = pgx.ForEachRow(rows, []any{&modelID, &uploaded, &identifier, &title}, func() error {
-		sr = append(sr, SearchResult{modelID, uploaded, identifier, title})
+	_, err = pgx.ForEachRow(rows, []any{&modelID, &uploaded, &identifier, &title, &modelType}, func() error {
+		sr = append(sr, SearchResult{modelID, uploaded, identifier, title, modelType})
 		return nil
 	})
 	if err != nil {

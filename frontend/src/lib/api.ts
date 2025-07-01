@@ -118,4 +118,5 @@ export type SearchItem = {
 	uploaded: string;
 	identifier: string;
 	title: string;
+	modelType: string;
 };
