@@ -5,6 +5,7 @@
 	import Header from "$lib/Header.svelte";
 	import Alert from "$lib/Alert.svelte";
 	import { apiToFlow } from "$lib/model";
+	import { SvelteFlowProvider } from "@xyflow/svelte";
 
 	let { data } = $props();
 	let { model, metadataMap } = $derived(data);
@@ -46,71 +47,73 @@
 <Alert bind:this={alert} />
 
 <div class="h-dvh w-dvw">
-	<Graph {nodes} {edges} interactive={false}>
-		{#snippet panel()}
-			<PanelComponent>
-				<div class="table">
-					<div class="table-row">
-						<h2 class="mb-2 table-cell text-xl font-bold">Metadata</h2>
-						{#if model.parent}
-							<span
-								class="mb-2 table-cell max-w-128 overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap"
-							>
-								based on
-								<a
-									class="mb-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-									title={model.parent.title}
-									href="/view/{model.parent.uuid}"
-								>
-									"{model.parent.title}"
-								</a>
-							</span>
-						{/if}
-					</div>
-					<div class="table-row">
-						<div class="text-l table-cell py-1 pr-2 font-bold">kind</div>
-						<div class="text-l table-cell py-1 pl-2 font-bold">value</div>
-					</div>
-					{#each model.metadata as { kind, value }, idx (idx)}
-						{@const type = metadataMap.get(kind)}
-
+	<SvelteFlowProvider>
+		<Graph {nodes} {edges} interactive={false}>
+			{#snippet panel()}
+				<PanelComponent>
+					<div class="table">
 						<div class="table-row">
-							<div class="table-cell py-1 pr-2">{kind}</div>
-
-							{#if type === "doi"}
-								<a
-									class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-									href={`https://doi.org/${value}`}
-									target="_blank"
-									rel="noopener noreferrer"
+							<h2 class="mb-2 table-cell text-xl font-bold">Metadata</h2>
+							{#if model.parent}
+								<span
+									class="mb-2 table-cell max-w-128 overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap"
 								>
-									{value}
-								</a>
-							{:else if type === "orcid"}
-								<a
-									class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-									href={`https://orcid.org/${value}`}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{value}
-								</a>
-							{:else if type === "url"}
-								<a
-									class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-									href={value}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{value}
-								</a>
-							{:else}
-								<div class="table-cell max-w-128 py-1 pl-2">{value}</div>
+									based on
+									<a
+										class="mb-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										title={model.parent.title}
+										href="/view/{model.parent.uuid}"
+									>
+										"{model.parent.title}"
+									</a>
+								</span>
 							{/if}
 						</div>
-					{/each}
-				</div>
-			</PanelComponent>
-		{/snippet}
-	</Graph>
+						<div class="table-row">
+							<div class="text-l table-cell py-1 pr-2 font-bold">kind</div>
+							<div class="text-l table-cell py-1 pl-2 font-bold">value</div>
+						</div>
+						{#each model.metadata as { kind, value }, idx (idx)}
+							{@const type = metadataMap.get(kind)}
+
+							<div class="table-row">
+								<div class="table-cell py-1 pr-2">{kind}</div>
+
+								{#if type === "doi"}
+									<a
+										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										href={`https://doi.org/${value}`}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{value}
+									</a>
+								{:else if type === "orcid"}
+									<a
+										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										href={`https://orcid.org/${value}`}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{value}
+									</a>
+								{:else if type === "url"}
+									<a
+										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										href={value}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{value}
+									</a>
+								{:else}
+									<div class="table-cell max-w-128 py-1 pl-2">{value}</div>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				</PanelComponent>
+			{/snippet}
+		</Graph>
+	</SvelteFlowProvider>
 </div>

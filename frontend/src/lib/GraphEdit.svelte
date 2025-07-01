@@ -10,6 +10,7 @@
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
 	import { clearNavigate, startNavigate } from "./navigating.svelte";
+	import { SvelteFlowProvider, type XYPosition } from "@xyflow/svelte";
 
 	let {
 		uuid,
@@ -43,12 +44,15 @@
 	}
 
 	let id = $state(initialNodes.length);
-	function add() {
+	function addNode(position?: XYPosition): string {
+		const thisId = id++;
+
+		const defaultPos = 100 + thisId * 10;
 		const node: Node = {
-			id: id.toString(),
+			id: thisId.toString(),
 			type: "custom",
 			dragHandle: ".drag-handle",
-			position: { x: 100, y: 100 },
+			position: position ?? { x: defaultPos, y: defaultPos },
 			data: {
 				body: `node #${nodes.length + 1}`,
 				color: ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"][id % 6],
@@ -56,8 +60,8 @@
 			},
 		};
 
-		id++;
 		nodes = [...nodes, node];
+		return thisId.toString();
 	}
 
 	beforeNavigate((nav) => {
@@ -79,7 +83,7 @@
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-2 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="add new node"
-			onclick={add}
+			onclick={() => addNode()}
 		>
 			<Plus />
 			<span class="px-1">node</span>
@@ -106,11 +110,13 @@
 <Alert bind:this={alert} />
 
 <div class="h-dvh w-dvw">
-	<Graph bind:nodes bind:edges interactive={true}>
-		{#snippet panel()}
-			<PanelComponent onaddmetadata={() => metadataPanel.addMetadata()}>
-				<MetadataPanel bind:this={metadataPanel} elements={metadataElements} bind:metadata />
-			</PanelComponent>
-		{/snippet}
-	</Graph>
+	<SvelteFlowProvider>
+		<Graph bind:nodes bind:edges interactive={true} {addNode}>
+			{#snippet panel()}
+				<PanelComponent onaddmetadata={() => metadataPanel.addMetadata()}>
+					<MetadataPanel bind:this={metadataPanel} elements={metadataElements} bind:metadata />
+				</PanelComponent>
+			{/snippet}
+		</Graph>
+	</SvelteFlowProvider>
 </div>
