@@ -120,6 +120,7 @@
 		inputElementOffset = Math.min(inputElementRect.x, max);
 	}
 
+	const chipsEditing = $state<boolean[]>([]);
 	$effect(() => {
 		inputElement?.scrollIntoView();
 		computeInputElementOffset();
@@ -147,8 +148,12 @@
 	{onfocusout}
 >
 	<span class="relative z-10 flex h-full items-center gap-1.5 px-1">
-		{#each chips as chip, idx (idx)}
-			<Chip {chip} />
+		{#each chips, idx (idx)}
+			<Chip
+				onenter={() => inputElement?.focus()}
+				bind:editing={chipsEditing[idx]}
+				bind:chip={chips[idx]}
+			/>
 		{/each}
 		{#if chip}
 			<Chip {chip} />
@@ -165,7 +170,7 @@
 		/>
 	</span>
 
-	{#if focused && suggestions.length !== 0}
+	{#if focused && suggestions.length !== 0 && !chipsEditing.includes(true)}
 		<div
 			style={inputElementOffset ? `left: ${inputElementOffset}px` : undefined}
 			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 bg-white p-2 py-1 shadow-xl dark:bg-neutral-800"

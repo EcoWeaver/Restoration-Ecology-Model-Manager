@@ -44,9 +44,10 @@
 	{#if data.editable}
 		<div
 			class="relative max-w-[30ch] cursor-text rounded px-2 py-1 text-center wrap-break-word outline-indigo-400 focus-visible:outline-2"
-			contenteditable
 			class:text-black={light}
 			class:text-white={!light}
+			contenteditable
+			role="textbox"
 			bind:innerText={body}
 		></div>
 		<div
