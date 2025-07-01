@@ -160,7 +160,10 @@
 	onresize={() => computeInputElementOffset()}
 	{onfocusout}
 >
-	<span class="relative z-10 flex h-full items-center gap-1.5 px-1">
+	<span
+		class:pl-3={chips.length === 0 && !chip}
+		class="relative z-10 flex h-full items-center gap-1.5 px-1"
+	>
 		{#each chips, idx (idx)}
 			<Chip
 				onremove={() => {
@@ -177,7 +180,7 @@
 		{/if}
 
 		<input
-			class="block field-sizing-content min-w-24 grow pl-1 focus-visible:outline-none"
+			class="block field-sizing-content min-w-24 grow focus-visible:outline-none"
 			placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
 			bind:this={inputElement}
 			bind:value={input}
