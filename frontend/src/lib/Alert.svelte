@@ -39,7 +39,7 @@
 		>
 			<span>{text}</span>
 			<button
-				class="ml-3 cursor-pointer rounded-xl outline-offset-2 focus-visible:outline-2"
+				class="ml-3 cursor-pointer rounded-full outline-offset-2 focus-visible:outline-2"
 				onclick={() => (open = false)}><X /></button
 			>
 		</span>

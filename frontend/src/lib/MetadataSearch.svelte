@@ -120,6 +120,13 @@
 		inputElementOffset = Math.min(inputElementRect.x, max);
 	}
 
+	$effect(() => {
+		// recompute offset on chip changes, as deleting
+		// and editing chips can change their size
+		$state.snapshot(chips);
+		computeInputElementOffset();
+	});
+
 	const chipsEditing = $state<boolean[]>([]);
 	$effect(() => {
 		inputElement?.scrollIntoView();
@@ -150,6 +157,10 @@
 	<span class="relative z-10 flex h-full items-center gap-1.5 px-1">
 		{#each chips, idx (idx)}
 			<Chip
+				onremove={() => {
+					chips.splice(idx, 1);
+					inputElement?.focus();
+				}}
 				onenter={() => inputElement?.focus()}
 				bind:editing={chipsEditing[idx]}
 				bind:chip={chips[idx]}
