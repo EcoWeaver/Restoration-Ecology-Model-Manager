@@ -42,18 +42,21 @@
 		}
 	}
 
+	let id = $state(initialNodes.length);
 	function add() {
 		const node: Node = {
-			id: nodes.length.toString(),
+			id: id.toString(),
 			type: "custom",
 			dragHandle: ".drag-handle",
 			position: { x: 100, y: 100 },
 			data: {
 				body: `node #${nodes.length + 1}`,
-				color: ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"][nodes.length % 6],
+				color: ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"][id % 6],
 				editable: true,
 			},
 		};
+
+		id++;
 		nodes = [...nodes, node];
 	}
 
