@@ -48,10 +48,7 @@ export async function saveModel(
 		return {
 			body,
 			color,
-			position: {
-				x: Math.round(n.position.x),
-				y: Math.round(n.position.y),
-			},
+			position: n.position,
 		};
 	});
 

@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net/url"
 	"slices"
 	"time"
@@ -38,20 +39,26 @@ type Metadata struct {
 }
 
 type Node struct {
-	Body     string `json:"body"`
-	Color    string `json:"color"`
-	Position Point  `json:"position"`
+	Body     string    `json:"body"`
+	Color    string    `json:"color"`
+	Position Cartesian `json:"position"`
 }
 
 type Relation struct {
-	Kind string `json:"kind"`
-	From int    `json:"from"`
-	To   int    `json:"to"`
+	Kind     string `json:"kind"`
+	From     int    `json:"from"`
+	To       int    `json:"to"`
+	Position Polar  `json:"position"`
 }
 
-type Point struct {
-	X int `json:"x"`
-	Y int `json:"y"`
+type Cartesian struct {
+	X float32 `json:"x"`
+	Y float32 `json:"y"`
+}
+
+type Polar struct {
+	R   float32 `json:"r"`
+	Phi float32 `json:"phi"`
 }
 
 func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) error {
@@ -215,9 +222,21 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 }
 
 func (self Relation) verify(r RelationsConfig) error {
-	if slices.Contains(r.Causal, self.Kind) || slices.Contains(r.Noncausal, self.Kind) {
-		return nil
+	if !slices.Contains(r.Causal, self.Kind) && !slices.Contains(r.Noncausal, self.Kind) {
+		return verify.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
 	}
 
-	return verify.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
+	return self.Position.verify()
+}
+
+func (self Polar) verify() error {
+	if self.R < 0.0 {
+		return verify.Error{E: fmt.Errorf("encountered invalid radius '%f'", self.R)}
+	}
+
+	if self.Phi < 0.0 || self.Phi >= math.Pi {
+		return verify.Error{E: fmt.Errorf("encountered invalid angle '%f rad'", self.Phi)}
+	}
+
+	return nil
 }
