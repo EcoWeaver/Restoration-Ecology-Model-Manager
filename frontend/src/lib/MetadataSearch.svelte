@@ -44,6 +44,22 @@
 		focused = false;
 	}
 
+	async function button() {
+		if (chip) {
+			if (input.length > 0) {
+				chip.value = input;
+				chips.push(chip);
+
+				chip = undefined;
+				input = "";
+
+				await submit();
+			}
+		} else if (input.length === 0) {
+			await submit();
+		}
+	}
+
 	async function key(key: KeyboardEvent) {
 		if (key.code === "Enter") {
 			if (chip) {
@@ -182,11 +198,7 @@
 <button
 	class="flex h-10 cursor-pointer place-items-center rounded-r-md border border-l-0 border-neutral-600 px-3 outline-indigo-400 focus-visible:outline-2"
 	title="search"
-	onclick={() => {
-		if (selected === -1 && input.length === 0) {
-			submit();
-		}
-	}}
+	onclick={button}
 >
 	<SearchIcon />
 </button>
