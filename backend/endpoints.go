@@ -108,8 +108,10 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}
 
-	var parentRes *SearchResult
+	var sr *SearchResult
 	if parent != nil {
+		sr = &SearchResult{UUID: *parent}
+
 		query = `
 		SELECT
 			models.uploaded,
@@ -124,13 +126,9 @@ func (self *State) GetModel(c echo.Context) error {
 		GROUP BY
 			models.uploaded`
 
-		var uploaded time.Time
-		var identifier, title, modelType string
-		if err := conn.QueryRow(ctx, query, *parent).Scan(&uploaded, &identifier, &title, &modelType); err != nil {
+		if err := conn.QueryRow(ctx, query, *parent).Scan(&sr.Uploaded, &sr.Identifier, &sr.Title, &sr.ModelType); err != nil {
 			return err
 		}
-
-		parentRes = &SearchResult{*parent, uploaded, identifier, title, modelType}
 	}
 
 	if err = conn.Commit(ctx); err != nil {
@@ -143,7 +141,7 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}()
 
-	return c.JSON(http.StatusOK, Model{modelID, uploaded, graph, parentRes, metadata})
+	return c.JSON(http.StatusOK, Model{modelID, uploaded, graph, sr, metadata})
 }
 
 // PutModel godoc
@@ -383,11 +381,10 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	var modelID, identifier, title, modelType string
-	var uploaded time.Time
-	var sr []SearchResult
-	_, err = pgx.ForEachRow(rows, []any{&modelID, &uploaded, &identifier, &title, &modelType}, func() error {
-		sr = append(sr, SearchResult{modelID, uploaded, identifier, title, modelType})
+	var sr SearchResult
+	var r []SearchResult
+	_, err = pgx.ForEachRow(rows, []any{&sr.UUID, &sr.Uploaded, &sr.Identifier, &sr.Title, &sr.ModelType}, func() error {
+		r = append(r, sr)
 		return nil
 	})
 	if err != nil {
@@ -398,7 +395,7 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, sr)
+	return c.JSON(http.StatusOK, r)
 }
 
 func slicesEqualUnordered[T comparable](a, b []T) bool {
