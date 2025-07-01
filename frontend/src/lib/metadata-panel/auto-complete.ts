@@ -1,3 +1,30 @@
+export function filterMatches(
+	elements: string[],
+	value: string,
+	sep: string,
+	includeExact: boolean,
+) {
+	return elements
+		.filter((elem) => {
+			return elem.toLowerCase().includes(value.toLowerCase()) && (includeExact || elem !== value);
+		})
+		.sort((l, r) => {
+			const lFirst = l.startsWith(value);
+			const rFirst = r.startsWith(value);
+			if (lFirst || rFirst) {
+				// if either of them matches prefix, prefer that one
+				return +rFirst - +lFirst;
+			}
+
+			// ... split the elements into words
+			const lAny = l.split(sep).some((elem) => elem.startsWith(value));
+			const rAny = r.split(sep).some((elem) => elem.startsWith(value));
+
+			// and otherwise prefer the one where any of the words match
+			return +rAny - +lAny;
+		});
+}
+
 export function suggestChoices(choices: string[]) {
 	let prevChoices = choices;
 
@@ -6,9 +33,7 @@ export function suggestChoices(choices: string[]) {
 			return [choices, selected];
 		}
 
-		const newChoices = choices.filter(
-			(choice) => choice.toLowerCase().startsWith(value.toLowerCase()) && choice !== value,
-		);
+		const newChoices = filterMatches(choices, value, " ", false);
 
 		let newSelected = 0;
 		if (selected !== 0 && typeof prevChoices[selected] === "string") {

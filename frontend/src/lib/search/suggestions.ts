@@ -1,4 +1,5 @@
 import { metadataElements } from "$lib/api";
+import { filterMatches } from "$lib/metadata-panel/auto-complete";
 
 const allElements = metadataElements().then((elements) =>
 	Object.values(elements)
@@ -9,9 +10,7 @@ const allElements = metadataElements().then((elements) =>
 let prevSuggestions = allElements;
 export async function suggest(value: string, selected: number): Promise<[string[], number]> {
 	const elements = await allElements;
-	const newSuggestions = elements.filter((elem) =>
-		elem.toLowerCase().includes(value.toLowerCase()),
-	);
+	const newSuggestions = filterMatches(elements, value, "-", true);
 
 	let newSelected = value === "" ? -1 : 0;
 	const prev = await prevSuggestions;
