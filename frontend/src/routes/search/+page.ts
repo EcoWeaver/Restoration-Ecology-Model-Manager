@@ -11,31 +11,34 @@ export const load: PageLoad = async ({ fetch, url }) => {
 
 	const queryItems: SearchItem[] = (await res.json()) ?? [];
 
+	// map from identifier => oldest date for that identifier
 	const order = new Map<string, string>();
 	for (const { identifier, created } of queryItems) {
 		const prev = order.get(identifier);
 		if (prev == null || prev > created) {
+			// set to the current if there is none
+			// or replace if the current created date is older
 			order.set(identifier, created);
 		}
 	}
 
 	const items = queryItems.sort((a, b) => {
-		const l = order.get(a.identifier)!;
-		const r = order.get(b.identifier)!;
+		// if the identifiers are unequal, compare
+		// the oldest creation dates for each identifier
+		// this groups the identifiers together
+		if (a.identifier !== b.identifier) {
+			const l = order.get(a.identifier)!;
+			const r = order.get(b.identifier)!;
 
-		if (r < l) {
-			return -1;
-		} else if (l < r) {
-			return 1;
+			// sort the identifiers in reverse (b cmp a) to
+			// put newer identifiers at the top
+			return r.localeCompare(l, "en");
 		}
 
-		if (a.identifier < b.identifier) {
-			return -1;
-		} else if (b.identifier < a.identifier) {
-			return 1;
-		} else {
-			return 0;
-		}
+		// if they have the same identifier sort their created dates
+		// don't sort in reverse (a cmp b) to have ascending creation
+		// dates per identifier
+		return a.created.localeCompare(b.created, "en");
 	});
 
 	const params = Array.from(url.searchParams.entries());
