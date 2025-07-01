@@ -21,7 +21,7 @@
 		interactive,
 		nodes = $bindable(),
 		edges = $bindable(),
-		addNode = undefined,
+		addNode,
 		panel,
 	}: {
 		interactive: boolean;

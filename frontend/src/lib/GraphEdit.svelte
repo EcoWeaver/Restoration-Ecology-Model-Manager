@@ -45,11 +45,11 @@
 
 	let id = $state(initialNodes.length);
 	function addNode(position?: XYPosition): string {
-		const thisId = id++;
+		const defaultPos = 100 + nodes.length * 20;
 
-		const defaultPos = 100 + thisId * 10;
+		const thisId = (id++).toString();
 		const node: Node = {
-			id: thisId.toString(),
+			id: thisId,
 			type: "custom",
 			dragHandle: ".drag-handle",
 			position: position ?? { x: defaultPos, y: defaultPos },
@@ -61,7 +61,7 @@
 		};
 
 		nodes = [...nodes, node];
-		return thisId.toString();
+		return thisId;
 	}
 
 	beforeNavigate((nav) => {
