@@ -2,9 +2,10 @@
 	import { browser } from "$app/environment";
 	import Header from "$lib/Header.svelte";
 	import type { ChipElement } from "$lib/search/Chip.svelte";
+	import { ChevronDown, ChevronUp } from "@lucide/svelte";
 
 	let { data } = $props();
-	let { items, params: searchParams } = $derived(data);
+	let { items: originalItems, params: searchParams } = $derived(data);
 
 	let params = $derived<ChipElement[]>(searchParams.map(([kind, value]) => ({ kind, value })));
 
@@ -29,6 +30,45 @@
 
 		return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${zoneSign}${zoneHours}:${zoneMinutes}`;
 	}
+
+	type SortColumn = "title" | "modelType" | "identifier" | "uploaded";
+	type SortType = "ascending" | "descending";
+	type SortState = { column: SortColumn; type: SortType };
+
+	let sortState = $state<SortState | undefined>(undefined);
+
+	function toggleState(column: SortColumn) {
+		if (sortState?.column === column) {
+			if (sortState.type === "ascending") {
+				sortState.type = "descending";
+			} else {
+				sortState = undefined;
+			}
+		} else {
+			sortState = { column, type: "ascending" };
+		}
+	}
+
+	$effect(() => {
+		// reset sort state when navigating between /search/ pages
+		$state.snapshot(originalItems);
+		sortState = undefined;
+	});
+
+	let items = $derived.by(() => {
+		if (sortState == null) {
+			return originalItems;
+		} else {
+			const { column, type } = sortState;
+			return [...originalItems].sort((l, r) => {
+				const lv = l[column];
+				const rv = r[column];
+
+				const cmp = lv.localeCompare(rv, "en");
+				return type === "ascending" ? cmp : -cmp;
+			});
+		}
+	});
 </script>
 
 <svelte:head>
@@ -47,10 +87,34 @@
 		<div class="p-4 pt-2">
 			<div class="table w-full border-collapse p-2 text-lg">
 				<div class="mb-2 table-row border-b-1 border-neutral-300">
-					<span class="table-cell p-3 font-semibold">title</span>
-					<span class="table-cell p-3 font-semibold">model-type</span>
-					<span class="table-cell p-3 font-semibold">identifier</span>
-					<span class="table-cell p-3 font-semibold">uploaded</span>
+					{#snippet header(column: SortColumn, value?: string)}
+						{@const text = value ?? column}
+						<span class="table-cell px-1 py-3 font-semibold">
+							<button
+								title={sortState?.column === column ? `${text} (${sortState.type})` : text}
+								class="outline-offset visible:outline-2 flex cursor-pointer items-center gap-1 rounded-md px-2 outline-indigo-400"
+								onclick={() => toggleState(column)}
+							>
+								{text}
+
+								{#if sortState?.column === column && sortState.type === "ascending"}
+									<ChevronUp size={20} />
+								{:else if sortState?.column === column && sortState.type === "descending"}
+									<ChevronDown size={20} />
+								{:else}
+									<div class="invisible w-[20px]"></div>
+								{/if}
+							</button>
+						</span>
+					{/snippet}
+
+					{@render header("title")}
+
+					{@render header("modelType", "model-type")}
+
+					{@render header("identifier")}
+
+					{@render header("uploaded")}
 				</div>
 				{#each items as { uuid, title, modelType, identifier, uploaded } (uuid)}
 					{@const date = new Date(uploaded)}
