@@ -48,16 +48,18 @@
 			<div class="table w-full border-collapse p-2 text-lg">
 				<div class="mb-2 table-row border-b-1 border-neutral-300">
 					<span class="table-cell p-3 font-semibold">title</span>
+					<span class="table-cell p-3 font-semibold">model-type</span>
 					<span class="table-cell p-3 font-semibold">identifier</span>
 					<span class="table-cell p-3 font-semibold">uploaded</span>
 				</div>
-				{#each items as { uuid, uploaded, identifier, title } (uuid)}
+				{#each items as { uuid, title, modelType, identifier, uploaded } (uuid)}
 					{@const date = new Date(uploaded)}
 					<a
 						href={`/view/${uuid}`}
 						class="table-row border-b-1 border-neutral-300 outline-indigo-400 last:border-none hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
 					>
 						<span class="table-cell p-3">{title}</span>
+						<span class="table-cell p-3">{modelType}</span>
 						<span class="table-cell p-3">{identifier}</span>
 						{#if browser}
 							<span title={dateFormat(date, false)} class="table-cell p-3">
