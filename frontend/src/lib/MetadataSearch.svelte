@@ -8,8 +8,14 @@
 	let { params = [] }: { params?: ChipElement[] } = $props();
 
 	let input = $state("");
-	const chips = $state(params);
 	let chip = $state<undefined | ChipElement>(undefined);
+	// $derived is not deeply reactive, so you have to put a $state
+	// inside of the $derived.
+	// see https://github.com/sveltejs/svelte/issues/16189
+	let chips = $derived.by(() => {
+		const v = $state(params);
+		return v;
+	});
 
 	let selected = $state<number>(-1);
 	let suggestions = $state<string[]>([]);
