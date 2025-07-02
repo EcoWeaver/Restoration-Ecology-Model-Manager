@@ -12,8 +12,8 @@
 		type XYPosition,
 	} from "@xyflow/svelte";
 	import type { Edge } from "$lib/model";
-	import { relationElements as getRelationElements } from "$lib/api";
-	import { ArrowDown, ArrowUp, Trash2 } from "@lucide/svelte";
+	import { cartesianToPolar, relationElements as getRelationElements } from "$lib/api";
+	import { ArrowDown, ArrowUp, Move, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
@@ -132,7 +132,7 @@
 		return [first1, first2, second1, second2];
 	}
 
-	let [path, labelX, labelY] = $derived.by(() => {
+	let [path, labelX, labelY, middleX, middleY] = $derived.by(() => {
 		if (sourceNode.current && targetNode.current) {
 			const params = edgeParams(sourceNode.current, targetNode.current);
 
@@ -153,6 +153,8 @@
 				`M ${params.sourceX},${params.sourceY} C ${x[0]},${y[0]} ${x[1]},${y[1]} ${labelX},${labelY} C ${x[2]},${y[2]} ${x[3]},${y[3]} ${params.targetX},${params.targetY}`,
 				labelX,
 				labelY,
+				middleX,
+				middleY,
 			];
 		}
 		return [undefined!, undefined, undefined];
@@ -161,7 +163,7 @@
 	const { updateEdge, getZoom, deleteElements } = useSvelteFlow();
 
 	let kind = $state(data!.kind);
-	const position = $state(data!.position);
+	let position = $state(data!.position);
 
 	$effect(() => {
 		const kindState = kind;
@@ -180,6 +182,9 @@
 			);
 		});
 	});
+
+	const { screenToFlowPosition } = useSvelteFlow();
+	const drag = $state({ dragging: false, offsetInvalid: true, offsetX: 0, offsetY: 0 });
 
 	function deleteSelf() {
 		deleteElements({ edges: [{ id }] });
@@ -228,6 +233,34 @@
 				>
 					<ArrowDown />
 				</button>
+				<div
+					class="nopan nodrag inline-block"
+					class:cursor-grab={!drag.dragging}
+					class:cursor-grabbing={drag.dragging}
+					onpointerdown={() => {
+						drag.dragging = true;
+						drag.offsetInvalid = true;
+					}}
+					onpointerup={() => {
+						drag.dragging = false;
+					}}
+					onpointermove={(e) => {
+						if (drag.dragging) {
+							const pos = screenToFlowPosition({ x: e.pageX, y: e.pageY });
+							if (drag.offsetInvalid) {
+								drag.offsetInvalid = false;
+								drag.offsetX = pos.x - labelX!;
+								drag.offsetY = pos.y - labelY!;
+							}
+							position = cartesianToPolar({
+								x: pos.x - drag.offsetX - middleX!,
+								y: pos.y - drag.offsetY - middleY!,
+							});
+						}
+					}}
+				>
+					<Move />
+				</div>
 				<button
 					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 					onclick={deleteSelf}
