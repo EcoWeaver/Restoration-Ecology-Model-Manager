@@ -9,7 +9,7 @@
 	import type { BackendError, Metadata, MetadataElements } from "./api";
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
-	import { clearNavigate, startNavigate } from "./navigating.svelte";
+	import { clearNavigate, startNavigate } from "./LoadingSpinner.svelte";
 	import { SvelteFlowProvider, type XYPosition } from "@xyflow/svelte";
 
 	let {
