@@ -21,6 +21,10 @@ check:
 	go run $(golangci-lint) fmt -d
 	go run $(golangci-lint) run
 
+prepare:
+	go mod download
+	go install $(swag)
+
 build:
 	go run $(swag) init --parseDependency
 	go build .
