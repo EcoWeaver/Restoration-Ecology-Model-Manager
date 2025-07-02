@@ -36,7 +36,7 @@ func main() {
 	e.Use(middleware.Secure())
 
 	if err := godotenv.Load(); err != nil {
-		e.Logger.Fatal(err)
+		e.Logger.Warn(err)
 	}
 
 	verify.REQ = os.Getenv("REMMA_NO_VERIFY_REQ") != "yes"
