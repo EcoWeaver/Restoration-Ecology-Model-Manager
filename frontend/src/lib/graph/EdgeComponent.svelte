@@ -12,8 +12,12 @@
 		type XYPosition,
 	} from "@xyflow/svelte";
 	import type { Edge } from "$lib/model";
-	import { cartesianToPolar, relationElements as getRelationElements } from "$lib/api";
-	import { ArrowDown, ArrowUp, Move, Trash2 } from "@lucide/svelte";
+	import {
+		cartesianToPolar,
+		relationElements as getRelationElements,
+		polarToCartesian,
+	} from "$lib/api";
+	import { Move, RotateCcw, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
@@ -132,19 +136,20 @@
 		return [first1, first2, second1, second2];
 	}
 
-	let [path, labelX, labelY, middleX, middleY] = $derived.by(() => {
+	let [path, labelX, labelY, middleX, middleY, alpha] = $derived.by(() => {
 		if (sourceNode.current && targetNode.current) {
 			const params = edgeParams(sourceNode.current, targetNode.current);
 
-			const dX = params.targetX - params.sourceX;
-			const dY = params.targetY - params.sourceY;
-
-			const length = Math.hypot(dX, dY);
-
 			const [middleX, middleY] = getEdgeCenter(params);
+			const alpha = Math.atan2(params.targetY - params.sourceY, params.targetX - params.sourceX);
 
-			const labelX = middleX + (dY / length) * data!.position!.r;
-			const labelY = middleY - (dX / length) * data!.position!.r;
+			const offset = polarToCartesian({
+				r: data!.position!.r,
+				phi: data!.position!.phi + alpha,
+			});
+
+			const labelX = middleX + offset.x;
+			const labelY = middleY + offset.y;
 
 			const x = controlPoints(params.sourceX, labelX, params.targetX);
 			const y = controlPoints(params.sourceY, labelY, params.targetY);
@@ -155,6 +160,7 @@
 				labelY,
 				middleX,
 				middleY,
+				alpha,
 			];
 		}
 		return [undefined!, undefined, undefined];
@@ -185,6 +191,20 @@
 
 	const { screenToFlowPosition } = useSvelteFlow();
 	const drag = $state({ dragging: false, offsetInvalid: true, offsetX: 0, offsetY: 0 });
+
+	function onpointermove(e: PointerEvent) {
+		const pos = screenToFlowPosition({ x: e.pageX, y: e.pageY });
+		if (drag.offsetInvalid) {
+			drag.offsetInvalid = false;
+			drag.offsetX = pos.x - labelX!;
+			drag.offsetY = pos.y - labelY!;
+		}
+		position = cartesianToPolar({
+			x: pos.x - drag.offsetX - middleX!,
+			y: pos.y - drag.offsetY - middleY!,
+		});
+		position.phi -= alpha!;
+	}
 
 	function deleteSelf() {
 		deleteElements({ edges: [{ id }] });
@@ -219,20 +239,6 @@
 				{/await}
 			</select>
 			<div class="ml-1 h-10 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700">
-				<button
-					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
-					onclick={() => (position!.r += 25)}
-					title="moveUp"
-				>
-					<ArrowUp />
-				</button>
-				<button
-					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
-					onclick={() => (position!.r -= 25)}
-					title="moveDown"
-				>
-					<ArrowDown />
-				</button>
 				<div
 					class="nopan nodrag inline-block"
 					class:cursor-grab={!drag.dragging}
@@ -241,26 +247,16 @@
 						drag.dragging = true;
 						drag.offsetInvalid = true;
 					}}
-					onpointerup={() => {
-						drag.dragging = false;
-					}}
-					onpointermove={(e) => {
-						if (drag.dragging) {
-							const pos = screenToFlowPosition({ x: e.pageX, y: e.pageY });
-							if (drag.offsetInvalid) {
-								drag.offsetInvalid = false;
-								drag.offsetX = pos.x - labelX!;
-								drag.offsetY = pos.y - labelY!;
-							}
-							position = cartesianToPolar({
-								x: pos.x - drag.offsetX - middleX!,
-								y: pos.y - drag.offsetY - middleY!,
-							});
-						}
-					}}
 				>
 					<Move />
 				</div>
+				<button
+					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+					onclick={() => (position.r = 0)}
+					title="reset position"
+				>
+					<RotateCcw />
+				</button>
 				<button
 					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 					onclick={deleteSelf}
@@ -276,3 +272,8 @@
 		</div>
 	{/if}
 </EdgeLabel>
+
+<svelte:window
+	onpointermove={drag.dragging ? onpointermove : undefined}
+	onpointerup={drag.dragging ? () => (drag.dragging = false) : undefined}
+/>
