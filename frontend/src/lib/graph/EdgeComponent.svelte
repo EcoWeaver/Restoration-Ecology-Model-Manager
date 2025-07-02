@@ -2,7 +2,7 @@
 	import {
 		BaseEdge,
 		EdgeLabel,
-		getStraightPath,
+		getEdgeCenter,
 		MarkerType,
 		Position,
 		useInternalNode,
@@ -13,7 +13,7 @@
 	} from "@xyflow/svelte";
 	import type { Edge } from "$lib/model";
 	import { relationElements as getRelationElements } from "$lib/api";
-	import { Trash2 } from "@lucide/svelte";
+	import { ArrowDown, ArrowUp, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
@@ -120,28 +120,61 @@
 		};
 	}
 
+	function controlPoints(start: number, middle: number, end: number) {
+		const x = (end - start) / 6;
+
+		const first1 = (start + middle) / 2 - x / 2;
+		const first2 = middle - x;
+
+		const second1 = middle + x;
+		const second2 = (end + middle) / 2 + x / 2;
+
+		return [first1, first2, second1, second2];
+	}
+
 	let [path, labelX, labelY] = $derived.by(() => {
 		if (sourceNode.current && targetNode.current) {
-			return getStraightPath(edgeParams(sourceNode.current, targetNode.current));
+			const params = edgeParams(sourceNode.current, targetNode.current);
+
+			const dX = params.targetX - params.sourceX;
+			const dY = params.targetY - params.sourceY;
+
+			const length = Math.hypot(dX, dY);
+
+			const [middleX, middleY] = getEdgeCenter(params);
+
+			const labelX = middleX + (dY / length) * data!.position!.r;
+			const labelY = middleY - (dX / length) * data!.position!.r;
+
+			const x = controlPoints(params.sourceX, labelX, params.targetX);
+			const y = controlPoints(params.sourceY, labelY, params.targetY);
+
+			return [
+				`M ${params.sourceX},${params.sourceY} C ${x[0]},${y[0]} ${x[1]},${y[1]} ${labelX},${labelY} C ${x[2]},${y[2]} ${x[3]},${y[3]} ${params.targetX},${params.targetY}`,
+				labelX,
+				labelY,
+			];
 		}
 		return [undefined!, undefined, undefined];
 	});
 
 	const { updateEdge, getZoom, deleteElements } = useSvelteFlow();
 
-	let value = $state(data!.kind);
+	let kind = $state(data!.kind);
+	const position = $state(data!.position);
 
 	$effect(() => {
-		const v = value;
+		const kindState = kind;
+		const positionState = position;
 		relationElements.then((re) => {
 			updateEdge(
 				id,
 				{
 					markerStart: `linecap-s-${source}-${target}`,
-					markerEnd: re.causal.includes(v)
+					markerEnd: re.causal.includes(kindState)
 						? { type: MarkerType.ArrowClosed }
 						: `linecap-e-${source}-${target}`,
-					data: { kind: value, editable: data!.editable },
+					data: { kind: kindState, editable: data!.editable, position: positionState },
 				},
 				{ replace: true },
 			);
@@ -156,7 +189,7 @@
 <LineCap id={`linecap-s-${source}-${target}`} />
 
 {#await relationElements then re}
-	{#if !re.causal.includes(value)}
+	{#if !re.causal.includes(kind)}
 		<LineCap id={`linecap-e-${source}-${target}`} />
 	{/if}
 {/await}
@@ -166,8 +199,8 @@
 	{#if data!.editable}
 		<div class="flex">
 			<select
-				bind:value
-				title={value}
+				bind:value={kind}
+				title={kind}
 				class="field-sizing-content h-10 cursor-pointer rounded-full bg-neutral-200 px-2 text-center outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 			>
 				{#await relationElements then relationElements}
@@ -180,13 +213,29 @@
 					{/each}
 				{/await}
 			</select>
-			<button
-				class="ml-1 cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
-				onclick={deleteSelf}
-				title="delete"
-			>
-				<Trash2 />
-			</button>
+			<div class="ml-1 h-10 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700">
+				<button
+					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+					onclick={() => (position!.r += 25)}
+					title="moveUp"
+				>
+					<ArrowUp />
+				</button>
+				<button
+					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+					onclick={() => (position!.r -= 25)}
+					title="moveDown"
+				>
+					<ArrowDown />
+				</button>
+				<button
+					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+					onclick={deleteSelf}
+					title="delete"
+				>
+					<Trash2 />
+				</button>
+			</div>
 		</div>
 	{:else}
 		<div class="flex h-10 items-center rounded-full bg-neutral-200 px-2 dark:bg-neutral-700">

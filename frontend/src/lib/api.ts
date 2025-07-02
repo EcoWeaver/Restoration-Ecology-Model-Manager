@@ -97,20 +97,26 @@ export type MetadataElement = {
 export type Node = {
 	body: string;
 	color: string;
-	position: Point;
+	position: Cartesian;
 };
 
 export type Relation = {
 	kind: RelationElement;
 	from: number;
 	to: number;
+	position: Polar;
 };
 
 export type RelationElement = string;
 
-export type Point = {
+export type Cartesian = {
 	x: number;
 	y: number;
+};
+
+export type Polar = {
+	r: number;
+	phi: number;
 };
 
 export type SearchItem = {

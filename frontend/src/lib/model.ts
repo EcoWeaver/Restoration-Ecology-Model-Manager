@@ -26,12 +26,12 @@ export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edg
 	);
 
 	const edges: Edge[] =
-		graph.relations?.map(({ from, to, kind }) => ({
+		graph.relations?.map(({ from, to, kind, position }) => ({
 			source: from.toString(),
 			target: to.toString(),
 			type: "custom",
 			id: `${from}-${to}`,
-			data: { kind, editable },
+			data: { kind, editable, position },
 		})) ?? [];
 
 	return { nodes, edges };
@@ -56,8 +56,8 @@ export async function saveModel(
 		const from = n.findIndex((n) => n.id === e.source);
 		const to = n.findIndex((n) => n.id === e.target)!;
 
-		const { kind } = e.data!;
-		return { kind, from, to };
+		const { kind, position } = e.data!;
+		return { from, to, kind, position };
 	});
 
 	const graph = { nodes, relations };

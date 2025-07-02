@@ -38,6 +38,7 @@
 		data: {
 			kind: "correlated-with",
 			editable: interactive,
+			position: { r: 0, phi: 0 },
 		},
 	};
 
