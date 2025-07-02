@@ -417,3 +417,70 @@ func slicesEqualUnordered[T comparable](a, b []T) bool {
 
 	return true
 }
+
+// PostModelRun godoc
+//
+//	@Summary		Run a model
+//	@Description	Runs a model with provided initial states and edge transfer functions.
+//	@Accept			json
+//	@Produce		json
+//	@Param			state		body		ModelRunRequest	true	"state"
+//	@Success		200			{object}	ModelRunResult
+//	@Failure		400			{object}	echo.HTTPError
+//	@Failure		404			{object}	echo.HTTPError
+//	@Failure		500			{object}	echo.HTTPError
+//	@Router			/model/run	[post]
+func (self *State) PostModelRun(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return err
+	}
+
+	var mr ModelRunRequest
+	if err = json.Unmarshal(body, &mr); err != nil {
+		c.Logger().Warn(err)
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+	}
+
+	query := `
+		SELECT
+			models.graph
+		FROM
+			models
+		WHERE
+			models.model_id = $1`
+
+	conn, err := self.DBPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Rollback(ctx)
+
+	var graph Graph
+	if err = conn.QueryRow(ctx, query, mr.UUID).Scan(&graph); err != nil {
+		if err == pgx.ErrNoRows {
+			err = fmt.Errorf("model with uuid '%s' not found", mr.UUID)
+			c.Logger().Warn(err)
+			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
+		} else {
+			return err
+		}
+	}
+
+	if err := conn.Commit(ctx); err != nil {
+		return err
+	}
+
+	r, err := self.Relations.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+
+	if err := mr.Verify(graph, &r); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, mr.Run(graph, &r))
+}

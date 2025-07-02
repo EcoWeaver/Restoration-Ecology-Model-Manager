@@ -63,6 +63,7 @@ func main() {
 
 	e.GET("/model", state.GetModel)
 	e.PUT("/model", state.PutModel)
+	e.POST("/model/run", state.PostModelRun)
 
 	e.GET("/relations", state.GetRelations)
 
