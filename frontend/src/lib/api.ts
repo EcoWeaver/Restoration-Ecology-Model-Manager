@@ -119,6 +119,20 @@ export type Polar = {
 	phi: number;
 };
 
+export function polarToCartesian(polar: Polar): Cartesian {
+	return {
+		x: polar.r * Math.cos(polar.phi),
+		y: polar.r * Math.sin(polar.phi),
+	};
+}
+
+export function cartesianToPolar(cartesian: Cartesian): Polar {
+	return {
+		r: Math.sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y),
+		phi: Math.atan2(cartesian.y, cartesian.x),
+	};
+}
+
 export type SearchItem = {
 	uuid: string;
 	uploaded: string;
