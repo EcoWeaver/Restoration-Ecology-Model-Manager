@@ -53,6 +53,7 @@
 			type: "custom",
 			dragHandle: ".drag-handle",
 			position: position ?? { x: defaultPos, y: defaultPos },
+			origin: [0.5, 0.5],
 			data: {
 				body: `node #${nodes.length + 1}`,
 				color: ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"][id % 6],

@@ -234,7 +234,7 @@ func (self Polar) verify() error {
 		return verify.Error{E: fmt.Errorf("encountered invalid radius '%f'", self.R)}
 	}
 
-	if self.Phi < 0.0 || self.Phi >= math.Pi {
+	if self.Phi < 0.0 || self.Phi >= 2.0*math.Pi {
 		return verify.Error{E: fmt.Errorf("encountered invalid angle '%f rad'", self.Phi)}
 	}
 

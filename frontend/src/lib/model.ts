@@ -57,6 +57,17 @@ export async function saveModel(
 		const to = n.findIndex((n) => n.id === e.target)!;
 
 		const { kind, position } = e.data!;
+		if (position.r < 0) {
+			position.r *= -1;
+			position.phi += Math.PI;
+		}
+
+		// modulo (euclidean remainder)
+		position.phi %= 2 * Math.PI;
+		if (position.phi < 0) {
+			position.phi += 2 * Math.PI;
+		}
+
 		return { from, to, kind, position };
 	});
 
