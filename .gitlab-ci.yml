@@ -10,7 +10,7 @@ backend:
   script:
     - cd backend
     - make build
-    - make check
+    - make lint
   rules:
     - changes:
         - backend/**/*

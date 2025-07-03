@@ -11,6 +11,7 @@ services:
       - db-data:/var/lib/postgresql/data
   pgadmin:
     image: dpage/pgadmin4
+    container_name: pgadmin
     env_file:
       - backend/.env
     ports:
@@ -35,7 +36,7 @@ services:
       context: frontend
     container_name: frontend
     environment:
-      PUBLIC_API_URL: http://10.231.241.64:8080
+      PUBLIC_API_URL: http://172.18.0.3:8080
       PUBLIC_INTERNAL_API_URL: http://backend:8080
     ports:
       - 3000:3000

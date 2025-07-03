@@ -2,36 +2,33 @@ swag = github.com/swaggo/swag/cmd/swag@latest
 golangci-lint = github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
 _default:
-	@echo "usage: make [up|down|psql|fmt|check|build|run|backup]"
+	@echo "usage: make [run|build|format|prepare|lint|up|down|backup]"
 
-up:
-	docker compose up
-
-down:
-	docker compose down -v
-
-psql:
-	docker exec -it postgres psql -U postgres -d postgres
-
-fmt:
-	go run $(swag) fmt
-	go run $(golangci-lint) fmt
-
-check:
-	go run $(golangci-lint) fmt -d
-	go run $(golangci-lint) run
-
-prepare:
-	go mod download
-	go install $(swag)
+run:
+	go run $(swag) init --parseDependency
+	go run .
 
 build:
 	go run $(swag) init --parseDependency
 	go build .
 
-run:
-	go run $(swag) init --parseDependency
-	go run .
+format:
+	go run $(swag) fmt
+	go run $(golangci-lint) fmt
+
+prepare:
+	go mod download
+	go install $(swag)
+
+lint:
+	go run $(golangci-lint) fmt -d
+	go run $(golangci-lint) run
+
+up:
+	docker compose up postgres
+
+down:
+	docker compose down -v postgres
 
 backup:
 	mkdir -p postgresql/backup

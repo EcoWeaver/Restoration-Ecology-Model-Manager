@@ -6,7 +6,7 @@ The three steps have to be performed in separate terminals.
 
 1. Run Docker Container
 
-This project includes a Docker container that runs both the PostgreSQL database and pgAdmin for database administration. The Docker container can be started with the following commands. PostgreSQL is available on http://localhost:25432 and pgAdmin is available on http://localhost:15432.
+This project includes a Docker container that runs the PostgreSQL database. It can be started with the following commands and is available on http://localhost:5432.
 
 ```sh
 cd backend
@@ -39,7 +39,7 @@ This project uses static analysis tools to ensure correctness and idiomatic code
 
 ### Backend
 
-The backend uses [`golangci-lint`](https://golangci-lint.run/) to run formatting and linting checks. Formatting can be run with `make fmt` and linting checks can be run with `make check`.
+The backend uses [`golangci-lint`](https://golangci-lint.run/) to run formatting and linting checks. Formatting can be run with `make format` and linting checks can be run with `make lint`.
 
 ### Frontend
 

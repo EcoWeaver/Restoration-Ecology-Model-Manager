@@ -2,7 +2,7 @@ FROM golang:alpine AS build
 
 WORKDIR /app
 
-RUN apk add --no-cache make
+RUN apk add --no-cache make gcc musl-dev
 
 COPY go.mod .
 COPY go.sum .
