@@ -36,7 +36,8 @@ services:
       context: frontend
     container_name: frontend
     environment:
-      PUBLIC_API_URL: http://172.18.0.3:8080
+      # change this to the public-facing url when deploying
+      PUBLIC_API_URL: http://localhost:8080
       PUBLIC_INTERNAL_API_URL: http://backend:8080
     ports:
       - 3000:3000
