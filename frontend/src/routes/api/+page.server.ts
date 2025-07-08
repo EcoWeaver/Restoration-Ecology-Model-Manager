@@ -1,8 +1,7 @@
-import { env } from "$env/dynamic/public";
+import { apiBase } from "$lib/api";
 import { redirect } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 
 export function load() {
-	const apiUrl = env.PUBLIC_API_URL || "http://localhost:8080";
-	redirect(StatusCodes.PERMANENT_REDIRECT, `${apiUrl}/swagger/index.html`);
+	redirect(StatusCodes.PERMANENT_REDIRECT, `${apiBase}/swagger/index.html`);
 }
