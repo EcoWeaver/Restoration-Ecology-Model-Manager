@@ -2,20 +2,18 @@
 	import {
 		BaseEdge,
 		EdgeLabel,
-		getEdgeCenter,
 		MarkerType,
-		Position,
 		useInternalNode,
 		useSvelteFlow,
 		type EdgeProps,
 		type InternalNode,
-		type XYPosition,
 	} from "@xyflow/svelte";
 	import type { Edge } from "$lib/model";
 	import {
 		cartesianToPolar,
 		relationElements as getRelationElements,
 		polarToCartesian,
+		type Cartesian,
 	} from "$lib/api";
 	import { Move, RotateCcw, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
@@ -26,7 +24,7 @@
 	const sourceNode = useInternalNode(source);
 	const targetNode = useInternalNode(target);
 
-	function nodeIntersection(intersectionNode: InternalNode, targetNode: InternalNode) {
+	function nodeIntersection(intersectionNode: InternalNode, target: Cartesian) {
 		/* eslint-disable camelcase -- maths isn't camelcase */
 
 		// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
@@ -35,8 +33,8 @@
 		const h = intersectionNode.measured.height! / 2;
 		const x2 = intersectionNode.internals.positionAbsolute.x + w;
 		const y2 = intersectionNode.internals.positionAbsolute.y + h;
-		const x1 = targetNode.internals.positionAbsolute.x + targetNode.measured.width! / 2;
-		const y1 = targetNode.internals.positionAbsolute.y + targetNode.measured.height! / 2;
+		const x1 = target.x;
+		const y1 = target.y;
 
 		const x1_ = (x1 - x2) / (2 * w) - (y1 - y2) / (2 * h);
 		const y1_ = (x1 - x2) / (2 * w) + (y1 - y2) / (2 * h);
@@ -84,46 +82,6 @@
 		};
 	}
 
-	function edgePosition(node: InternalNode, intersectionPoint: XYPosition) {
-		const n = { ...node.internals.positionAbsolute, ...node };
-		const nx = Math.round(n.x);
-		const ny = Math.round(n.y);
-		const px = Math.round(intersectionPoint.x);
-		const py = Math.round(intersectionPoint.y);
-
-		if (px <= nx + 1) {
-			return Position.Left;
-		}
-		if (px >= nx + n.measured.width! - 1) {
-			return Position.Right;
-		}
-		if (py <= ny + 1) {
-			return Position.Top;
-		}
-		if (py >= n.y + n.measured.height! - 1) {
-			return Position.Bottom;
-		}
-
-		return Position.Top;
-	}
-
-	function edgeParams(source: InternalNode, target: InternalNode) {
-		const sourceIntersectionPoint = nodeIntersection(source, target);
-		const targetIntersectionPoint = nodeIntersection(target, source);
-
-		const sourcePosition = edgePosition(source, sourceIntersectionPoint);
-		const targetPosition = edgePosition(target, targetIntersectionPoint);
-
-		return {
-			sourceX: sourceIntersectionPoint.x,
-			sourceY: sourceIntersectionPoint.y,
-			targetX: targetIntersectionPoint.x,
-			targetY: targetIntersectionPoint.y,
-			sourcePosition,
-			targetPosition,
-		};
-	}
-
 	function controlPoints(start: number, middle: number, end: number) {
 		const x = (end - start) / 6;
 
@@ -138,10 +96,18 @@
 
 	let [path, labelX, labelY, middleX, middleY, alpha] = $derived.by(() => {
 		if (sourceNode.current && targetNode.current) {
-			const params = edgeParams(sourceNode.current, targetNode.current);
+			const source = sourceNode.current;
+			const target = targetNode.current;
 
-			const [middleX, middleY] = getEdgeCenter(params);
-			const alpha = Math.atan2(params.targetY - params.sourceY, params.targetX - params.sourceX);
+			const sourceX = source.internals.positionAbsolute.x + source.measured!.width! / 2;
+			const sourceY = source.internals.positionAbsolute.y + source.measured!.height! / 2;
+			const targetX = target.internals.positionAbsolute.x + target.measured!.width! / 2;
+			const targetY = target.internals.positionAbsolute.y + target.measured!.height! / 2;
+
+			const middleX = (sourceX + targetX) / 2;
+			const middleY = (sourceY + targetY) / 2;
+
+			const alpha = Math.atan2(targetY - sourceY, targetX - sourceX);
 
 			const offset = polarToCartesian({
 				r: data!.position!.r,
@@ -151,11 +117,14 @@
 			const labelX = middleX + offset.x;
 			const labelY = middleY + offset.y;
 
-			const x = controlPoints(params.sourceX, labelX, params.targetX);
-			const y = controlPoints(params.sourceY, labelY, params.targetY);
+			const { x: edgeSourceX, y: edgeSourceY } = nodeIntersection(source, { x: labelX, y: labelY });
+			const { x: edgeTargetX, y: edgeTargetY } = nodeIntersection(target, { x: labelX, y: labelY });
+
+			const x = controlPoints(sourceX, labelX, targetX);
+			const y = controlPoints(sourceY, labelY, targetY);
 
 			return [
-				`M ${params.sourceX},${params.sourceY} C ${x[0]},${y[0]} ${x[1]},${y[1]} ${labelX},${labelY} C ${x[2]},${y[2]} ${x[3]},${y[3]} ${params.targetX},${params.targetY}`,
+				`M ${edgeSourceX},${edgeSourceY} C ${x[0]},${y[0]} ${x[1]},${y[1]} ${labelX},${labelY} C ${x[2]},${y[2]} ${x[3]},${y[3]} ${edgeTargetX},${edgeTargetY}`,
 				labelX,
 				labelY,
 				middleX,
