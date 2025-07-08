@@ -49,12 +49,14 @@
 		const sourceId = connectionState.fromNode!.id;
 
 		const { clientX, clientY } = "changedTouches" in event ? event.changedTouches[0] : event;
-		const targetId = addNode(
-			screenToFlowPosition({
-				x: clientX,
-				y: clientY,
-			}),
-		);
+		const targetPos = screenToFlowPosition({ x: clientX, y: clientY });
+		const sourcePos = nodes.find((n) => n.id === sourceId)!.position;
+		const dist = Math.hypot(sourcePos.x - targetPos.x, sourcePos.y - targetPos.y);
+		if (dist < 100) {
+			return;
+		}
+
+		const targetId = addNode(targetPos);
 
 		const newEdge = {
 			...defaultEdge,
