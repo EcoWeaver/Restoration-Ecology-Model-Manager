@@ -120,8 +120,8 @@
 			const { x: edgeSourceX, y: edgeSourceY } = nodeIntersection(source, { x: labelX, y: labelY });
 			const { x: edgeTargetX, y: edgeTargetY } = nodeIntersection(target, { x: labelX, y: labelY });
 
-			const x = controlPoints(sourceX, labelX, targetX);
-			const y = controlPoints(sourceY, labelY, targetY);
+			const x = controlPoints(edgeSourceX, labelX, edgeTargetX);
+			const y = controlPoints(edgeSourceY, labelY, edgeTargetY);
 
 			return [
 				`M ${edgeSourceX},${edgeSourceY} C ${x[0]},${y[0]} ${x[1]},${y[1]} ${labelX},${labelY} C ${x[2]},${y[2]} ${x[3]},${y[3]} ${edgeTargetX},${edgeTargetY}`,
