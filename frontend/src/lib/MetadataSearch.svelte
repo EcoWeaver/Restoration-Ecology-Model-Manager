@@ -55,7 +55,7 @@
 			query.append(kind, value!);
 		}
 
-		await goto(`/search?${query}`, { invalidateAll: true });
+		await goto(`/search?${query}`);
 		focused = false;
 	}
 
