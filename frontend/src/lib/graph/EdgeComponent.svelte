@@ -95,44 +95,41 @@
 	}
 
 	let [path, labelX, labelY, middleX, middleY, alpha] = $derived.by(() => {
-		if (sourceNode.current && targetNode.current) {
-			const source = sourceNode.current;
-			const target = targetNode.current;
+		const source = sourceNode.current!;
+		const target = targetNode.current!;
 
-			const sourceX = source.internals.positionAbsolute.x + source.measured!.width! / 2;
-			const sourceY = source.internals.positionAbsolute.y + source.measured!.height! / 2;
-			const targetX = target.internals.positionAbsolute.x + target.measured!.width! / 2;
-			const targetY = target.internals.positionAbsolute.y + target.measured!.height! / 2;
+		const sourceX = source.internals.positionAbsolute.x + source.measured!.width! / 2;
+		const sourceY = source.internals.positionAbsolute.y + source.measured!.height! / 2;
+		const targetX = target.internals.positionAbsolute.x + target.measured!.width! / 2;
+		const targetY = target.internals.positionAbsolute.y + target.measured!.height! / 2;
 
-			const middleX = (sourceX + targetX) / 2;
-			const middleY = (sourceY + targetY) / 2;
+		const middleX = (sourceX + targetX) / 2;
+		const middleY = (sourceY + targetY) / 2;
 
-			const alpha = Math.atan2(targetY - sourceY, targetX - sourceX);
+		const alpha = Math.atan2(targetY - sourceY, targetX - sourceX);
 
-			const offset = polarToCartesian({
-				r: data!.position!.r,
-				phi: data!.position!.phi + alpha,
-			});
+		const offset = polarToCartesian({
+			r: data!.position!.r,
+			phi: data!.position!.phi + alpha,
+		});
 
-			const labelX = middleX + offset.x;
-			const labelY = middleY + offset.y;
+		const labelX = middleX + offset.x;
+		const labelY = middleY + offset.y;
 
-			const { x: edgeSourceX, y: edgeSourceY } = nodeIntersection(source, { x: labelX, y: labelY });
-			const { x: edgeTargetX, y: edgeTargetY } = nodeIntersection(target, { x: labelX, y: labelY });
+		const { x: edgeSourceX, y: edgeSourceY } = nodeIntersection(source, { x: labelX, y: labelY });
+		const { x: edgeTargetX, y: edgeTargetY } = nodeIntersection(target, { x: labelX, y: labelY });
 
-			const x = controlPoints(edgeSourceX, labelX, edgeTargetX);
-			const y = controlPoints(edgeSourceY, labelY, edgeTargetY);
+		const x = controlPoints(edgeSourceX, labelX, edgeTargetX);
+		const y = controlPoints(edgeSourceY, labelY, edgeTargetY);
 
-			return [
-				`M ${edgeSourceX},${edgeSourceY} C ${x[0]},${y[0]} ${x[1]},${y[1]} ${labelX},${labelY} C ${x[2]},${y[2]} ${x[3]},${y[3]} ${edgeTargetX},${edgeTargetY}`,
-				labelX,
-				labelY,
-				middleX,
-				middleY,
-				alpha,
-			];
-		}
-		return [undefined!, undefined, undefined];
+		return [
+			`M ${edgeSourceX},${edgeSourceY} C ${x[0]},${y[0]} ${x[1]},${y[1]} ${labelX},${labelY} C ${x[2]},${y[2]} ${x[3]},${y[3]} ${edgeTargetX},${edgeTargetY}`,
+			labelX,
+			labelY,
+			middleX,
+			middleY,
+			alpha,
+		];
 	});
 
 	const { updateEdge, getZoom, deleteElements } = useSvelteFlow();
