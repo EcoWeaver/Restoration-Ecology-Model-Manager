@@ -47,12 +47,20 @@
 		if (connectionState.isValid) return;
 
 		const sourceId = connectionState.fromNode!.id;
+		const sourceNode = nodes.find((n) => n.id === sourceId)!;
+		const sourcePos = sourceNode.position;
+		const sourceWidth = sourceNode.measured!.width! / 2 + 40;
+		const sourceHeight = sourceNode.measured!.height! / 2 + 40;
 
 		const { clientX, clientY } = "changedTouches" in event ? event.changedTouches[0] : event;
 		const targetPos = screenToFlowPosition({ x: clientX, y: clientY });
-		const sourcePos = nodes.find((n) => n.id === sourceId)!.position;
-		const dist = Math.hypot(sourcePos.x - targetPos.x, sourcePos.y - targetPos.y);
-		if (dist < 100) {
+
+		if (
+			targetPos.x > sourcePos.x - sourceWidth &&
+			targetPos.x < sourcePos.x + sourceWidth &&
+			targetPos.y > sourcePos.y - sourceHeight &&
+			targetPos.y < sourcePos.y + sourceHeight
+		) {
 			return;
 		}
 
