@@ -39,7 +39,7 @@ This project uses static analysis tools to ensure correctness and idiomatic code
 
 ### Backend
 
-The backend uses [`golangci-lint`](https://golangci-lint.run/) to run formatting and linting checks. Formatting can be run with `make format` and linting checks can be run with `make lint`.
+The backend uses [`golangci-lint`](https://golangci-lint.run/) to run formatting and linting checks. Formatting can be run with `make fmt` and linting checks can be run with `make lint`.
 
 ### Frontend
 

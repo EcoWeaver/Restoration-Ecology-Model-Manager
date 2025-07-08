@@ -2,7 +2,7 @@ swag = github.com/swaggo/swag/cmd/swag@latest
 golangci-lint = github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
 _default:
-	@echo "usage: make [run|build|format|prepare|lint|up|down|backup]"
+	@echo "usage: make [run|build|fmt|prepare|lint|up|down|backup]"
 
 run:
 	go run $(swag) init --parseDependency
@@ -12,7 +12,7 @@ build:
 	go run $(swag) init --parseDependency
 	go build .
 
-format:
+fmt:
 	go run $(swag) fmt
 	go run $(golangci-lint) fmt
 
