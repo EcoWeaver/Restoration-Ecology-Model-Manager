@@ -133,7 +133,7 @@ export function polarToCartesian(polar: Polar): Cartesian {
 
 export function cartesianToPolar(cartesian: Cartesian): Polar {
 	return {
-		r: Math.sqrt(cartesian.x * cartesian.x + cartesian.y * cartesian.y),
+		r: Math.hypot(cartesian.x, cartesian.y),
 		phi: Math.atan2(cartesian.y, cartesian.x),
 	};
 }

@@ -61,7 +61,7 @@
 
 		let dx = x1 - x2;
 		let dy = y1 - y2;
-		const dl = Math.sqrt(dx * dx + dy * dy);
+		const dl = Math.hypot(dx, dy);
 		dx /= dl;
 		dy /= dl;
 
