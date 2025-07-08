@@ -49,7 +49,7 @@
 			class="relative max-w-[30ch] cursor-text rounded px-2 py-1 text-center wrap-break-word outline-indigo-400 focus-visible:outline-2"
 			class:text-black={light}
 			class:text-white={!light}
-			contenteditable
+			contenteditable="plaintext-only"
 			role="textbox"
 			bind:innerText={body}
 		></div>

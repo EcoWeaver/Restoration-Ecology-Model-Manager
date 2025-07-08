@@ -58,7 +58,7 @@
 		>
 			<div
 				class="px-2 outline-none"
-				contenteditable
+				contenteditable="plaintext-only"
 				role="textbox"
 				bind:innerText={chip.value}
 				bind:focused={editing}
