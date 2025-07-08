@@ -119,9 +119,10 @@
 				{#each items as { uuid, title, modelType, identifier, uploaded } (uuid)}
 					{@const date = new Date(uploaded)}
 					<a
-						data-sveltekit-preload-data="tap"
 						href={`/view/${uuid}`}
 						class="table-row border-b-1 border-neutral-300 outline-indigo-400 last:border-none hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
+						data-sveltekit-preload-data="tap"
+						data-sveltekit-preload-code="hover"
 					>
 						<span class="table-cell p-3">{title}</span>
 						<span class="table-cell p-3">{modelType}</span>
