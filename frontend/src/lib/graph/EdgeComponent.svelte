@@ -159,18 +159,22 @@
 	});
 
 	const { screenToFlowPosition } = useSvelteFlow();
-	const drag = $state({ dragging: false, offsetInvalid: true, offsetX: 0, offsetY: 0 });
+	const drag = $state<{
+		dragging: boolean;
+		offset: Cartesian | undefined;
+	}>({
+		dragging: false,
+		offset: undefined,
+	});
 
 	function onpointermove(e: PointerEvent) {
 		const pos = screenToFlowPosition({ x: e.pageX, y: e.pageY });
-		if (drag.offsetInvalid) {
-			drag.offsetInvalid = false;
-			drag.offsetX = pos.x - labelX!;
-			drag.offsetY = pos.y - labelY!;
+		if (drag.offset === undefined) {
+			drag.offset = { x: pos.x - labelX!, y: pos.y - labelY! };
 		}
 		position = cartesianToPolar({
-			x: pos.x - drag.offsetX - middleX!,
-			y: pos.y - drag.offsetY - middleY!,
+			x: pos.x - drag.offset.x - middleX!,
+			y: pos.y - drag.offset.y - middleY!,
 		});
 		position.phi -= alpha!;
 	}
@@ -214,7 +218,7 @@
 					class:cursor-grabbing={drag.dragging}
 					onpointerdown={() => {
 						drag.dragging = true;
-						drag.offsetInvalid = true;
+						drag.offset = undefined;
 					}}
 				>
 					<Move />
