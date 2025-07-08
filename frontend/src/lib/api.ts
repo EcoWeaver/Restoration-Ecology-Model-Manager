@@ -1,12 +1,14 @@
 import { browser } from "$app/environment";
 import { env } from "$env/dynamic/public";
 
-export const apiBase = browser
-	? env.PUBLIC_API_URL || "http://localhost:8080"
+export const apiBase = env.PUBLIC_API_URL || "http://localhost:8080/";
+
+export const reqApiBase = browser
+	? apiBase
 	: env.PUBLIC_INTERNAL_API_URL || "http://localhost:8080";
 
 async function req<T>(method: string, path: string, body?: unknown | undefined): Promise<T> {
-	const res = await fetch(`${apiBase}/${path}`, {
+	const res = await fetch(`${reqApiBase}/${path}`, {
 		method,
 		body: body === undefined ? undefined : JSON.stringify(body),
 	});

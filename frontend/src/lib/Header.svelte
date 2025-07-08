@@ -9,7 +9,11 @@
 		params,
 		children,
 		createModel = true,
-	}: { params?: ChipElement[]; createModel?: boolean; children?: Snippet } = $props();
+	}: {
+		params?: ChipElement[];
+		createModel?: boolean;
+		children?: Snippet;
+	} = $props();
 </script>
 
 <div class="flex items-center gap-4 p-4" role="navigation">
