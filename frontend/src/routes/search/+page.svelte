@@ -5,7 +5,7 @@
 	import { ChevronDown, ChevronUp } from "@lucide/svelte";
 
 	let { data } = $props();
-	let { items: originalItems, params: searchParams } = $derived(data);
+	let { items: originalItems, params: searchParams, metadataElements } = $derived(data);
 
 	let params = $derived<ChipElement[]>(searchParams.map(([kind, value]) => ({ kind, value })));
 
@@ -75,7 +75,7 @@
 	<title>search by metadata</title>
 </svelte:head>
 
-<Header {params} />
+<Header {metadataElements} {params} />
 
 <!--
 	only render the contents on the client as the server timezone may be different from that of the client,

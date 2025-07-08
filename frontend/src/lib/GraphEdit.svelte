@@ -80,7 +80,7 @@
 </script>
 
 <div class="t-0 absolute z-10 w-full bg-white dark:bg-neutral-800">
-	<Header createModel={false}>
+	<Header {metadataElements} createModel={false}>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-2 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="add new node"

@@ -4,12 +4,15 @@
 	import type { Snippet } from "svelte";
 	import DarkLight from "./DarkLight.svelte";
 	import MetadataSearch from "./MetadataSearch.svelte";
+	import { type MetadataElements } from "./api";
 
 	let {
+		metadataElements,
 		params,
 		children,
 		createModel = true,
 	}: {
+		metadataElements: MetadataElements;
 		params?: ChipElement[];
 		createModel?: boolean;
 		children?: Snippet;
@@ -26,7 +29,7 @@
 	</a>
 
 	<div class="flex min-w-0 grow">
-		<MetadataSearch {params} />
+		<MetadataSearch {metadataElements} {params} />
 	</div>
 
 	{#if createModel}

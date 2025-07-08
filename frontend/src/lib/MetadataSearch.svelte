@@ -2,10 +2,19 @@
 	import { untrack } from "svelte";
 	import { goto } from "$app/navigation";
 	import Chip, { type ChipElement } from "./search/Chip.svelte";
-	import { suggest } from "./search/suggestions";
+	import { metadataSuggest } from "./search/suggestions";
 	import { Search as SearchIcon } from "@lucide/svelte";
+	import type { MetadataElements } from "./api";
 
-	let { params = [] }: { params?: ChipElement[] } = $props();
+	let {
+		metadataElements,
+		params = [],
+	}: {
+		metadataElements: MetadataElements;
+		params?: ChipElement[];
+	} = $props();
+
+	const suggest = metadataSuggest(metadataElements);
 
 	let input = $state("");
 	let chip = $state<undefined | ChipElement>(undefined);
@@ -143,13 +152,10 @@
 			return;
 		}
 
-		suggest(
+		[suggestions, selected] = suggest(
 			input,
 			untrack(() => selected),
-		).then(([newSuggestions, newSelected]) => {
-			suggestions = newSuggestions;
-			selected = newSelected;
-		});
+		);
 	});
 </script>
 

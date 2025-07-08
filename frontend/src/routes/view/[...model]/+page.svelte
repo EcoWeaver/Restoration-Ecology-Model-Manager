@@ -6,10 +6,19 @@
 	import Alert from "$lib/Alert.svelte";
 	import { apiToFlow } from "$lib/model";
 	import { SvelteFlowProvider } from "@xyflow/svelte";
+	import type { MetadataType } from "$lib/api.js";
 
 	let { data } = $props();
-	let { model, metadataMap } = $derived(data);
+	let { model, metadataElements } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
+
+	const metadataMap = $derived.by(() => {
+		const map = new Map<string, MetadataType | undefined>();
+		for (const { name, type } of Object.values(metadataElements).flat()) {
+			map.set(name, type);
+		}
+		return map;
+	});
 
 	let alert: ReturnType<typeof Alert>;
 	async function share() {
@@ -23,7 +32,7 @@
 </svelte:head>
 
 <div class="absolute z-10 w-full bg-white dark:bg-neutral-800">
-	<Header>
+	<Header {metadataElements}>
 		<a
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="edit model"

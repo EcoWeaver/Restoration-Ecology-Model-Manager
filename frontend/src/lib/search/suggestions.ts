@@ -1,23 +1,21 @@
-import { metadataElements } from "$lib/api";
+import { type MetadataElements } from "$lib/api";
 import { filterMatches } from "$lib/metadata-panel/auto-complete";
 
-const allElements = metadataElements().then((elements) =>
-	Object.values(elements)
+export function metadataSuggest(metadataElements: MetadataElements) {
+	const elements = Object.values(metadataElements)
 		.flat()
-		.map((element) => element.name),
-);
+		.map((element) => element.name);
 
-let prevSuggestions = allElements;
-export async function suggest(value: string, selected: number): Promise<[string[], number]> {
-	const elements = await allElements;
-	const newSuggestions = filterMatches(elements, value, "-", true);
+	let prevSuggestions = elements;
+	return function suggest(value: string, selected: number): [string[], number] {
+		const newSuggestions = filterMatches(elements, value, "-", true);
 
-	let newSelected = value === "" ? -1 : 0;
-	const prev = await prevSuggestions;
-	if (selected > 0 && typeof prev[selected] === "string") {
-		newSelected = newSuggestions.findIndex((choice) => choice === prev[selected]);
-	}
+		let newSelected = value === "" ? -1 : 0;
+		if (selected > 0 && typeof prevSuggestions[selected] === "string") {
+			newSelected = newSuggestions.findIndex((choice) => choice === prevSuggestions[selected]);
+		}
 
-	prevSuggestions = Promise.resolve(newSuggestions);
-	return [newSuggestions, newSelected];
+		prevSuggestions = newSuggestions;
+		return [newSuggestions, newSelected];
+	};
 }
