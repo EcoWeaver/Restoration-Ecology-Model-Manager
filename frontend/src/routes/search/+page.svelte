@@ -126,7 +126,7 @@
 					>
 						<span class="table-cell p-3">{title}</span>
 						<span class="table-cell p-3">{modelType}</span>
-						<span class="table-cell p-3">{identifier}</span>
+						<span class="table-cell p-3 text-nowrap">{identifier}</span>
 						{#if browser}
 							<span title={dateFormat(date, false)} class="table-cell p-3">
 								{dateFormat(date, true)}
