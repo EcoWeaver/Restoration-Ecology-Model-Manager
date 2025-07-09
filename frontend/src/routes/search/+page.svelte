@@ -92,7 +92,7 @@
 						<span class="table-cell px-1 py-3 font-semibold">
 							<button
 								title={sortState?.column === column ? `${text} (${sortState.type})` : text}
-								class="outline-offset flex cursor-pointer items-center gap-1 rounded-md px-2 outline-indigo-400 focus-visible:outline-2"
+								class="outline-offset flex cursor-pointer items-center gap-1 rounded-md px-2 text-nowrap outline-indigo-400 focus-visible:outline-2"
 								onclick={() => toggleState(column)}
 							>
 								{text}
