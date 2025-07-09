@@ -258,12 +258,12 @@ func (self *State) PutModel(c echo.Context) error {
 
 // GetRelations godoc
 //
-//	@Summary	Get the relations
-//	@Summary	Gets the list of currently accepted relation kinds and types.
-//	@Produce	json
-//	@Success	200			{object}	RelationsConfig
-//	@Failure	500			{object}	echo.HTTPError
-//	@Router		/relations	[get]
+//	@Summary		Get the relations
+//	@Description	Gets the list of currently accepted relation kinds and types.
+//	@Produce		json
+//	@Success		200			{object}	RelationsConfig
+//	@Failure		500			{object}	echo.HTTPError
+//	@Router			/relations	[get]
 func (self *State) GetRelations(c echo.Context) error {
 	r, err := self.Relations.Get(c.Logger())
 	if err != nil {
