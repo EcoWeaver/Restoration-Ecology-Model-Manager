@@ -1,3 +1,4 @@
 backend
 docs/
 postgresql/backup/
+postgresql/1-example-data.sql

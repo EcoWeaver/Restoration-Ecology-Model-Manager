@@ -32,7 +32,4 @@ down:
 
 backup:
 	mkdir -p postgresql/backup
-	docker exec -it postgres pg_dump -U postgres -d postgres --column-inserts \
-		| grep "INSERT INTO " \
-		| sed -e "s/INSERT INTO public./INSERT INTO /g" \
-		> postgresql/backup/backup_$(shell date +%Y-%m-%d_%H-%M-%S).sql
+	docker exec -it postgres pg_dump -U postgres -d postgres --column-inserts > postgresql/backup/$(shell date +%Y-%m-%d_%H-%M-%S).sql
