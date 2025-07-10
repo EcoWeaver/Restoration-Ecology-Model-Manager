@@ -29,8 +29,8 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./backend/metadata.json:/app/metadata.json:ro
-      - ./backend/relations.json:/app/relations.json:ro
+      - ./backend/metadata.json:/app/metadata.json:ro,z
+      - ./backend/relations.json:/app/relations.json:ro,z
   frontend:
     build:
       context: frontend
