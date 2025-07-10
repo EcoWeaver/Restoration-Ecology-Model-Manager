@@ -8,8 +8,8 @@
 	const { id, data }: NodeProps<Omit<Node, "dragHandle"> & { dragHandle?: string }> = $props();
 	const { updateNodeData, deleteElements } = useSvelteFlow();
 
-	let body = $state(data.body);
-	let color = $state(data.color);
+	let body = $derived(data.body);
+	let color = $derived(data.color);
 	$effect(() => updateNodeData(id, { body, color }));
 
 	const connection = useConnection();
