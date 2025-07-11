@@ -105,7 +105,7 @@
 			data-sveltekit-preload-code="hover"
 		>
 			<CircleX />
-			<span class="pl-2">cancel</span>
+			<span class="pl-2 select-none">cancel</span>
 		</a>
 	</Header>
 </div>

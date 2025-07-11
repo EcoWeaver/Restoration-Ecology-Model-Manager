@@ -39,7 +39,7 @@
 			href={`/edit/${model.uuid}`}
 		>
 			<PencilLine strokeWidth={1.7} />
-			<span class="pl-2">edit</span>
+			<span class="pl-2 select-none">edit</span>
 		</a>
 
 		<button
@@ -48,7 +48,7 @@
 			onclick={share}
 		>
 			<Link />
-			<span class="pl-2">share</span>
+			<span class="pl-2 select-none">share</span>
 		</button>
 	</Header>
 </div>
@@ -62,10 +62,10 @@
 				<PanelComponent>
 					<div class="table">
 						<div class="table-row">
-							<h2 class="mb-2 table-cell text-xl font-bold">Metadata</h2>
+							<h2 class="mb-2 table-cell text-xl font-bold select-text">Metadata</h2>
 							{#if model.parent}
 								<span
-									class="mb-2 table-cell max-w-128 overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap"
+									class="mb-2 table-cell max-w-128 overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap select-text"
 								>
 									based on
 									<a
@@ -79,18 +79,18 @@
 							{/if}
 						</div>
 						<div class="table-row">
-							<div class="text-l table-cell py-1 pr-2 font-bold">kind</div>
-							<div class="text-l table-cell py-1 pl-2 font-bold">value</div>
+							<div class="text-l table-cell py-1 pr-2 font-bold select-text">kind</div>
+							<div class="text-l table-cell py-1 pl-2 font-bold select-text">value</div>
 						</div>
 						{#each model.metadata as { kind, value }, idx (idx)}
 							{@const type = metadataMap.get(kind)}
 
 							<div class="table-row">
-								<div class="table-cell py-1 pr-2">{kind}</div>
+								<div class="table-cell py-1 pr-2 select-text">{kind}</div>
 
 								{#if type === "doi"}
 									<a
-										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
 										href={`https://doi.org/${value}`}
 										target="_blank"
 										rel="noopener noreferrer"
@@ -99,7 +99,7 @@
 									</a>
 								{:else if type === "orcid"}
 									<a
-										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
 										href={`https://orcid.org/${value}`}
 										target="_blank"
 										rel="noopener noreferrer"
@@ -108,7 +108,7 @@
 									</a>
 								{:else if type === "url"}
 									<a
-										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
 										href={value}
 										target="_blank"
 										rel="noopener noreferrer"
@@ -116,7 +116,7 @@
 										{value}
 									</a>
 								{:else}
-									<div class="table-cell max-w-128 py-1 pl-2">{value}</div>
+									<div class="table-cell max-w-128 py-1 pl-2 select-text">{value}</div>
 								{/if}
 							</div>
 						{/each}

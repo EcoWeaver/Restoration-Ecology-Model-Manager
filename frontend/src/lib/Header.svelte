@@ -39,7 +39,7 @@
 			class="flex h-10 items-center rounded-md bg-indigo-300 px-2 font-medium outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 		>
 			<Plus />
-			<span class="px-1">model</span>
+			<span class="px-1 select-none">model</span>
 		</a>
 	{/if}
 
