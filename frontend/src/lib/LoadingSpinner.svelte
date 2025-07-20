@@ -4,15 +4,18 @@
 	import { fade } from "svelte/transition";
 
 	let timer: undefined | number = undefined;
-	let navDelayed = $state(false);
+	let spinner: "idle" | "waiting" | "spinning" = $state("idle");
 
 	export function startNavigate() {
-		timer = setTimeout(() => (navDelayed = true), 500);
+		if (spinner === "idle") {
+			spinner = "waiting";
+			timer = setTimeout(() => (spinner = "spinning"), 500);
+		}
 	}
 
 	export function clearNavigate() {
 		clearTimeout(timer);
-		navDelayed = false;
+		spinner = "idle";
 	}
 </script>
 
@@ -20,13 +23,13 @@
 	$effect(() => {
 		if (navigating.to) {
 			startNavigate();
+		} else {
+			clearNavigate();
 		}
-
-		return () => clearNavigate();
 	});
 </script>
 
-{#if navDelayed}
+{#if spinner === "spinning"}
 	<div
 		class="absolute top-0 z-1000 flex h-full w-full items-center justify-center bg-white/50 dark:bg-neutral-800/50"
 		in:fade={{ duration: 250 }}

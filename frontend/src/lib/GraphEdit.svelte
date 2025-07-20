@@ -38,7 +38,6 @@
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
-		} finally {
 			clearNavigate();
 		}
 	}
