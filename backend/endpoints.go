@@ -444,6 +444,16 @@ func (self *State) PostModelRun(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
+	r, err := self.Relations.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+
+	if err := mr.Verify(&r); err != nil {
+		c.Logger().Warn(err)
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+	}
+
 	query := `
 		SELECT
 			models.graph
@@ -473,14 +483,11 @@ func (self *State) PostModelRun(c echo.Context) error {
 		return err
 	}
 
-	r, err := self.Relations.Get(c.Logger())
+	res, err := mr.Run(graph, &r)
 	if err != nil {
-		return err
+		c.Logger().Warn(err)
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err := mr.Verify(graph, &r); err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, mr.Run(graph, &r))
+	return c.JSON(http.StatusOK, res)
 }
