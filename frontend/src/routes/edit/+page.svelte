@@ -3,6 +3,7 @@
 
 	import GraphEdit from "$lib/GraphEdit.svelte";
 	import { type Metadata } from "$lib/api";
+	import { SvelteFlowProvider } from "@xyflow/svelte";
 
 	let { data }: PageProps = $props();
 	let metadata = $state<Metadata[]>([]);
@@ -12,4 +13,6 @@
 	<title>create new model</title>
 </svelte:head>
 
-<GraphEdit bind:metadata metadataElements={data.metadataElements} nodes={[]} edges={[]} />
+<SvelteFlowProvider>
+	<GraphEdit bind:metadata metadataElements={data.metadataElements} nodes={[]} edges={[]} />
+</SvelteFlowProvider>

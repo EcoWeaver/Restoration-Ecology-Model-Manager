@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { apiToFlow } from "$lib/model.js";
 	import GraphEdit from "$lib/GraphEdit.svelte";
+	import { SvelteFlowProvider } from "@xyflow/svelte";
 
 	let { data } = $props();
 	const { model, metadataElements } = data;
@@ -13,4 +14,6 @@
 	<title>editing {metadata.find(({ kind }) => kind === "title")?.value ?? uuid}</title>
 </svelte:head>
 
-<GraphEdit {uuid} bind:metadata {metadataElements} {nodes} {edges} />
+<SvelteFlowProvider>
+	<GraphEdit {uuid} bind:metadata {metadataElements} {nodes} {edges} />
+</SvelteFlowProvider>

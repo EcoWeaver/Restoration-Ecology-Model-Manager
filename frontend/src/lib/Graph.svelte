@@ -9,6 +9,7 @@
 		SvelteFlow,
 		useSvelteFlow,
 		type OnConnectEnd,
+		type OnMove,
 		type XYPosition,
 	} from "@xyflow/svelte";
 	import NodeComponent from "./graph/NodeComponent.svelte";
@@ -22,12 +23,14 @@
 		nodes = $bindable(),
 		edges = $bindable(),
 		addNode,
+		onmovetoggle,
 		panel,
 	}: {
 		interactive: boolean;
 		nodes: Node[];
 		edges: Edge[];
 		addNode?: (pos: XYPosition) => string;
+		onmovetoggle?: OnMove;
 		panel: Snippet;
 	} = $props();
 
@@ -92,6 +95,8 @@
 	nodesFocusable={interactive}
 	edgesFocusable={interactive}
 	onconnectend={interactive ? onconnectend : undefined}
+	onmovestart={onmovetoggle}
+	onmoveend={onmovetoggle}
 	deleteKey={["Delete", "Backspace"]}
 	fitView={nodes.length > 0}
 >
