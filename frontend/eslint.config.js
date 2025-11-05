@@ -42,6 +42,7 @@ export default ts.config(
 		rules: {
 			"array-callback-return": "error",
 			camelcase: "error",
+			curly: "error",
 			eqeqeq: ["error", "always", { null: "ignore" }],
 			"no-console": "error",
 			"no-duplicate-imports": "error",

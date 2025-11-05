@@ -3,7 +3,7 @@
 	import { navigating } from "$app/state";
 	import { fade } from "svelte/transition";
 
-	let timer: undefined | number = undefined;
+	let timer: number | undefined;
 	let spinner: "idle" | "waiting" | "spinning" = $state("idle");
 
 	export function startNavigate() {

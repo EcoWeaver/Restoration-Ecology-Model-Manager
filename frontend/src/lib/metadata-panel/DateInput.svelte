@@ -11,7 +11,9 @@
 		let digits = 4;
 		for (const t of v) {
 			if (digits === 0) {
-				if (t !== "-") return;
+				if (t !== "-") {
+					return;
+				}
 			} else if (t < "0" || t > "9") {
 				return;
 			}

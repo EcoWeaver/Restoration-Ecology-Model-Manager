@@ -17,7 +17,7 @@
 	const suggest = metadataSuggest(metadataElements);
 
 	let input = $state("");
-	let chip = $state<undefined | ChipElement>(undefined);
+	let chip = $state<ChipElement>();
 	// $derived is not deeply reactive, so you have to put a $state
 	// inside of the $derived.
 	// see https://github.com/sveltejs/svelte/issues/16189
@@ -39,7 +39,7 @@
 		focused = false;
 	}
 
-	let inputElement: HTMLInputElement | undefined = $state();
+	let inputElement = $state<HTMLInputElement>();
 	function select(event: MouseEvent, selected: number) {
 		inputElement?.focus();
 		event.preventDefault();
@@ -121,7 +121,7 @@
 	$effect(() => element?.scrollIntoView({ block: "nearest" }));
 
 	let containerElement: HTMLDivElement;
-	let inputElementOffset = $state<number | undefined>();
+	let inputElementOffset = $state<number>();
 	function computeInputElementOffset() {
 		const inputElementRect = inputElement?.getBoundingClientRect();
 		if (!inputElementRect) {

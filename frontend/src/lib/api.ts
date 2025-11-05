@@ -2,7 +2,7 @@ import { env } from "$env/dynamic/public";
 
 export const apiBase = env.PUBLIC_API_URL || "http://localhost:8080";
 
-async function req<T>(method: string, path: string, body?: unknown | undefined): Promise<T> {
+async function req<T>(method: string, path: string, body?: unknown): Promise<T> {
 	const res = await fetch(`${apiBase}/${path}`, {
 		method,
 		body: body === undefined ? undefined : JSON.stringify(body),

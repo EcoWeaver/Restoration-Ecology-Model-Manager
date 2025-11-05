@@ -35,7 +35,7 @@
 	type SortType = "ascending" | "descending";
 	type SortState = { column: SortColumn; type: SortType };
 
-	let sortState = $state<SortState | undefined>(undefined);
+	let sortState = $state<SortState>();
 
 	function toggleState(column: SortColumn) {
 		if (sortState?.column === column) {

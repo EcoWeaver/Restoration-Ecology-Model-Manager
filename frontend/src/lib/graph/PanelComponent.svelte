@@ -1,15 +1,20 @@
 <script lang="ts">
 	import { type Snippet } from "svelte";
 	import type { MouseEventHandler } from "svelte/elements";
-	import { GanttChartSquare, PlusIcon } from "@lucide/svelte";
+	import { GanttChartSquare, PlusIcon, RedoIcon, UndoIcon } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
 
 	let {
 		children,
-		onaddmetadata: onmetadata,
+		onaddmetadata,
+		history,
 	}: {
 		children: Snippet;
 		onaddmetadata?: MouseEventHandler<HTMLButtonElement>;
+		history?: {
+			undo?: MouseEventHandler<HTMLButtonElement>;
+			redo?: MouseEventHandler<HTMLButtonElement>;
+		};
 	} = $props();
 
 	let show = $state(true);
@@ -26,10 +31,36 @@
 {/if}
 
 <div class="flex h-10 w-full flex-row justify-end gap-2 px-3">
-	{#if onmetadata && show}
+	{#if history}
 		<button
+			title={history.undo ? "undo" : undefined}
+			onclick={history.undo}
+			class:cursor-pointer={history.undo}
+			class:hover:bg-neutral-300={history.undo}
+			class:dark:hover:bg-neutral-600={history.undo}
+			class:text-neutral-400={!history.undo}
+			class="cursor right-0 block rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
+		>
+			<UndoIcon />
+		</button>
+		<button
+			title={history.redo ? "redo" : undefined}
+			onclick={history.redo}
+			class:cursor-pointer={history.redo}
+			class:hover:bg-neutral-300={history.redo}
+			class:dark:hover:bg-neutral-600={history.redo}
+			class:text-neutral-400={!history.redo}
+			class="cursor right-0 block rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
+		>
+			<RedoIcon />
+		</button>
+	{/if}
+
+	{#if onaddmetadata && show}
+		<button
+			title="add metadata"
 			transition:slide={{ duration: 100, axis: "x" }}
-			onclick={onmetadata}
+			onclick={onaddmetadata}
 			class="cursor right-0 flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 px-4 py-1 text-nowrap outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:bg-neutral-700 dark:hover:bg-neutral-600"
 		>
 			<PlusIcon class="inline size-5.5" />

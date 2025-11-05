@@ -64,7 +64,7 @@
 		});
 	});
 
-	let focusedElement: HTMLButtonElement | undefined = $state(undefined);
+	let focusedElement = $state<HTMLButtonElement>();
 	$effect(() => focusedElement?.scrollIntoView({ block: "nearest" }));
 </script>
 

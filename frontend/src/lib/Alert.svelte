@@ -5,7 +5,7 @@
 	let open = $state(false);
 	let text = $state("");
 	let isError = $state(false);
-	let timeoutId = $state<number | undefined>();
+	let timeoutId = $state<number>();
 
 	export function error(err: string) {
 		clearTimeout(timeoutId);

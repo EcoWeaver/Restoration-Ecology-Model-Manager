@@ -57,7 +57,7 @@
 
 <div class="h-dvh w-dvw">
 	<SvelteFlowProvider>
-		<Graph {nodes} {edges} interactive={false}>
+		<Graph {nodes} {edges}>
 			{#snippet panel()}
 				<PanelComponent>
 					<div class="table">

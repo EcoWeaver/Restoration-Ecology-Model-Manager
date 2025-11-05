@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageProps } from "./$types";
-
 	import GraphEdit from "$lib/GraphEdit.svelte";
 	import { type Metadata } from "$lib/api";
 	import { SvelteFlowProvider } from "@xyflow/svelte";

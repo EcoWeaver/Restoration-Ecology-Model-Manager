@@ -14,6 +14,17 @@ export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "
 };
 export type Edge = FlowEdge<Omit<ApiRelation, "from" | "to"> & { editable: boolean }, "custom">;
 
+export function defaultEdge(editable: boolean): Partial<Edge> {
+	return {
+		type: "custom",
+		data: {
+			kind: "correlated-with",
+			editable,
+			position: { r: 0, phi: 0 },
+		},
+	};
+}
+
 export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edges: Edge[] } {
 	const nodes: Node[] = Array.from(
 		graph.nodes?.entries().map(([id, { body, position, color }]) => ({

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CircleX, Plus, Save } from "@lucide/svelte";
 	import Graph from "$lib/Graph.svelte";
-	import { saveModel } from "$lib/model.js";
+	import { defaultEdge, saveModel } from "$lib/model.js";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
@@ -10,7 +10,8 @@
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
 	import { clearNavigate, startNavigate } from "./LoadingSpinner.svelte";
-	import { useStore, useSvelteFlow, type XYPosition } from "@xyflow/svelte";
+	import { type XYPosition, useStore, useSvelteFlow } from "@xyflow/svelte";
+	import { History } from "./graph/history.svelte";
 
 	let {
 		uuid,
@@ -29,6 +30,9 @@
 	let nodes: Node[] = $state.raw(initialNodes);
 	let edges: Edge[] = $state.raw(initialEdges);
 
+	const history = new History(initialNodes, initialEdges, defaultEdge(true));
+	$effect(() => history.push($state.snapshot(nodes) as Node[], $state.snapshot(edges) as Edge[]));
+
 	let alert: ReturnType<typeof Alert>;
 	async function save() {
 		try {
@@ -43,14 +47,14 @@
 	}
 
 	const { getViewport } = useSvelteFlow();
-	const store = $derived(useStore());
-	let offset = 0;
+	const { width, height } = $derived(useStore());
 
-	let id = $state(initialNodes.length);
+	let id = initialNodes.length;
+	let offset = 0;
 	function addNode(position?: XYPosition): string {
 		const viewport = getViewport();
-		const x = store.width / 2 - viewport.x + offset;
-		const y = store.height / 2 - viewport.y + offset;
+		const x = (width / 2 - viewport.x) / viewport.zoom + offset;
+		const y = (height / 2 - viewport.y) / viewport.zoom + offset;
 		offset += 10;
 
 		const thisId = (id++).toString();
@@ -81,6 +85,18 @@
 			}
 		}
 	});
+
+	function onkeydown(event: KeyboardEvent) {
+		if (event.ctrlKey) {
+			if (history.canUndo() && event.key === "z") {
+				event.preventDefault();
+				[nodes, edges] = history.undo();
+			} else if (history.canRedo() && (event.key === "Z" || event.key === "y")) {
+				event.preventDefault();
+				[nodes, edges] = history.redo();
+			}
+		}
+	}
 
 	let metadataPanel: ReturnType<typeof MetadataPanel>;
 </script>
@@ -119,11 +135,19 @@
 <Alert bind:this={alert} />
 
 <div class="h-dvh w-dvw">
-	<Graph bind:nodes bind:edges interactive={true} {addNode} onmovetoggle={() => (offset = 0)}>
+	<Graph bind:nodes bind:edges {addNode} onmovetoggle={() => (offset = 0)}>
 		{#snippet panel()}
-			<PanelComponent onaddmetadata={() => metadataPanel.addMetadata()}>
+			<PanelComponent
+				onaddmetadata={() => metadataPanel.addMetadata()}
+				history={{
+					undo: history.canUndo() ? () => ([nodes, edges] = history.undo()) : undefined,
+					redo: history.canRedo() ? () => ([nodes, edges] = history.redo()) : undefined,
+				}}
+			>
 				<MetadataPanel bind:this={metadataPanel} elements={metadataElements} bind:metadata />
 			</PanelComponent>
 		{/snippet}
 	</Graph>
 </div>
+
+<svelte:window {onkeydown} />

@@ -134,8 +134,8 @@
 
 	const { updateEdge, getZoom, deleteElements } = useSvelteFlow();
 
-	let kind = $state(data!.kind);
-	let position = $state(data!.position);
+	let kind = $derived(data!.kind);
+	let position = $derived(data!.position);
 
 	$effect(() => {
 		const kindState = kind;
@@ -156,17 +156,17 @@
 	});
 
 	const { screenToFlowPosition } = useSvelteFlow();
-	const drag = $state<{
+	const drag: {
 		dragging: boolean;
-		offset: Cartesian | undefined;
-	}>({
+		offset?: Cartesian;
+	} = {
 		dragging: false,
 		offset: undefined,
-	});
+	};
 
 	function onpointermove(e: PointerEvent) {
 		const pos = screenToFlowPosition({ x: e.pageX, y: e.pageY });
-		if (drag.offset === undefined) {
+		if (!drag.offset) {
 			drag.offset = { x: pos.x - labelX!, y: pos.y - labelY! };
 		}
 		position = cartesianToPolar({

@@ -7,16 +7,22 @@
 	function set(v: string) {
 		v = stripURL(v, "https://orcid.org/");
 
-		if (v.length > 19) return;
+		if (v.length > 19) {
+			return;
+		}
 		v = v.toUpperCase();
 
 		let digits = 0;
 		let clusters = 0;
 		for (const t of v) {
 			if (digits === 4) {
-				if (t !== "-") return;
+				if (t !== "-") {
+					return;
+				}
 			} else if (t < "0" || t > "9") {
-				if (clusters === 3 && digits === 3 && t === "X") break;
+				if (clusters === 3 && digits === 3 && t === "X") {
+					break;
+				}
 				return;
 			}
 
