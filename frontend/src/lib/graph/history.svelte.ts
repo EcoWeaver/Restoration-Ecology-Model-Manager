@@ -28,7 +28,8 @@ export class History {
 			this.diffAddOrRemove(nodes, edges) ?? this.diffNodeData(nodes) ?? this.diffEdgeData(edges);
 
 		if (change) {
-			[this.nodes, this.edges] = structuredClone([nodes, edges]);
+			this.nodes = structuredClone(nodes);
+			this.edges = structuredClone(edges);
 			if (change !== "collapsed") {
 				this.undoHist.push(change);
 				this.redoHist.length = 0;
@@ -171,7 +172,7 @@ export class History {
 				if (change.remove) {
 					if (change.node) {
 						const id = change.node.id;
-						const idx = this.nodes.findIndex((n) => n.id !== id);
+						const idx = this.nodes.findIndex((n) => n.id === id);
 						this.nodes.splice(idx, 1);
 					}
 					this.edges = this.edges.filter((edge) => !change.edges.has(edge.id));
@@ -234,7 +235,7 @@ export class History {
 			this.apply(change);
 			this.redoHist.push(change);
 		}
-		return structuredClone([this.nodes, this.edges]);
+		return [structuredClone(this.nodes), structuredClone(this.edges)];
 	}
 
 	canRedo(): boolean {
@@ -247,6 +248,6 @@ export class History {
 			this.apply(change);
 			this.undoHist.push(change);
 		}
-		return structuredClone([this.nodes, this.edges]);
+		return [structuredClone(this.nodes), structuredClone(this.edges)];
 	}
 }
