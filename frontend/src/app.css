@@ -2,10 +2,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root.dark {
-	color-scheme: dark;
-}
-
 .svelte-flow {
 	--xy-edge-label-background-color: transparent;
 	--xy-edge-stroke-width: 3;
