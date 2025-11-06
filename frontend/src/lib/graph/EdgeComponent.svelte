@@ -181,11 +181,11 @@
 	}
 </script>
 
-<LineCap id={`linecap-s-${source}-${target}`} />
+<LineCap id="linecap-s-{source}-{target}" />
 
 {#await relationElements then re}
 	{#if !re.causal.includes(kind)}
-		<LineCap id={`linecap-e-${source}-${target}`} />
+		<LineCap id="linecap-e-{source}-{target}" />
 	{/if}
 {/await}
 
@@ -200,7 +200,7 @@
 			>
 				{#await relationElements then relationElements}
 					{#each Object.entries(relationElements) as [group, values] (group)}
-						<optgroup label={group} style:font-size={`${getZoom()}em`}>
+						<optgroup label={group} style:font-size="{getZoom()}em">
 							{#each values as value (value)}
 								<option {value}>{value}</option>
 							{/each}
