@@ -222,7 +222,7 @@
 				</div>
 				<button
 					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
-					onclick={() => (position.r = 0)}
+					onclick={() => (position = { r: 0, phi: 0 })}
 					title="reset position"
 				>
 					<RotateCcw />
