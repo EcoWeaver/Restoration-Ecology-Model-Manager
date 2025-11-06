@@ -119,7 +119,7 @@
 					/>
 				{:else}
 					<textarea
-						class="field-sizing-content min-h-8 w-full max-w-128 rounded border border-neutral-600 py-1 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
+						class="field-sizing-content min-h-8 w-full max-w-lg rounded border border-neutral-600 py-1 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
 						rows="1"
 						placeholder={m.kind}
 						bind:value={m.value}
@@ -130,7 +130,7 @@
 			{#if !m.mandatory}
 				<div class="relative table-cell">
 					<button
-						class="absolute top-2 left-[4px] inline h-6 cursor-pointer rounded-4xl outline-red-500 focus-visible:outline-2"
+						class="absolute top-2 left-1 inline h-6 cursor-pointer rounded-4xl outline-red-500 focus-visible:outline-2"
 						onclick={() => meta.splice(idx, 1)}
 					>
 						<X class="stroke-red-500" />

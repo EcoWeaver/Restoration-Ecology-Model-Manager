@@ -12,6 +12,7 @@
 	import { clearNavigate, startNavigate } from "./LoadingSpinner.svelte";
 	import { type XYPosition, useStore, useSvelteFlow } from "@xyflow/svelte";
 	import { History } from "./graph/history.svelte";
+	import { resolve } from "$app/paths";
 
 	let {
 		uuid,
@@ -31,14 +32,20 @@
 	let edges: Edge[] = $state.raw(initialEdges);
 
 	const history = new History(initialNodes, initialEdges, defaultEdge(true));
-	$effect(() => history.push($state.snapshot(nodes) as Node[], $state.snapshot(edges) as Edge[]));
+	$effect(() =>
+		// FIXME: https://github.com/sveltejs/svelte/issues/17117
+		history.push(
+			$state.snapshot(nodes) as unknown as Node[],
+			$state.snapshot(edges) as unknown as Edge[],
+		),
+	);
 
 	let alert: ReturnType<typeof Alert>;
 	async function save() {
 		try {
 			startNavigate();
 			const res = await saveModel(uuid, metadata, nodes, edges);
-			await goto(`/view/${res.uuid}`);
+			await goto(resolve(`/view/${res.uuid}`));
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
@@ -120,7 +127,7 @@
 			<span class="pl-2">save</span>
 		</button>
 		<a
-			href={uuid ? `/view/${uuid}` : "/"}
+			href={resolve(uuid ? `/view/${uuid}` : "/")}
 			title="cancel editing"
 			class="flex h-10 cursor-pointer items-center rounded-md bg-red-300 px-3 outline-offset-2 outline-red-400 hover:bg-red-400 focus-visible:outline-2 dark:bg-red-500"
 			data-sveltekit-preload-data="tap"

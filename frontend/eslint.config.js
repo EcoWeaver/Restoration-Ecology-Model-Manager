@@ -36,6 +36,7 @@ export default ts.config(
 		},
 		rules: {
 			"svelte/prefer-const": "error",
+			"svelte/prefer-svelte-reactivity": "off",
 		},
 	},
 	{

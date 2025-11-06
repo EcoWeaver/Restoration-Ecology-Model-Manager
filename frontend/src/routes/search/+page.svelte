@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from "$app/environment";
+	import { resolve } from "$app/paths";
 	import Header from "$lib/Header.svelte";
 	import type { ChipElement } from "$lib/search/Chip.svelte";
 	import { ChevronDown, ChevronUp } from "@lucide/svelte";
@@ -86,7 +87,7 @@
 	{#if items.length > 0}
 		<div class="p-4 pt-2">
 			<div class="table w-full border-collapse p-2 text-lg">
-				<div class="mb-2 table-row border-b-1 border-neutral-300">
+				<div class="mb-2 table-row border-b border-neutral-300">
 					{#snippet header(column: SortColumn, value?: string)}
 						{@const text = value ?? column}
 						<span class="table-cell px-1 py-3 font-semibold">
@@ -102,7 +103,7 @@
 								{:else if sortState?.column === column && sortState.type === "descending"}
 									<ChevronDown size={20} />
 								{:else}
-									<div class="invisible w-[20px]"></div>
+									<div class="invisible w-5"></div>
 								{/if}
 							</button>
 						</span>
@@ -119,8 +120,8 @@
 				{#each items as { uuid, title, modelType, identifier, uploaded } (uuid)}
 					{@const date = new Date(uploaded)}
 					<a
-						href={`/view/${uuid}`}
-						class="table-row border-b-1 border-neutral-300 outline-indigo-400 last:border-none hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
+						href={resolve(`/view/${uuid}`)}
+						class="table-row border-b border-neutral-300 outline-indigo-400 last:border-none hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
 						data-sveltekit-preload-data="tap"
 						data-sveltekit-preload-code="hover"
 					>

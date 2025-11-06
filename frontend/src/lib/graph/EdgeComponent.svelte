@@ -146,7 +146,7 @@
 				{
 					markerStart: `linecap-s-${source}-${target}`,
 					markerEnd: re.causal.includes(kindState)
-						? { type: MarkerType.ArrowClosed }
+						? { type: MarkerType.ArrowClosed, color: null }
 						: `linecap-e-${source}-${target}`,
 					data: { kind: kindState, editable: data!.editable, position: positionState },
 				},
@@ -190,7 +190,7 @@
 {/await}
 
 <BaseEdge {id} {path} {markerStart} {markerEnd} />
-<EdgeLabel x={labelX} y={labelY} class="!text-base">
+<EdgeLabel x={labelX} y={labelY} class="text-base!">
 	{#if data!.editable}
 		<div class="flex">
 			<select

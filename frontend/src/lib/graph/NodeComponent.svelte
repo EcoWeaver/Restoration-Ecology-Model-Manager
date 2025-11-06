@@ -42,7 +42,7 @@
 	<Handle
 		type="source"
 		position={Position.Top}
-		class={`!absolute !inset-0 !size-full !transform-none !rounded-none !border-0 opacity-0 ${connection.current.inProgress ? "z-10" : ""}`}
+		class={`absolute! inset-0! size-full! transform-none! rounded-none! border-0! opacity-0 ${connection.current.inProgress ? "z-10" : ""}`}
 	/>
 	{#if data.editable}
 		<div

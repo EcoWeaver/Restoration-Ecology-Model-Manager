@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from "$app/paths";
 	import { page } from "$app/state";
 	import { getReasonPhrase } from "http-status-codes";
 
@@ -21,7 +22,7 @@
 		</h1>
 		<div class="mt-10 items-center">
 			<a
-				href="/"
+				href={resolve("/")}
 				class="rounded-md bg-red-300 px-5 py-2.5 text-lg font-semibold outline-offset-2 outline-red-400 hover:bg-red-400 focus-visible:outline-2 dark:bg-red-500"
 			>
 				go home

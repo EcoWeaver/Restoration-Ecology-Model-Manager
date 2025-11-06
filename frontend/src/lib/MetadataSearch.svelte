@@ -5,6 +5,7 @@
 	import { metadataSuggest } from "./search/suggestions";
 	import { Search as SearchIcon } from "@lucide/svelte";
 	import type { MetadataElements } from "./api";
+	import { resolve } from "$app/paths";
 
 	let {
 		metadataElements,
@@ -55,7 +56,8 @@
 			query.append(kind, value!);
 		}
 
-		await goto(`/search?${query}`);
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
+		await goto(resolve("/search") + `?${query}`);
 		focused = false;
 	}
 
@@ -161,7 +163,7 @@
 
 <div
 	bind:this={containerElement}
-	class="scrollbar-neutral-400 h-10 min-w-0 grow overflow-x-auto overflow-y-clip rounded-l-md border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
+	class="h-10 min-w-0 grow overflow-x-auto overflow-y-clip rounded-l-md border border-neutral-600 focus-within:outline-2 focus-within:outline-indigo-400"
 	onscroll={() => computeInputElementOffset()}
 	onresize={() => computeInputElementOffset()}
 	{onfocusout}

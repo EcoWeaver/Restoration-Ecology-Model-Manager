@@ -17,7 +17,7 @@ func species(s string, ctx context.Context) error {
 		return nil
 	}
 
-	api := "https://api.gbif.org/v1/species/match?rank=SPECIES&name=" + url.QueryEscape(s)
+	api := "https://api.gbif.org/v2/species/match?taxonRank=SPECIES&scientificName=" + url.QueryEscape(s)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
 	if err != nil {
 		return err
@@ -35,8 +35,12 @@ func species(s string, ctx context.Context) error {
 	}
 
 	type Response struct {
-		Status    string `json:"status"`
-		MatchType string `json:"matchType"`
+		Usage struct {
+			Status string `json:"status"`
+		} `json:"usage"`
+		Diagnostics struct {
+			MatchType string `json:"matchType"`
+		} `json:"diagnostics"`
 	}
 
 	var r Response
@@ -44,7 +48,7 @@ func species(s string, ctx context.Context) error {
 		return err
 	}
 
-	if r.Status != "ACCEPTED" || r.MatchType != "EXACT" {
+	if r.Usage.Status != "ACCEPTED" || r.Diagnostics.MatchType != "EXACT" {
 		return errUnregistered("species")
 	}
 

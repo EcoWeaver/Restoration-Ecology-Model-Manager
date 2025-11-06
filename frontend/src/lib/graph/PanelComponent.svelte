@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type Snippet } from "svelte";
 	import type { MouseEventHandler } from "svelte/elements";
-	import { GanttChartSquare, PlusIcon, RedoIcon, UndoIcon } from "@lucide/svelte";
+	import { PlusIcon, RedoIcon, SquareChartGantt, UndoIcon } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
 
 	let {
@@ -77,6 +77,6 @@
 		class:dark:bg-neutral-700={!show}
 		class="cursor right-0 block cursor-pointer rounded-full p-2 outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:hover:bg-neutral-600"
 	>
-		<GanttChartSquare />
+		<SquareChartGantt />
 	</button>
 </div>

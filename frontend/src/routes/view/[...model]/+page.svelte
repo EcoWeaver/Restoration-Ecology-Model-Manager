@@ -7,6 +7,7 @@
 	import { apiToFlow } from "$lib/model";
 	import { SvelteFlowProvider } from "@xyflow/svelte";
 	import type { MetadataType } from "$lib/api.js";
+	import { resolve } from "$app/paths";
 
 	let { data } = $props();
 	let { model, metadataElements } = $derived(data);
@@ -36,7 +37,7 @@
 		<a
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="edit model"
-			href={`/edit/${model.uuid}`}
+			href={resolve(`/edit/${model.uuid}`)}
 		>
 			<PencilLine strokeWidth={1.7} />
 			<span class="pl-2 select-none">edit</span>
@@ -65,13 +66,13 @@
 							<h2 class="mb-2 table-cell text-xl font-bold select-text">Metadata</h2>
 							{#if model.parent}
 								<span
-									class="mb-2 table-cell max-w-128 overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap select-text"
+									class="mb-2 table-cell max-w-lg overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap select-text"
 								>
 									based on
 									<a
 										class="mb-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 										title={model.parent.title}
-										href="/view/{model.parent.uuid}"
+										href={resolve("/view/{model.parent.uuid}")}
 									>
 										"{model.parent.title}"
 									</a>
@@ -90,8 +91,8 @@
 
 								{#if type === "doi"}
 									<a
-										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
-										href={`https://doi.org/${value}`}
+										class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
+										href="https://doi.org/{value}"
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -99,8 +100,8 @@
 									</a>
 								{:else if type === "orcid"}
 									<a
-										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
-										href={`https://orcid.org/${value}`}
+										class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
+										href="https://orcid.org/{value}"
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -108,15 +109,15 @@
 									</a>
 								{:else if type === "url"}
 									<a
-										class="table-cell max-w-128 py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
-										href={value}
+										class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
+										href={/* eslint-disable-line svelte/no-navigation-without-resolve */ value}
 										target="_blank"
 										rel="noopener noreferrer"
 									>
 										{value}
 									</a>
 								{:else}
-									<div class="table-cell max-w-128 py-1 pl-2 select-text">{value}</div>
+									<div class="table-cell max-w-lg py-1 pl-2 select-text">{value}</div>
 								{/if}
 							</div>
 						{/each}

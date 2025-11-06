@@ -2,12 +2,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@layer utilities {
-	.scrollbar-neutral-400 {
-		scrollbar-color: var(--color-neutral-400) transparent;
-	}
-}
-
 :root.dark {
 	color-scheme: dark;
 }
@@ -24,29 +18,18 @@
 	--xy-background-color: var(--color-neutral-800);
 }
 
-.svelte-flow__arrowhead polyline {
-	stroke: var(--xy-edge-stroke);
-	fill: var(--xy-edge-stroke);
-}
-
-.svelte-flow__remma-custom-linecap {
-	fill: var(--xy-edge-stroke);
-}
-
 .svelte-flow__node {
-	cursor: unset !important;
-	border-radius: var(--radius-lg);
+	@apply cursor-[unset]! rounded-lg;
 }
 
 .svelte-flow__node:focus-visible {
-	outline: none;
-	box-shadow: 0 0px 0px 2px var(--color-indigo-400);
+	@apply ring-2 ring-indigo-400;
 }
 
 .svelte-flow__node.selectable.selected {
-	box-shadow: 0 0px 0px 2px black;
+	@apply ring-2 ring-black;
 }
 
 .dark .svelte-flow__node.selectable.selected {
-	box-shadow: 0 0px 0px 2px white;
+	@apply ring-2 ring-white;
 }
