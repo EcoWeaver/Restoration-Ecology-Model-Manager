@@ -8,6 +8,7 @@ import (
 	"math"
 	"net/url"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -82,11 +83,11 @@ func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) er
 		delete(e, me.Kind)
 	}
 	if len(e) != 0 {
-		err := "missing mandatory metadata elements"
+		var k []string
 		for me := range e {
-			err += " '" + me + "'"
+			k = append(k, me)
 		}
-		return verify.Error{E: errors.New(err)}
+		return verify.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", strings.Join(k, "', '"))}
 	}
 
 	if self.Parent != nil {
