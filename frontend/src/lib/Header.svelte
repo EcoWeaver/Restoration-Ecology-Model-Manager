@@ -51,7 +51,7 @@
 	<a
 		class="rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 		title="source code"
-		href="https://git.uni-jena.de/fusion/teaching/project/2025sose/swep/restoration-ecology-model-manager/restoration-ecology-model-manager-app"
+		href="https://github.com/EcoWeaver/Restoration-Ecology-Model-Manager"
 		target="_blank"
 		rel="noopener noreferrer"
 	>

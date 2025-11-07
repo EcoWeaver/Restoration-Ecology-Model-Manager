@@ -10,7 +10,7 @@
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
 	import { clearNavigate, startNavigate } from "./LoadingSpinner.svelte";
-	import { type XYPosition, useStore, useSvelteFlow } from "@xyflow/svelte";
+	import { type XYPosition, useStore, useSvelteFlow, useUpdateNodeInternals } from "@xyflow/svelte";
 	import { History } from "./graph/history.svelte";
 	import { resolve } from "$app/paths";
 
@@ -28,10 +28,14 @@
 		edges: Edge[];
 	} = $props();
 
+	const { getViewport } = useSvelteFlow();
+	const { width, height } = $derived(useStore());
+	const updateNodeInternals = useUpdateNodeInternals();
+
 	let nodes: Node[] = $state.raw(initialNodes);
 	let edges: Edge[] = $state.raw(initialEdges);
 
-	const history = new History(initialNodes, initialEdges, defaultEdge(true));
+	const history = new History(initialNodes, initialEdges, defaultEdge(true), updateNodeInternals);
 	$effect(() =>
 		// FIXME: https://github.com/sveltejs/svelte/issues/17117
 		history.push(
@@ -52,9 +56,6 @@
 			clearNavigate();
 		}
 	}
-
-	const { getViewport } = useSvelteFlow();
-	const { width, height } = $derived(useStore());
 
 	let id = initialNodes.length;
 	let offset = 0;

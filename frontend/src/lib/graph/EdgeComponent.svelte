@@ -19,14 +19,14 @@
 	import LineCap from "./LineCap.svelte";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
-	const relationElements = getRelationElements();
 
+	const { updateEdge, getZoom, deleteElements, screenToFlowPosition } = useSvelteFlow();
 	const sourceNode = useInternalNode(source);
 	const targetNode = useInternalNode(target);
 
-	function nodeIntersection(intersectionNode: InternalNode, target: Cartesian) {
-		/* eslint-disable camelcase -- maths isn't camelcase */
+	const relationElements = getRelationElements();
 
+	function nodeIntersection(intersectionNode: InternalNode, target: Cartesian) {
 		// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
 
 		const w = intersectionNode.measured.width! / 2;
@@ -73,8 +73,8 @@
 		const u2x = ux - u1x;
 		const u2y = uy - u1y;
 
-		const d_2 = u2x * u2x + u2y * u2y;
-		const m = Math.sqrt(cr * cr - d_2);
+		const d2 = u2x * u2x + u2y * u2y;
+		const m = Math.sqrt(cr * cr - d2);
 
 		return {
 			x: x2 + u1x + m * dx,
@@ -132,30 +132,25 @@
 		];
 	});
 
-	const { updateEdge, getZoom, deleteElements } = useSvelteFlow();
-
-	let kind = $derived(data!.kind);
-	let position = $derived(data!.position);
-
+	let { kind, position } = $derived(data!);
 	$effect(() => {
-		const kindState = kind;
-		const positionState = position;
+		const kind_ = kind;
+		const position_ = position;
 		relationElements.then((re) => {
 			updateEdge(
 				id,
 				{
 					markerStart: `linecap-s-${source}-${target}`,
-					markerEnd: re.causal.includes(kindState)
+					markerEnd: re.causal.includes(kind_)
 						? { type: MarkerType.ArrowClosed, color: null }
 						: `linecap-e-${source}-${target}`,
-					data: { kind: kindState, editable: data!.editable, position: positionState },
+					data: { kind: kind_, editable: data!.editable, position: position_ },
 				},
 				{ replace: true },
 			);
 		});
 	});
 
-	const { screenToFlowPosition } = useSvelteFlow();
 	const drag: {
 		dragging: boolean;
 		offset?: Cartesian;

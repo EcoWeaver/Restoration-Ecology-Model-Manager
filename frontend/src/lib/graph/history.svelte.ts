@@ -14,13 +14,21 @@ export class History {
 	nodes: Node[];
 	edges: Edge[];
 	defaultEdge: Partial<Edge>;
+	updateNodeInternals: (nodeId?: string | string[]) => void;
+
 	undoHist: Change[] = $state([]);
 	redoHist: Change[] = $state([]);
 
-	constructor(nodes: Node[], edges: Edge[], defaultEdge: Partial<Edge>) {
+	constructor(
+		nodes: Node[],
+		edges: Edge[],
+		defaultEdge: Partial<Edge>,
+		updateNodeInternals: (nodeId?: string | string[]) => void,
+	) {
 		this.nodes = nodes;
 		this.edges = edges;
 		this.defaultEdge = defaultEdge;
+		this.updateNodeInternals = updateNodeInternals;
 	}
 
 	push(nodes: Node[], edges: Edge[]) {
@@ -181,6 +189,9 @@ export class History {
 						this.nodes.push(structuredClone(change.node));
 					}
 					this.edges = [...this.edges, ...change.edges.values().map((e) => structuredClone(e))];
+				}
+				for (const { source, target } of change.edges.values()) {
+					this.updateNodeInternals([source, target]);
 				}
 				change.remove = !change.remove;
 				break;
