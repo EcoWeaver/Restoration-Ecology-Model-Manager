@@ -21,13 +21,13 @@
 		nodes = $bindable(),
 		edges = $bindable(),
 		addNode,
-		onmovetoggle,
+		onmoveend,
 		panel,
 	}: {
 		nodes: Node[];
 		edges: Edge[];
 		addNode?: (pos: XYPosition) => string;
-		onmovetoggle?: OnMove;
+		onmoveend?: OnMove;
 		panel: Snippet;
 	} = $props();
 
@@ -86,8 +86,7 @@
 	connectionLineType={ConnectionLineType.Straight}
 	elevateEdgesOnSelect={false}
 	proOptions={{ hideAttribution: true }}
-	onmovestart={onmovetoggle}
-	onmoveend={onmovetoggle}
+	{onmoveend}
 	onconnectend={editable ? onconnectend : undefined}
 >
 	<Panel position="bottom-right">

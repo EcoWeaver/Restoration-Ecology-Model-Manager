@@ -143,7 +143,7 @@
 <Alert bind:this={alert} />
 
 <div class="h-dvh w-dvw">
-	<Graph bind:nodes bind:edges {addNode} onmovetoggle={() => (offset = 0)}>
+	<Graph bind:nodes bind:edges {addNode} onmoveend={() => (offset = 0)}>
 		{#snippet panel()}
 			<PanelComponent
 				onaddmetadata={() => metadataPanel.addMetadata()}
