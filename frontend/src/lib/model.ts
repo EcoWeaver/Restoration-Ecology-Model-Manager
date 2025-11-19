@@ -18,7 +18,7 @@ export function defaultEdge(editable: boolean): Partial<Edge> {
 	return {
 		type: "custom",
 		data: {
-			kind: "correlated-with",
+			kind: "affects",
 			editable,
 			position: { r: 0, phi: 0 },
 		},

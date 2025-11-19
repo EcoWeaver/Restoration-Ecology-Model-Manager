@@ -53,13 +53,13 @@ type Relation struct {
 }
 
 type Cartesian struct {
-	X float32 `json:"x"`
-	Y float32 `json:"y"`
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
 
 type Polar struct {
-	R   float32 `json:"r"`
-	Phi float32 `json:"phi"`
+	R   float64 `json:"r"`
+	Phi float64 `json:"phi"`
 }
 
 func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) error {
