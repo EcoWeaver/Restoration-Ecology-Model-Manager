@@ -118,22 +118,20 @@ func (self Graph) verify(s *State, l echo.Logger) error {
 	}
 
 	for _, re := range self.Relations {
-		if re.From < 0 || re.From >= len(self.Nodes) {
-			return verify.Error{E: fmt.Errorf("encountered invalid relation from %d", re.From)}
-		}
-		if re.To < 0 || re.To >= len(self.Nodes) {
-			return verify.Error{E: fmt.Errorf("encountered invalid relation to %d", re.To)}
-		}
-		if re.From == re.To {
-			return verify.Error{E: fmt.Errorf("encountered invalid relation from %d to %d", re.From, re.To)}
+		if err := re.verify(r, len(self.Nodes)); err != nil {
+			return err
 		}
 		pair := Relation{re.From, re.To}
 		if _, ok := e[pair]; ok {
 			return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
 		}
 		e[pair] = struct{}{}
-		if err := re.verify(r); err != nil {
-			return err
+		if slices.Contains(r.Noncausal, re.Kind) {
+			pair = Relation{re.To, re.From}
+			if _, ok := e[pair]; ok {
+				return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
+			}
+			e[pair] = struct{}{}
 		}
 	}
 
@@ -222,7 +220,11 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 	return verify.Error{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
 }
 
-func (self Relation) verify(r RelationsConfig) error {
+func (self Relation) verify(r RelationsConfig, n int) error {
+	if self.From < 0 || self.From >= n || self.To < 0 || self.To >= n || self.From == self.To {
+		return verify.Error{E: fmt.Errorf("encountered invalid relation from %d to %d", self.From, self.To)}
+	}
+
 	if !slices.Contains(r.Causal, self.Kind) && !slices.Contains(r.Noncausal, self.Kind) {
 		return verify.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
 	}
