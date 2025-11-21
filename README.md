@@ -13,6 +13,9 @@ Make sure you have [`docker`](https://www.docker.com/) installed. If you don't, 
 ### Preparation
 1. Download the [latest source code](https://github.com/EcoWeaver/Restoration-Ecology-Model-Manager/archive/refs/heads/main.zip), and unzip the downloaded archive.
 2. Navigate to the `backend` folder and rename `.env.example` to `.env`.
+	- Your file explorer may not show 'hidden files' by default. If this is the case, refer to the following articles to make them appear:
+		- Windows: https://www.computerhope.com/issues/ch000516.htm
+		- MacOS: https://www.wikihow.com/Show-Hidden-Files-and-Folders-on-a-Mac
 
 You should repeat these steps anytime you'd like to update to a newer version of the app. The uploaded models will persist locally between versions.
 
@@ -21,5 +24,6 @@ You should repeat these steps anytime you'd like to update to a newer version of
 	- On Windows you can do this from Explorer by holding shift, right-clicking the folder and selecting "Open in Terminal" or "Open PowerShell window here".
 	- On MacOS you can do this from Finder by right-clicking the folder and selecting "New Terminal at Folder".
 2. In this shell, type `docker compose up --build postgres backend frontend` (or copy-paste from here) and press enter.
+	- You may have to open the Docker Desktop app once before this command is available.
 
 When `docker` has finished building and starting each component, you can access the app at http://localhost:3000 until you close the shell. To start the app again, just repeat these steps. The uploaded models will persist locally between sessions.
