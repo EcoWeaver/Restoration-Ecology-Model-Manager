@@ -1,3 +1,5 @@
+import type { OLS4 } from "$lib/api";
+
 export function filterMatches(
 	elements: string[],
 	value: string,
@@ -25,46 +27,45 @@ export function filterMatches(
 		});
 }
 
-export function suggestChoices(choices: string[]) {
-	let prevChoices = choices;
-
-	return async function suggest(value: string, selected: number): Promise<[string[], number]> {
-		if (value === "") {
-			return [choices, selected];
-		}
-
-		const newChoices = filterMatches(choices, value, " ", false);
-
-		let newSelected = 0;
-		if (selected !== 0 && typeof prevChoices[selected] === "string") {
-			const index = newChoices.findIndex((choice) => choice === prevChoices[selected]);
-			newSelected = index === -1 ? 0 : index;
-		}
-
-		prevChoices = newChoices;
-		return [newChoices, newSelected];
-	};
-}
-
-type SpeciesSuggestion = {
-	status: string;
-	canonicalName?: string;
-};
-
-export async function suggestSpecies(value: string, selected: number): Promise<[string[], number]> {
+export async function suggestSpecies(value: string): Promise<string[]> {
 	if (value === "") {
-		return [[], selected];
+		return [];
 	}
 
 	const response = await fetch(
 		`https://api.gbif.org/v1/species/suggest?rank=SPECIES&q=${encodeURIComponent(value)}`,
 	);
-	const suggestions: SpeciesSuggestion[] = await response.json();
-	const newSuggestions = suggestions
+	const suggestions: {
+		status: string;
+		canonicalName?: string;
+	}[] = await response.json();
+	const filtered = suggestions
 		.filter((suggestion) => suggestion.status === "ACCEPTED")
 		.map((suggestion) => suggestion.canonicalName)
-		.filter((suggestion) => typeof suggestion === "string")
+		.filter((suggestion) => suggestion !== undefined)
 		.filter((suggestion) => suggestion !== value);
 
-	return [newSuggestions, Math.min(selected, Math.max(0, newSuggestions.length - 1))];
+	return filtered;
+}
+
+export async function suggestOLS4(value: string, ols4: OLS4): Promise<string[]> {
+	if (value === "") {
+		return [];
+	}
+
+	const response = await fetch(
+		`https://www.ebi.ac.uk/ols4/api/search?fieldList=label&queryFields=label&ontology=${ols4.onto}&childrenOf=${ols4.iri}&q=${encodeURIComponent(value)}`,
+	);
+	const suggestions: {
+		response: {
+			docs: {
+				label: string;
+			}[];
+		};
+	} = await response.json();
+	const filtered = suggestions.response.docs
+		.map((suggestion) => suggestion.label)
+		.filter((suggestion) => suggestion !== value);
+
+	return filtered;
 }

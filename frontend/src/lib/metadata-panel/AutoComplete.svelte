@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { untrack } from "svelte";
 	import Input from "./Input.svelte";
 
 	let {
@@ -8,7 +7,7 @@
 		value = $bindable(),
 	}: {
 		placeholder: string;
-		suggest: (value: string, index: number) => Promise<[string[], number]>;
+		suggest: (value: string) => Promise<string[]>;
 		value: string;
 	} = $props();
 
@@ -51,16 +50,9 @@
 	}
 
 	$effect(() => {
-		suggest(
-			value,
-			untrack(() => selected),
-		).then(([newSuggestions, newSelected]) => {
+		suggest(value).then((newSuggestions) => {
 			suggestions = newSuggestions;
-			if (suggestions.length === 0) {
-				selected = 0;
-			} else {
-				selected = newSelected;
-			}
+			selected = Math.min(selected, Math.max(0, newSuggestions.length - 1));
 		});
 	});
 

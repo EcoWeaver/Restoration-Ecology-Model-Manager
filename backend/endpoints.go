@@ -22,6 +22,7 @@ type State struct {
 	DOICache     verify.Cache
 	ORCIDCache   verify.Cache
 	SpeciesCache verify.Cache
+	OLS4Caches   map[verify.OLS4]*verify.Cache
 }
 
 type SaveResult struct {
@@ -396,26 +397,6 @@ func (self *State) PostSearch(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, r)
-}
-
-func slicesEqualUnordered[T comparable](a, b []T) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	e := map[T]int{}
-	for _, v := range a {
-		e[v]++
-	}
-
-	for _, v := range b {
-		if e[v] == 0 {
-			return false
-		}
-		e[v]--
-	}
-
-	return true
 }
 
 // PostModelRun godoc

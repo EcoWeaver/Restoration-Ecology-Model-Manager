@@ -52,7 +52,7 @@
 	</div>
 	<div class="h-8 content-center bg-neutral-200 px-2 dark:bg-neutral-600">≈</div>
 
-	{#if typeof chip.value === "string"}
+	{#if chip.value !== undefined}
 		<div
 			class="flex h-8 items-center rounded-r bg-neutral-200 pr-2 text-nowrap outline-indigo-400 focus-within:outline-2 dark:bg-neutral-600"
 		>

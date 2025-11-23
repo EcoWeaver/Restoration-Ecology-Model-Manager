@@ -57,6 +57,7 @@ func main() {
 		DOICache:     verify.DOICache(),
 		ORCIDCache:   verify.ORCIDCache(),
 		SpeciesCache: verify.SpeciesCache(),
+		OLS4Caches:   map[verify.OLS4]*verify.Cache{},
 	}
 
 	e.GET("/metadata", state.GetMetadata)

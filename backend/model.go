@@ -77,9 +77,6 @@ func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) er
 		e[me.Name] = struct{}{}
 	}
 	for _, me := range self.Metadata {
-		if err = me.verify(s, m, l, ctx); err != nil {
-			return err
-		}
 		delete(e, me.Kind)
 	}
 	if len(e) != 0 {
@@ -88,6 +85,12 @@ func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) er
 			k = append(k, me)
 		}
 		return verify.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", strings.Join(k, "', '"))}
+	}
+
+	for _, err := range slicesParMap(self.Metadata, func(me Metadata) error { return me.verify(s, m, l, ctx) }) {
+		if err != nil {
+			return err
+		}
 	}
 
 	if self.Parent != nil {
@@ -165,13 +168,7 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 			case "":
 				return nil
 			case "choice":
-				for _, ch := range me.Choices {
-					if ch.Label == self.Value {
-						return nil
-					}
-				}
-			case "ietf-bcp-47":
-				if _, err := language.Parse(self.Value); err == nil {
+				if slices.Contains(me.Choices, self.Value) {
 					return nil
 				}
 			case "date":
@@ -181,17 +178,23 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 				if _, err := time.Parse(YearMonth, self.Value); err == nil {
 					return nil
 				}
-				fallthrough
-			case "year":
 				if _, err := time.Parse(Year, self.Value); err == nil {
-					return nil
-				}
-			case "url":
-				if _, err := url.ParseRequestURI(self.Value); err == nil {
 					return nil
 				}
 			case "doi":
 				if err = s.DOICache.Verify(self.Value, ctx); err == nil {
+					return nil
+				}
+			case "ietf-bcp-47":
+				if _, err := language.Parse(self.Value); err == nil {
+					return nil
+				}
+			case "ols4":
+				if _, ok := s.OLS4Caches[*me.OLS4]; !ok {
+					c := verify.OLS4Cache(*me.OLS4)
+					s.OLS4Caches[*me.OLS4] = &c
+				}
+				if err = s.OLS4Caches[*me.OLS4].Verify(self.Value, ctx); err == nil {
 					return nil
 				}
 			case "orcid":
@@ -200,6 +203,14 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 				}
 			case "species":
 				if err = s.SpeciesCache.Verify(self.Value, ctx); err == nil {
+					return nil
+				}
+			case "url":
+				if _, err := url.ParseRequestURI(self.Value); err == nil {
+					return nil
+				}
+			case "year":
+				if _, err := time.Parse(Year, self.Value); err == nil {
 					return nil
 				}
 			default:

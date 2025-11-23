@@ -5,6 +5,7 @@
 	import { SvelteFlowProvider } from "@xyflow/svelte";
 
 	let { data }: PageProps = $props();
+	const { metadataElements } = data;
 	let metadata = $state<Metadata[]>([]);
 </script>
 
@@ -13,5 +14,5 @@
 </svelte:head>
 
 <SvelteFlowProvider>
-	<GraphEdit bind:metadata metadataElements={data.metadataElements} nodes={[]} edges={[]} />
+	<GraphEdit bind:metadata {metadataElements} nodes={[]} edges={[]} />
 </SvelteFlowProvider>

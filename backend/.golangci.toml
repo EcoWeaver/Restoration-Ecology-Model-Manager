@@ -72,7 +72,7 @@ initialisms = [
     "TS",
 
     "DOI",
+    "IRI",
     "ORCID",
-    "GND",
 ]
 http-status-code-whitelist = []

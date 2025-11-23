@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { X } from "@lucide/svelte";
-	import { type Metadata, type MetadataElements, type MetadataType } from "$lib/api";
+	import { type Metadata, type MetadataElements, type MetadataType, type OLS4 } from "$lib/api";
 	import Input from "./metadata-panel/Input.svelte";
 	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
 	import DateInput from "./metadata-panel/DateInput.svelte";
 	import DoiInput from "./metadata-panel/DoiInput.svelte";
 	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
 	import YearInput from "./metadata-panel/YearInput.svelte";
-	import { suggestChoices, suggestSpecies } from "./metadata-panel/auto-complete";
+	import { suggestOLS4, suggestSpecies } from "./metadata-panel/auto-complete";
 
 	let { elements, metadata = $bindable() }: { elements: MetadataElements; metadata: Metadata[] } =
 		$props();
@@ -15,12 +15,12 @@
 	type FlatMeta = {
 		type?: MetadataType;
 		choices?: string[];
+		ols4?: OLS4;
 	};
 
 	const flatMetadata = new Map<string, FlatMeta>();
-	for (const { name, type, choices: c } of Object.values(elements).flat()) {
-		const choices = c?.map(({ label }) => label);
-		flatMetadata.set(name, { type, choices });
+	for (const { name, type, choices, ols4 } of Object.values(elements).flat()) {
+		flatMetadata.set(name, { type, choices, ols4 });
 	}
 
 	const meta: (Metadata & { mandatory: boolean })[] = $state([]);
@@ -58,7 +58,7 @@
 	</div>
 
 	{#each meta as m, idx (idx)}
-		{@const { type, choices } = flatMetadata.get(m.kind) || {}}
+		{@const { type, choices, ols4 } = flatMetadata.get(m.kind) || {}}
 
 		<div class="table-row">
 			{#if m.mandatory}
@@ -110,11 +110,11 @@
 				{:else if type === "year"}
 					<YearInput {type} bind:value={m.value} />
 				{:else if type === "species"}
-					<AutoComplete placeholder="species" suggest={suggestSpecies} bind:value={m.value} />
-				{:else if choices}
+					<AutoComplete placeholder={type} suggest={suggestSpecies} bind:value={m.value} />
+				{:else if type === "ols4"}
 					<AutoComplete
-						placeholder={type || m.kind}
-						suggest={suggestChoices(choices)}
+						placeholder={m.kind}
+						suggest={(value) => suggestOLS4(value, ols4!)}
 						bind:value={m.value}
 					/>
 				{:else}

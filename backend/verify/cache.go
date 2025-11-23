@@ -33,3 +33,7 @@ func ORCIDCache() Cache {
 func SpeciesCache() Cache {
 	return Cache{get: species}
 }
+
+func OLS4Cache(ols4 OLS4) Cache {
+	return Cache{get: ols4.verify}
+}

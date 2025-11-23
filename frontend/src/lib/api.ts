@@ -66,25 +66,27 @@ export type Metadata = {
 	value: string;
 };
 
-export type Choice = {
-	label: string;
-	ontology?: string;
-};
-
 export type MetadataType =
 	| "choice"
 	| "date"
 	| "doi"
 	| "ietf-bcp-47"
+	| "ols4"
 	| "orcid"
 	| "species"
 	| "url"
 	| "year";
 
+export type OLS4 = {
+	onto: string;
+	iri: string;
+};
+
 export type MetadataElement = {
 	name: string;
 	type?: MetadataType;
-	choices?: Choice[];
+	choices?: string[];
+	ols4?: OLS4;
 };
 
 export type Node = {

@@ -1,573 +1,180 @@
 {
-  "mandatory": [
-    {
-      "name": "identifier",
-      "type": "doi"
-    },
-    {
-      "name": "creator",
-      "type": "orcid"
-    },
-    {
-      "name": "title"
-    },
-    {
-      "name": "publisher"
-    },
-    {
-      "name": "publication-year",
-      "type": "year"
-    },
-    {
-      "name": "resource-type",
-      "type": "choice",
-      "choices": [
-        {
-          "label": "ComputationalNotebook"
-        },
-        {
-          "label": "ConferencePaper"
-        },
-        {
-          "label": "DataPaper"
-        },
-        {
-          "label": "Dataset"
-        },
-        {
-          "label": "Model"
-        },
-        {
-          "label": "Software"
-        },
-        {
-          "label": "Other"
-        },
-        {
-          "label": "Text"
-        },
-        {
-          "label": "Service"
-        }
-      ]
-    },
-    {
-      "name": "model-type",
-      "type": "choice",
-      "choices": [
-        {
-          "label": "Generalized Linear Model",
-          "ontology": "https://www.wikidata.org/wiki/Q1501882"
-        },
-        {
-          "label": "Generalized Additive Model",
-          "ontology": "https://www.wikidata.org/wiki/Q3318054"
-        },
-        {
-          "label": "Structural Equation Model",
-          "ontology": "https://www.wikidata.org/wiki/Q1476639"
-        },
-        {
-          "label": "Linear Regression Model",
-          "ontology": "https://www.wikidata.org/wiki/Q3339222"
-        },
-        {
-          "label": "Matrix Model"
-        },
-        {
-          "label": "Differential Equation",
-          "ontology": "https://www.wikidata.org/wiki/Q11214"
-        },
-        {
-          "label": "Causal Graph",
-          "ontology": "https://www.wikidata.org/wiki/Q25048149"
-        },
-        {
-          "label": "Conceptual Causal Network Graphs"
-        },
-        {
-          "label": "Fuzzy Cognitive Map",
-          "ontology": "https://www.wikidata.org/wiki/Q5511107"
-        },
-        {
-          "label": "Rule-based Fuzzy Logic Model"
-        },
-        {
-          "label": "Markov Chain",
-          "ontology": "https://www.wikidata.org/wiki/Q176645"
-        },
-        {
-          "label": "Extended Fuzzy Cognitive Map",
-          "ontology": "https://www.wikidata.org/wiki/Q131436844"
-        },
-        {
-          "label": "Global Circulation Model",
-          "ontology": "https://www.wikidata.org/wiki/Q650994"
-        },
-        {
-          "label": "Structural Conceptual Model",
-          "ontology": "https://www.wikidata.org/wiki/Q2623243"
-        },
-        {
-          "label": "Knowledge Graph",
-          "ontology": "https://www.wikidata.org/wiki/Q33002955"
-        },
-        {
-          "label": "Species Distribution Model",
-          "ontology": "https://www.wikidata.org/wiki/Q122175981"
-        },
-        {
-          "label": "Gradient Forest Model"
-        },
-        {
-          "label": "Bayesian Networks",
-          "ontology": "https://www.wikidata.org/wiki/Q812540"
-        },
-        {
-          "label": "Random Forest Model",
-          "ontology": "https://www.wikidata.org/wiki/Q245748"
-        },
-        {
-          "label": "Non-metric Multidimensional Scale"
-        },
-        {
-          "label": "Influence Diagram",
-          "ontology": "https://www.wikidata.org/wiki/Q623966"
-        }
-      ]
-    }
-  ],
-  "recommended": [
-    {
-      "name": "subject"
-    },
-    {
-      "name": "contributor",
-      "type": "orcid"
-    },
-    {
-      "name": "date",
-      "type": "date"
-    },
-    {
-      "name": "ecological-domain",
-      "type": "choice",
-      "choices": [
-        {
-          "label": "Terrestrial biome",
-          "ontology": "http://purl.obolibrary.org/obo/ENVO_00000446"
-        },
-        {
-          "label": "Aquatic biome",
-          "ontology": "http://purl.obolibrary.org/obo/ENVO_00002030"
-        },
-        {
-          "label": "Marine biome",
-          "ontology": "http://purl.obolibrary.org/obo/ENVO_00000447"
-        },
-        {
-          "label": "Freshwater biome",
-          "ontology": "http://purl.obolibrary.org/obo/ENVO_00000873"
-        },
-        {
-          "label": "Urban biome",
-          "ontology": "http://purl.obolibrary.org/obo/ENVO_01000249"
-        }
-      ]
-    },
-    {
-      "name": "description"
-    },
-    {
-      "name": "geolocation"
-    },
-    {
-      "name": "spatial-scale",
-      "type": "choice",
-      "choices": [
-        {
-          "label": "Local"
-        },
-        {
-          "label": "Regional"
-        },
-        {
-          "label": "Global"
-        }
-      ]
-    },
-    {
-      "name": "target-species",
-      "type": "species"
-    }
-  ],
-  "optional": [
-    {
-      "name": "language",
-      "type": "ietf-bcp-47"
-    },
-    {
-      "name": "alternate-identifier",
-      "type": "url"
-    },
-    {
-      "name": "size"
-    },
-    {
-      "name": "format",
-      "choices": [
-        {
-          "label": "CSV",
-          "ontology": "http://edamontology.org/format_3752"
-        },
-        {
-          "label": "TSV",
-          "ontology": "http://edamontology.org/format_3475"
-        },
-        {
-          "label": "XLSX",
-          "ontology": "http://edamontology.org/format_3620"
-        },
-        {
-          "label": "XLS",
-          "ontology": "http://edamontology.org/format_3468"
-        },
-        {
-          "label": "JSON",
-          "ontology": "http://edamontology.org/format_3464"
-        },
-        {
-          "label": "XML",
-          "ontology": "http://edamontology.org/format_2332"
-        },
-        {
-          "label": "NetCDF",
-          "ontology": "http://edamontology.org/format_3650"
-        },
-        {
-          "label": "TXT",
-          "ontology": "http://edamontology.org/format_1964"
-        },
-        {
-          "label": "HDF5",
-          "ontology": "http://edamontology.org/format_3590"
-        },
-        {
-          "label": "RDF",
-          "ontology": "http://edamontology.org/format_3261"
-        },
-        {
-          "label": "TURTLE",
-          "ontology": "http://edamontology.org/format_3255"
-        },
-        {
-          "label": "JSON-LD",
-          "ontology": "http://edamontology.org/format_3784"
-        },
-        {
-          "label": "YAML",
-          "ontology": "http://edamontology.org/format_3750"
-        },
-        {
-          "label": "ZIP",
-          "ontology": "http://edamontology.org/format_3987"
-        }
-      ]
-    },
-    {
-      "name": "version"
-    },
-    {
-      "name": "rights",
-      "choices": [
-        {
-          "label": "MIT License",
-          "ontology": "https://spdx.org/licenses/MIT.html"
-        },
-        {
-          "label": "Apache License 2.0",
-          "ontology": "https://spdx.org/licenses/Apache-2.0.html"
-        },
-        {
-          "label": "BSD 2-Clause 'Simplified' License",
-          "ontology": "https://spdx.org/licenses/BSD-2-Clause.html"
-        },
-        {
-          "label": "BSD 3-Clause 'New' or 'Revised' License",
-          "ontology": "https://spdx.org/licenses/BSD-3-Clause.html"
-        },
-        {
-          "label": "ISC License",
-          "ontology": "https://spdx.org/licenses/ISC.html"
-        },
-        {
-          "label": "Mozilla Public License 2.0",
-          "ontology": "https://spdx.org/licenses/MPL-2.0.html"
-        },
-        {
-          "label": "Eclipse Public License 2.0",
-          "ontology": "https://spdx.org/licenses/EPL-2.0.html"
-        },
-        {
-          "label": "GNU Lesser General Public License v2.0 only",
-          "ontology": "https://spdx.org/licenses/LGPL-2.0-only.html"
-        },
-        {
-          "label": "GNU Lesser General Public License v2.0 or later",
-          "ontology": "https://spdx.org/licenses/LGPL-2.0-or-later.html"
-        },
-        {
-          "label": "GNU Lesser General Public License v2.1 only",
-          "ontology": "https://spdx.org/licenses/LGPL-2.1-only.html"
-        },
-        {
-          "label": "GNU Lesser General Public License v2.1 or later",
-          "ontology": "https://spdx.org/licenses/LGPL-2.1-or-later.html"
-        },
-        {
-          "label": "GNU Lesser General Public License v3.0 only",
-          "ontology": "https://spdx.org/licenses/LGPL-3.0-only.html"
-        },
-        {
-          "label": "GNU Lesser General Public License v3.0 or later",
-          "ontology": "https://spdx.org/licenses/LGPL-3.0-or-later.html"
-        },
-        {
-          "label": "GNU General Public License v2.0 only",
-          "ontology": "https://spdx.org/licenses/GPL-2.0-only.html"
-        },
-        {
-          "label": "GNU General Public License v2.0 or later",
-          "ontology": "https://spdx.org/licenses/GPL-2.0-or-later.html"
-        },
-        {
-          "label": "GNU General Public License v3.0 only",
-          "ontology": "https://spdx.org/licenses/GPL-3.0-only.html"
-        },
-        {
-          "label": "GNU General Public License v3.0 or later",
-          "ontology": "https://spdx.org/licenses/GPL-3.0-or-later.html"
-        },
-        {
-          "label": "GNU Affero General Public License v3.0 only",
-          "ontology": "https://spdx.org/licenses/AGPL-3.0-only.html"
-        },
-        {
-          "label": "GNU Affero General Public License v3.0 or later",
-          "ontology": "https://spdx.org/licenses/AGPL-3.0-or-later.html"
-        }
-      ]
-    },
-    {
-      "name": "funding-reference",
-      "type": "url"
-    },
-    {
-      "name": "related-item"
-    },
-    {
-      "name": "temporal-scale",
-      "type": "choice",
-      "choices": [
-        {
-          "label": "Short-Term"
-        },
-        {
-          "label": "Long-Term"
-        },
-        {
-          "label": "Seasonal"
-        },
-        {
-          "label": "Event-based"
-        }
-      ]
-    },
-    {
-      "name": "programming-language",
-      "choices": [
-        {
-          "label": "MATLAB",
-          "ontology": "https://www.wikidata.org/wiki/Q169478"
-        },
-        {
-          "label": "Python",
-          "ontology": "https://www.wikidata.org/wiki/Q28865"
-        },
-        {
-          "label": "R",
-          "ontology": "https://www.wikidata.org/wiki/Q206904"
-        },
-        {
-          "label": "Julia",
-          "ontology": "https://www.wikidata.org/wiki/Q2613697"
-        },
-        {
-          "label": "Fortran",
-          "ontology": "https://www.wikidata.org/wiki/Q83303"
-        },
-        {
-          "label": "C",
-          "ontology": "https://www.wikidata.org/wiki/Q15777"
-        },
-        {
-          "label": "C++",
-          "ontology": "https://www.wikidata.org/wiki/Q2407"
-        },
-        {
-          "label": "Java",
-          "ontology": "https://www.wikidata.org/wiki/Q251"
-        },
-        {
-          "label": "Scala",
-          "ontology": "https://www.wikidata.org/wiki/Q460584"
-        },
-        {
-          "label": "GNU Octave",
-          "ontology": "https://www.wikidata.org/wiki/Q223679"
-        },
-        {
-          "label": "JavaScript",
-          "ontology": "https://www.wikidata.org/wiki/Q2005"
-        },
-        {
-          "label": "TypeScript",
-          "ontology": "https://www.wikidata.org/wiki/Q978185"
-        }
-      ]
-    },
-    {
-      "name": "dependency"
-    },
-    {
-      "name": "input-data"
-    },
-    {
-      "name": "output-data"
-    },
-    {
-      "name": "performance-metric",
-      "choices": [
-        {
-          "label": "Accuracy",
-          "ontology": "https://www.wikidata.org/wiki/Q272035"
-        },
-        {
-          "label": "Precision",
-          "ontology": "https://www.wikidata.org/wiki/Q272035"
-        },
-        {
-          "label": "Recall",
-          "ontology": "https://www.wikidata.org/wiki/Q6842789"
-        },
-        {
-          "label": "Specificity",
-          "ontology": "https://www.wikidata.org/wiki/Q3494375"
-        },
-        {
-          "label": "F1 Score",
-          "ontology": "https://www.wikidata.org/wiki/Q6975395"
-        },
-        {
-          "label": "AUC",
-          "ontology": "https://www.wikidata.org/wiki/Q16833590"
-        },
-        {
-          "label": "RMSE",
-          "ontology": "https://www.wikidata.org/wiki/Q29037"
-        },
-        {
-          "label": "MAE",
-          "ontology": "https://www.wikidata.org/wiki/Q6803609"
-        },
-        {
-          "label": "MSE",
-          "ontology": "https://www.wikidata.org/wiki/Q1940696"
-        },
-        {
-          "label": "R²",
-          "ontology": "https://www.wikidata.org/wiki/Q192830"
-        },
-        {
-          "label": "Cross-Entropy Loss (Log-Loss)",
-          "ontology": "https://www.wikidata.org/wiki/Q22667762"
-        },
-        {
-          "label": "AIC",
-          "ontology": "https://www.wikidata.org/wiki/Q1662573"
-        },
-        {
-          "label": "Residual Error",
-          "ontology": "https://www.wikidata.org/wiki/Q1502698"
-        },
-        {
-          "label": "False Positive Rate",
-          "ontology": "https://www.wikidata.org/wiki/Q5432725"
-        },
-        {
-          "label": "False Negative Rate",
-          "ontology": "https://www.wikidata.org/wiki/Q57771243"
-        },
-        {
-          "label": "Bias",
-          "ontology": "https://www.wikidata.org/wiki/Q742736"
-        },
-        {
-          "label": "Variance",
-          "ontology": "https://www.wikidata.org/wiki/Q175199"
-        },
-        {
-          "label": "Mean",
-          "ontology": "https://www.wikidata.org/wiki/Q2796622"
-        },
-        {
-          "label": "Median",
-          "ontology": "https://www.wikidata.org/wiki/Q226995"
-        },
-        {
-          "label": "Mode",
-          "ontology": "https://www.wikidata.org/wiki/Q188224"
-        },
-        {
-          "label": "Geometric Mean",
-          "ontology": "https://www.wikidata.org/wiki/Q185049"
-        },
-        {
-          "label": "Cohen's Kappa",
-          "ontology": "https://www.wikidata.org/wiki/Q1107106"
-        },
-        {
-          "label": "Gini Coefficient",
-          "ontology": "https://www.wikidata.org/wiki/Q162455"
-        },
-        {
-          "label": "Information Entropy",
-          "ontology": "https://www.wikidata.org/wiki/Q204570"
-        },
-        {
-          "label": "Deviance",
-          "ontology": "https://www.wikidata.org/wiki/Q3706279"
-        },
-        {
-          "label": "Hosmer-Lemeshow Test",
-          "ontology": "https://www.wikidata.org/wiki/Q5908162"
-        },
-        {
-          "label": "Matthews Correlation Coefficient",
-          "ontology": "https://www.wikidata.org/wiki/Q6791500"
-        }
-      ]
-    },
-    {
-      "name": "repository",
-      "type": "url"
-    },
-    {
-      "name": "computational-environment-details"
-    },
-    {
-      "name": "discussion-platform",
-      "type": "url"
-    }
-  ]
+	"mandatory": [
+		{
+			"name": "identifier",
+			"type": "doi"
+		},
+		{
+			"name": "creator",
+			"type": "orcid"
+		},
+		{
+			"name": "title"
+		},
+		{
+			"name": "publisher"
+		},
+		{
+			"name": "publication-year",
+			"type": "year"
+		},
+		{
+			"name": "resource-type",
+			"type": "choice",
+			"choices": [
+				"ComputationalNotebook",
+				"ConferencePaper",
+				"DataPaper",
+				"Dataset",
+				"Model",
+				"Software",
+				"Other",
+				"Text",
+				"Service"
+			]
+		},
+		{
+			"name": "model-type",
+			"type": "choice",
+			"choices": [
+				"Generalized Linear Model",
+				"Generalized Additive Model",
+				"Structural Equation Model",
+				"Linear Regression Model",
+				"Matrix Model",
+				"Differential Equation",
+				"Causal Graph",
+				"Conceptual Causal Network Graphs",
+				"Fuzzy Cognitive Map",
+				"Rule-based Fuzzy Logic Model",
+				"Markov Chain",
+				"Extended Fuzzy Cognitive Map",
+				"Global Circulation Model",
+				"Structural Conceptual Model",
+				"Knowledge Graph",
+				"Species Distribution Model",
+				"Gradient Forest Model",
+				"Bayesian Networks",
+				"Random Forest Model",
+				"Non-metric Multidimensional Scale",
+				"Influence Diagram"
+			]
+		}
+	],
+	"recommended": [
+		{
+			"name": "subject"
+		},
+		{
+			"name": "contributor",
+			"type": "orcid"
+		},
+		{
+			"name": "date",
+			"type": "date"
+		},
+		{
+			"name": "ecological-domain",
+			"type": "ols4",
+			"ols4": {
+				"onto": "envo",
+				"iri": "http://purl.obolibrary.org/obo/ENVO_00000428"
+			}
+		},
+		{
+			"name": "description"
+		},
+		{
+			"name": "geolocation"
+		},
+		{
+			"name": "spatial-scale",
+			"type": "choice",
+			"choices": ["Local", "Regional", "Global"]
+		},
+		{
+			"name": "target-species",
+			"type": "species"
+		}
+	],
+	"optional": [
+		{
+			"name": "language",
+			"type": "ietf-bcp-47"
+		},
+		{
+			"name": "alternate-identifier",
+			"type": "url"
+		},
+		{
+			"name": "size"
+		},
+		{
+			"name": "format",
+			"type": "ols4",
+			"ols4": {
+				"onto": "edam",
+				"iri": "http://edamontology.org/format_1915"
+			}
+		},
+		{
+			"name": "version"
+		},
+		{
+			"name": "licence",
+			"type": "ols4",
+			"ols4": {
+				"onto": "swo",
+				"iri": "http://www.ebi.ac.uk/swo/SWO_0000002"
+			}
+		},
+		{
+			"name": "funding-reference",
+			"type": "url"
+		},
+		{
+			"name": "related-item"
+		},
+		{
+			"name": "temporal-scale",
+			"type": "choice",
+			"choices": ["Short-Term", "Long-Term", "Seasonal", "Event-based"]
+		},
+		{
+			"name": "programming-language",
+			"type": "ols4",
+			"ols4": {
+				"onto": "iao",
+				"iri": "http://purl.obolibrary.org/obo/IAO_0000025"
+			}
+		},
+		{
+			"name": "dependency"
+		},
+		{
+			"name": "input-data"
+		},
+		{
+			"name": "output-data"
+		},
+		{
+			"name": "performance-metric",
+			"type": "ols4",
+			"ols4": {
+				"onto": "stato",
+				"iri": "http://purl.obolibrary.org/obo/STATO_0000039"
+			}
+		},
+		{
+			"name": "repository",
+			"type": "url"
+		},
+		{
+			"name": "computational-environment-details"
+		},
+		{
+			"name": "discussion-platform",
+			"type": "url"
+		}
+	]
 }

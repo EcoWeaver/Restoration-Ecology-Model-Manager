@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/verify"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -24,14 +25,10 @@ type MetadataConfig struct {
 }
 
 type MetadataEntry struct {
-	Name    string   `json:"name"`
-	Type    string   `json:"type,omitempty"`
-	Choices []Choice `json:"choices,omitempty"`
-}
-
-type Choice struct {
-	Label    string  `json:"label"`
-	Ontology *string `json:"ontology,omitempty"`
+	Name    string       `json:"name"`
+	Type    string       `json:"type,omitempty"`
+	Choices []string     `json:"choices,omitempty"`
+	OLS4    *verify.OLS4 `json:"ols4,omitempty"`
 }
 
 func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
@@ -87,36 +84,41 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 }
 
 func (self *MetadataEntry) verify(l echo.Logger) error {
-	if len(self.Choices) != 0 {
-		if self.Type == "" || self.Type == "choice" {
+	if self.Type == "choice" {
+		if len(self.Choices) != 0 {
 			e := map[string]struct{}{}
-			self.Choices = slices.DeleteFunc(self.Choices, func(ce Choice) bool {
-				_, ok := e[ce.Label]
-				e[ce.Label] = struct{}{}
+			self.Choices = slices.DeleteFunc(self.Choices, func(ce string) bool {
+				_, ok := e[ce]
+				e[ce] = struct{}{}
 				if ok {
-					l.Warnf("ignoring duplicate choice '%s' for metadata kind '%s'", ce.Label, self.Name)
+					l.Warnf("ignoring duplicate choice '%s' for metadata kind '%s'", ce, self.Name)
 				}
 				return ok
 			})
 		} else {
-			l.Warnf("ignoring unnecessary choices for metadata kind '%s'", self.Name)
-			self.Choices = []Choice{}
+			return fmt.Errorf("missing choices for metadata kind '%s'", self.Name)
 		}
-	} else if self.Type == "choice" {
-		return fmt.Errorf("missing choices for metadata kind '%s'", self.Name)
+	} else if len(self.Choices) != 0 {
+		l.Warnf("ignoring unnecessary choices for metadata kind '%s'", self.Name)
+		self.Choices = []string{}
+	}
+
+	if self.Type == "ols4" {
+		if self.OLS4 == nil {
+			return fmt.Errorf("missing ontology for metadata kind '%s'", self.Name)
+		}
+	} else if self.OLS4 != nil {
+		l.Warnf("ignoring unnecessary ontology for metadata kind '%s'", self.Name)
+		self.OLS4 = nil
 	}
 
 	return nil
 }
 
 func (self MetadataConfig) IsMetadataKind(k string) bool {
-	for _, ml := range [][]MetadataEntry{self.Mandatory, self.Recommended, self.Optional} {
-		for _, me := range ml {
-			if k == me.Name {
-				return true
-			}
-		}
-	}
-
-	return false
+	return slices.ContainsFunc([][]MetadataEntry{self.Mandatory, self.Recommended, self.Optional}, func(ml []MetadataEntry) bool {
+		return slices.ContainsFunc(ml, func(me MetadataEntry) bool {
+			return k == me.Name
+		})
+	})
 }
