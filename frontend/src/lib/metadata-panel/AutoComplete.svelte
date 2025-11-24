@@ -14,22 +14,33 @@
 	let suggestions = $state<string[]>([]);
 	let selected = $state(0);
 
+	let focused = $state(false);
+	let inputElement: ReturnType<typeof Input>;
+
 	function onkeydown(event: KeyboardEvent) {
 		if (event.key === "Enter") {
 			if (suggestions[selected]) {
+				event.preventDefault();
 				value = suggestions[selected];
+				selected = 0;
+				focused = false;
 			}
-		} else if (event.key === "ArrowUp") {
-			event.preventDefault();
-			selected = Math.min(suggestions.length - 1, selected + 1);
-		} else if (event.key === "ArrowDown") {
-			event.preventDefault();
-			selected = Math.max(0, selected - 1);
+		} else {
+			if (event.key === "ArrowUp") {
+				event.preventDefault();
+				if (focused) {
+					selected = Math.min(suggestions.length - 1, selected + 1);
+				}
+			} else if (event.key === "ArrowDown") {
+				event.preventDefault();
+				if (focused) {
+					selected = Math.max(0, selected - 1);
+				}
+			}
+			focused = true;
 		}
 	}
 
-	let focused = $state(false);
-	let inputElement: ReturnType<typeof Input>;
 	function select(event: MouseEvent, idx: number) {
 		inputElement.focus();
 		event.preventDefault();
@@ -37,6 +48,7 @@
 		if (suggestions[idx]) {
 			value = suggestions[idx];
 			selected = 0;
+			focused = false;
 		}
 	}
 

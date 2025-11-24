@@ -11,8 +11,9 @@ import (
 )
 
 type OLS4 struct {
-	Onto string `json:"onto"`
-	IRI  string `json:"iri"`
+	Onto  string `json:"onto"`
+	IRI   string `json:"iri"`
+	Label string `json:"label"`
 }
 
 func (self OLS4) verify(s string, ctx context.Context) error {
@@ -57,7 +58,7 @@ func (self OLS4) verify(s string, ctx context.Context) error {
 	}
 
 	if !slices.ContainsFunc(r.Response.Docs, func(l Label) bool { return l.Label == s }) {
-		return errInvalid(fmt.Sprintf("subclass of '%s' in ontology '%s'", self.IRI, self.Onto))
+		return errInvalid(fmt.Sprintf("subclass of '%s' in ontology '%s'", self.Label, self.Onto))
 	}
 
 	return nil

@@ -61,16 +61,14 @@
 		{@const { type, choices, ols4 } = flatMetadata.get(m.kind) || {}}
 
 		<div class="table-row">
-			{#if m.mandatory}
-				<div class="table-cell align-top">
+			<div class="table-cell align-middle">
+				{#if m.mandatory}
 					<div class="px-2 py-1">{m.kind}</div>
-				</div>
-			{:else}
-				<div class="table-cell align-top">
+				{:else}
 					<select
 						bind:value={m.kind}
 						title={m.kind}
-						class="field-sizing-content rounded px-2 py-1 outline-indigo-400 focus-visible:outline-2"
+						class="field-sizing-content h-8 rounded px-2 py-1 outline-indigo-400 focus-visible:outline-2"
 					>
 						<option class="hidden" value="" disabled selected>-- select a kind --</option>
 						{#each Object.entries(elements) as [group, values] (group)}
@@ -81,12 +79,12 @@
 							</optgroup>
 						{/each}
 					</select>
-				</div>
-			{/if}
+				{/if}
+			</div>
 
 			<span class="table-cell py-0.75 pl-2">
 				{#if m.kind === ""}
-					<Input value="" disabled placeholder="please select a metadata kind" />
+					<Input value="" disabled placeholder="-- select a kind --" />
 				{:else if type === "choice"}
 					<select
 						bind:value={m.value}
@@ -113,7 +111,7 @@
 					<AutoComplete placeholder={type} suggest={suggestSpecies} bind:value={m.value} />
 				{:else if type === "ols4"}
 					<AutoComplete
-						placeholder={m.kind}
+						placeholder={`subclass of '${ols4!.label}' in ontology '${ols4!.onto}'`}
 						suggest={(value) => suggestOLS4(value, ols4!)}
 						bind:value={m.value}
 					/>
@@ -121,7 +119,6 @@
 					<textarea
 						class="field-sizing-content min-h-8 w-full max-w-lg rounded border border-neutral-600 py-1 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
 						rows="1"
-						placeholder={m.kind}
 						bind:value={m.value}
 					></textarea>
 				{/if}

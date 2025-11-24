@@ -13,12 +13,11 @@
 	let { body, color } = $derived(data);
 	$effect(() => updateNodeData(id, { body, color }));
 
-	function isLight(s: string) {
+	function isLight(s: string): boolean {
 		const rgb = parseInt(s.slice(1), 16);
 		const r = (rgb >> 16) & 0xff;
 		const g = (rgb >> 8) & 0xff;
 		const b = rgb & 0xff;
-
 		const luma = r * 0.2126 + g * 0.7152 + b * 0.0722;
 		return luma > 127;
 	}

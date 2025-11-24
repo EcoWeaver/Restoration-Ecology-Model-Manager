@@ -96,12 +96,16 @@
 
 	function onkeydown(event: KeyboardEvent) {
 		if (event.ctrlKey) {
-			if (history.canUndo() && event.key === "z") {
-				event.preventDefault();
-				[nodes, edges] = history.undo();
-			} else if (history.canRedo() && (event.key === "Z" || event.key === "y")) {
-				event.preventDefault();
-				[nodes, edges] = history.redo();
+			if (event.key === "z") {
+				if (history.canUndo()) {
+					event.preventDefault();
+					[nodes, edges] = history.undo();
+				}
+			} else if (event.key === "Z" || event.key === "y") {
+				if (history.canRedo()) {
+					event.preventDefault();
+					[nodes, edges] = history.redo();
+				}
 			}
 		}
 	}

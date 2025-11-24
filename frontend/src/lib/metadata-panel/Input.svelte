@@ -7,7 +7,6 @@
 		disabled = false,
 		onkeydown,
 		onfocus,
-		onblur,
 		value = $bindable(),
 	}: {
 		type?: string;
@@ -15,7 +14,6 @@
 		disabled?: boolean;
 		onkeydown?: KeyboardEventHandler<HTMLInputElement>;
 		onfocus?: FocusEventHandler<HTMLInputElement>;
-		onblur?: FocusEventHandler<HTMLInputElement>;
 		value: string;
 	} = $props();
 
@@ -32,7 +30,6 @@
 	bind:value
 	{onkeydown}
 	{onfocus}
-	{onblur}
-	class="h-8 w-full rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
+	class="field-sizing-content h-8 w-full rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
 	{type}
 />

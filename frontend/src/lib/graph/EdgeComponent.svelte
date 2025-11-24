@@ -26,7 +26,7 @@
 
 	const relationElements = getRelationElements();
 
-	function nodeIntersection(intersectionNode: InternalNode, target: Cartesian) {
+	function nodeIntersection(intersectionNode: InternalNode, target: Cartesian): Cartesian {
 		// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
 
 		const w = intersectionNode.measured.width! / 2;
@@ -82,7 +82,7 @@
 		};
 	}
 
-	function controlPoints(start: number, middle: number, end: number) {
+	function controlPoints(start: number, middle: number, end: number): number[] {
 		const x = (end - start) / 6;
 
 		const first1 = (start + middle) / 2 - x / 2;

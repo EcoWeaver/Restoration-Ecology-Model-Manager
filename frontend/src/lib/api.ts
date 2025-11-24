@@ -80,6 +80,7 @@ export type MetadataType =
 export type OLS4 = {
 	onto: string;
 	iri: string;
+	label: string;
 };
 
 export type MetadataElement = {

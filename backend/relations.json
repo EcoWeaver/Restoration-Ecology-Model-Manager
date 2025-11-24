@@ -1,4 +1,4 @@
 {
 	"causal": ["affects", "increases", "decreases"],
-	"noncausal": ["related", "positively-correlated", "negatively-correlated"]
+	"noncausal": ["related", "positively correlated", "negatively correlated"]
 }

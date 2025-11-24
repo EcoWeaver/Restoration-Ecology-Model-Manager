@@ -7,7 +7,7 @@
 	let storage = $state(browser ? (localStorage?.getItem("theme") ?? "system") : null);
 	let current = $derived(storage === "dark" || (storage === "system" && preference.current));
 
-	function invertTheme(theme: string) {
+	function invertTheme(theme: "dark" | "light"): "dark" | "light" {
 		return theme === "dark" ? "light" : "dark";
 	}
 

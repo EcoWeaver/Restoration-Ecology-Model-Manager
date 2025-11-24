@@ -15,16 +15,16 @@
 			"name": "publisher"
 		},
 		{
-			"name": "publication-year",
+			"name": "publication year",
 			"type": "year"
 		},
 		{
-			"name": "resource-type",
+			"name": "resource type",
 			"type": "choice",
 			"choices": [
-				"ComputationalNotebook",
-				"ConferencePaper",
-				"DataPaper",
+				"Computational Notebook",
+				"Conference Paper",
+				"Data Paper",
 				"Dataset",
 				"Model",
 				"Software",
@@ -34,7 +34,7 @@
 			]
 		},
 		{
-			"name": "model-type",
+			"name": "model type",
 			"type": "choice",
 			"choices": [
 				"Generalized Linear Model",
@@ -74,12 +74,7 @@
 			"type": "date"
 		},
 		{
-			"name": "ecological-domain",
-			"type": "ols4",
-			"ols4": {
-				"onto": "envo",
-				"iri": "http://purl.obolibrary.org/obo/ENVO_00000428"
-			}
+			"name": "related identifier"
 		},
 		{
 			"name": "description"
@@ -88,12 +83,21 @@
 			"name": "geolocation"
 		},
 		{
-			"name": "spatial-scale",
+			"name": "ecological domain",
+			"type": "ols4",
+			"ols4": {
+				"onto": "envo",
+				"iri": "http://purl.obolibrary.org/obo/ENVO_00000428",
+				"label": "biome"
+			}
+		},
+		{
+			"name": "spatial scale",
 			"type": "choice",
 			"choices": ["Local", "Regional", "Global"]
 		},
 		{
-			"name": "target-species",
+			"name": "target species",
 			"type": "species"
 		}
 	],
@@ -103,8 +107,7 @@
 			"type": "ietf-bcp-47"
 		},
 		{
-			"name": "alternate-identifier",
-			"type": "url"
+			"name": "alternate identifier"
 		},
 		{
 			"name": "size"
@@ -114,55 +117,59 @@
 			"type": "ols4",
 			"ols4": {
 				"onto": "edam",
-				"iri": "http://edamontology.org/format_1915"
+				"iri": "http://edamontology.org/format_1915",
+				"label": "Format"
 			}
 		},
 		{
 			"name": "version"
 		},
 		{
-			"name": "licence",
+			"name": "rights",
 			"type": "ols4",
 			"ols4": {
 				"onto": "swo",
-				"iri": "http://www.ebi.ac.uk/swo/SWO_0000002"
+				"iri": "http://www.ebi.ac.uk/swo/SWO_0000002",
+				"label": "licence"
 			}
 		},
 		{
-			"name": "funding-reference",
+			"name": "funding reference",
 			"type": "url"
 		},
 		{
-			"name": "related-item"
+			"name": "related item"
 		},
 		{
-			"name": "temporal-scale",
+			"name": "temporal scale",
 			"type": "choice",
 			"choices": ["Short-Term", "Long-Term", "Seasonal", "Event-based"]
 		},
 		{
-			"name": "programming-language",
+			"name": "programming language",
 			"type": "ols4",
 			"ols4": {
-				"onto": "iao",
-				"iri": "http://purl.obolibrary.org/obo/IAO_0000025"
+				"onto": "swo",
+				"iri": "http://purl.obolibrary.org/obo/IAO_0000025",
+				"label": "programming language"
 			}
 		},
 		{
 			"name": "dependency"
 		},
 		{
-			"name": "input-data"
+			"name": "input data"
 		},
 		{
-			"name": "output-data"
+			"name": "output data"
 		},
 		{
-			"name": "performance-metric",
+			"name": "performance metric",
 			"type": "ols4",
 			"ols4": {
 				"onto": "stato",
-				"iri": "http://purl.obolibrary.org/obo/STATO_0000039"
+				"iri": "http://purl.obolibrary.org/obo/STATO_0000039",
+				"label": "statistic"
 			}
 		},
 		{
@@ -170,10 +177,10 @@
 			"type": "url"
 		},
 		{
-			"name": "computational-environment-details"
+			"name": "computational environment details"
 		},
 		{
-			"name": "discussion-platform",
+			"name": "discussion platform",
 			"type": "url"
 		}
 	]

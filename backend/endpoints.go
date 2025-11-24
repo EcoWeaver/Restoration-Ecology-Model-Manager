@@ -118,7 +118,7 @@ func (self *State) GetModel(c echo.Context) error {
 			models.uploaded,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
 			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'model-type' THEN metadata.value END)
+			MAX(CASE WHEN metadata.kind = 'model type' THEN metadata.value END)
 		FROM
 			models
 			JOIN metadata ON models.model_id = metadata.model_id
@@ -319,7 +319,7 @@ func (self *State) PostSearch(c echo.Context) error {
 			models.uploaded,
 			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
 			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'model-type' THEN metadata.value END)
+			MAX(CASE WHEN metadata.kind = 'model type' THEN metadata.value END)
 		FROM
 			models
 			JOIN metadata ON models.model_id = metadata.model_id`
