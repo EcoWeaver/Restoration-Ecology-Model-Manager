@@ -6,7 +6,7 @@ import {
 	type Graph,
 	type Metadata,
 	type SaveResult,
-	type UnsavedModel,
+	type Model,
 } from "./api";
 
 export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & {
@@ -83,7 +83,7 @@ export async function saveModel(
 	});
 
 	const graph = { nodes, relations };
-	const request: UnsavedModel = {
+	const request: Model = {
 		metadata,
 		graph,
 		parent,

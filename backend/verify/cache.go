@@ -1,6 +1,7 @@
 package verify
 
 import (
+	"backend/types"
 	"context"
 	"sync"
 )
@@ -34,6 +35,8 @@ func SpeciesCache() Cache {
 	return Cache{get: species}
 }
 
-func OLS4Cache(ols4 OLS4) Cache {
-	return Cache{get: ols4.verify}
+func OLS4Cache(o types.OLS4) Cache {
+	return Cache{get: func(s string, ctx context.Context) error {
+		return ols4(o, s, ctx)
+	}}
 }

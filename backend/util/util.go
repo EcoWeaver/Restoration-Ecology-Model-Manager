@@ -1,10 +1,10 @@
-package main
+package util
 
 import (
 	"sync"
 )
 
-func slicesEqualUnordered[T comparable](a, b []T) bool {
+func SlicesEqualUnordered[T comparable](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -24,7 +24,7 @@ func slicesEqualUnordered[T comparable](a, b []T) bool {
 	return true
 }
 
-func slicesParMap[T any, U any](s []T, f func(T) U) []U {
+func SlicesParMap[T any, U any](s []T, f func(T) U) []U {
 	res := make([]U, len(s))
 
 	var wg sync.WaitGroup

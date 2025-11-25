@@ -30,7 +30,7 @@ export function relationElements(): Promise<RelationElements> {
 
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 
-export function putModel(model: UnsavedModel): Promise<SaveResult> {
+export function putModel(model: Model): Promise<SaveResult> {
 	return req<SaveResult>("PUT", "model", model);
 }
 
@@ -42,15 +42,23 @@ export type SaveResult = {
 	uuid: string;
 };
 
-export type Model = {
+export type ModelResult = {
 	uuid: string;
 	uploaded: string;
 	graph: Graph;
 	metadata: Metadata[];
-	parent?: SearchItem;
+	parent?: SearchResult;
 };
 
-export type UnsavedModel = {
+export type SearchResult = {
+	uuid: string;
+	uploaded: string;
+	identifier: string;
+	title: string;
+	modelType: string;
+};
+
+export type Model = {
 	graph: Graph;
 	metadata: Metadata[];
 	parent?: string;
@@ -66,6 +74,13 @@ export type Metadata = {
 	value: string;
 };
 
+export type MetadataElement = {
+	name: string;
+	type?: MetadataType;
+	choices?: string[];
+	ols4?: OLS4;
+};
+
 export type MetadataType =
 	| "choice"
 	| "date"
@@ -76,19 +91,6 @@ export type MetadataType =
 	| "species"
 	| "url"
 	| "year";
-
-export type OLS4 = {
-	onto: string;
-	iri: string;
-	label: string;
-};
-
-export type MetadataElement = {
-	name: string;
-	type?: MetadataType;
-	choices?: string[];
-	ols4?: OLS4;
-};
 
 export type Node = {
 	body: string;
@@ -115,6 +117,12 @@ export type Polar = {
 	phi: number;
 };
 
+export type OLS4 = {
+	onto: string;
+	iri: string;
+	label: string;
+};
+
 export function polarToCartesian(polar: Polar): Cartesian {
 	return {
 		x: polar.r * Math.cos(polar.phi),
@@ -128,11 +136,3 @@ export function cartesianToPolar(cartesian: Cartesian): Polar {
 		phi: Math.atan2(cartesian.y, cartesian.x),
 	};
 }
-
-export type SearchItem = {
-	uuid: string;
-	uploaded: string;
-	identifier: string;
-	title: string;
-	modelType: string;
-};

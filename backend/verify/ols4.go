@@ -1,6 +1,7 @@
 package verify
 
 import (
+	"backend/types"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -10,15 +11,9 @@ import (
 	"slices"
 )
 
-type OLS4 struct {
-	Onto  string `json:"onto"`
-	IRI   string `json:"iri"`
-	Label string `json:"label"`
-}
-
-func (self OLS4) verify(s string, ctx context.Context) error {
+func ols4(self types.OLS4, s string, ctx context.Context) error {
 	if s == "" {
-		return errNotProvided(fmt.Sprintf("ontology '%s'", self.Onto))
+		return errNotProvided(formatOLS4(self))
 	}
 
 	if !REQ {
@@ -58,8 +53,12 @@ func (self OLS4) verify(s string, ctx context.Context) error {
 	}
 
 	if !slices.ContainsFunc(r.Response.Docs, func(l Label) bool { return l.Label == s }) {
-		return errInvalid(fmt.Sprintf("subclass of '%s' in ontology '%s'", self.Label, self.Onto))
+		return errInvalid(formatOLS4(self))
 	}
 
 	return nil
+}
+
+func formatOLS4(self types.OLS4) string {
+	return fmt.Sprintf("subclass of '%s' in ontology '%s'", self.Label, self.Onto)
 }

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"backend/verify"
+	"backend/types"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"slices"
 	"sync"
@@ -19,16 +20,16 @@ type LiveMetadataConfig struct {
 }
 
 type MetadataConfig struct {
-	Mandatory   []MetadataEntry `json:"mandatory"`
-	Recommended []MetadataEntry `json:"recommended"`
-	Optional    []MetadataEntry `json:"optional"`
+	Mandatory   []MetadataElement `json:"mandatory"`
+	Recommended []MetadataElement `json:"recommended"`
+	Optional    []MetadataElement `json:"optional"`
 }
 
-type MetadataEntry struct {
-	Name    string       `json:"name"`
-	Type    string       `json:"type,omitempty"`
-	Choices []string     `json:"choices,omitempty"`
-	OLS4    *verify.OLS4 `json:"ols4,omitempty"`
+type MetadataElement struct {
+	Name    string      `json:"name"`
+	Type    string      `json:"type,omitempty"`
+	Choices []string    `json:"choices,omitempty"`
+	OLS4    *types.OLS4 `json:"ols4,omitempty"`
 }
 
 func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
@@ -56,8 +57,8 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 	}
 
 	e := map[string]struct{}{}
-	for _, s := range []*[]MetadataEntry{&m.Mandatory, &m.Recommended, &m.Optional} {
-		*s = slices.DeleteFunc(*s, func(me MetadataEntry) bool {
+	for _, s := range [][]MetadataElement{m.Mandatory, m.Recommended, m.Optional} {
+		s = slices.DeleteFunc(s, func(me MetadataElement) bool {
 			if err != nil {
 				return false
 			}
@@ -83,7 +84,7 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 	return m, nil
 }
 
-func (self *MetadataEntry) verify(l echo.Logger) error {
+func (self *MetadataElement) verify(l echo.Logger) error {
 	if self.Type == "choice" {
 		if len(self.Choices) != 0 {
 			e := map[string]struct{}{}
@@ -106,6 +107,8 @@ func (self *MetadataEntry) verify(l echo.Logger) error {
 	if self.Type == "ols4" {
 		if self.OLS4 == nil {
 			return fmt.Errorf("missing ontology for metadata kind '%s'", self.Name)
+		} else if _, err := url.ParseRequestURI(self.OLS4.IRI); err != nil {
+			return err
 		}
 	} else if self.OLS4 != nil {
 		l.Warnf("ignoring unnecessary ontology for metadata kind '%s'", self.Name)
@@ -116,8 +119,8 @@ func (self *MetadataEntry) verify(l echo.Logger) error {
 }
 
 func (self MetadataConfig) IsMetadataKind(k string) bool {
-	return slices.ContainsFunc([][]MetadataEntry{self.Mandatory, self.Recommended, self.Optional}, func(ml []MetadataEntry) bool {
-		return slices.ContainsFunc(ml, func(me MetadataEntry) bool {
+	return slices.ContainsFunc([][]MetadataElement{self.Mandatory, self.Recommended, self.Optional}, func(ml []MetadataElement) bool {
+		return slices.ContainsFunc(ml, func(me MetadataElement) bool {
 			return k == me.Name
 		})
 	})

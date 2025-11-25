@@ -1,6 +1,8 @@
 package main
 
 import (
+	"backend/types"
+	"backend/util"
 	"backend/verify"
 	"context"
 	"errors"
@@ -15,55 +17,8 @@ import (
 	"golang.org/x/text/language"
 )
 
-type Model struct {
-	UUID     string        `json:"uuid"`
-	Uploaded time.Time     `json:"uploaded"`
-	Graph    Graph         `json:"graph"`
-	Parent   *SearchResult `json:"parent"`
-	Metadata []Metadata    `json:"metadata"`
-}
-
-type UnsavedModel struct {
-	Graph    Graph      `json:"graph"`
-	Parent   *string    `json:"parent"`
-	Metadata []Metadata `json:"metadata"`
-}
-
-type Graph struct {
-	Nodes     []Node     `json:"nodes"`
-	Relations []Relation `json:"relations"`
-}
-
-type Metadata struct {
-	Kind  string `json:"kind"`
-	Value string `json:"value"`
-}
-
-type Node struct {
-	Body     string    `json:"body"`
-	Color    string    `json:"color"`
-	Position Cartesian `json:"position"`
-}
-
-type Relation struct {
-	Kind     string `json:"kind"`
-	From     int    `json:"from"`
-	To       int    `json:"to"`
-	Position Polar  `json:"position"`
-}
-
-type Cartesian struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
-}
-
-type Polar struct {
-	R   float64 `json:"r"`
-	Phi float64 `json:"phi"`
-}
-
-func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) error {
-	if err := self.Graph.verify(s, l); err != nil {
+func verifyModel(self types.Model, s *State, l echo.Logger, ctx context.Context) error {
+	if err := verifyGraph(self.Graph, s, l); err != nil {
 		return err
 	}
 
@@ -84,10 +39,12 @@ func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) er
 		for me := range e {
 			k = append(k, me)
 		}
-		return verify.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", strings.Join(k, "', '"))}
+		return types.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", strings.Join(k, "', '"))}
 	}
 
-	for _, err := range slicesParMap(self.Metadata, func(me Metadata) error { return me.verify(s, m, l, ctx) }) {
+	for _, err := range util.SlicesParMap(self.Metadata, func(me types.Metadata) error {
+		return verifyMetadata(me, s, m, l, ctx)
+	}) {
 		if err != nil {
 			return err
 		}
@@ -102,7 +59,7 @@ func (self UnsavedModel) verify(s *State, l echo.Logger, ctx context.Context) er
 	return nil
 }
 
-func (self Graph) verify(s *State, l echo.Logger) error {
+func verifyGraph(self types.Graph, s *State, l echo.Logger) error {
 	type Relation struct {
 		From int
 		To   int
@@ -121,18 +78,18 @@ func (self Graph) verify(s *State, l echo.Logger) error {
 	}
 
 	for _, re := range self.Relations {
-		if err := re.verify(r, len(self.Nodes)); err != nil {
+		if err := verifyRelation(re, r, len(self.Nodes)); err != nil {
 			return err
 		}
 		pair := Relation{re.From, re.To}
 		if _, ok := e[pair]; ok {
-			return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
+			return types.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
 		}
 		e[pair] = struct{}{}
 		if slices.Contains(r.Noncausal, re.Kind) {
 			pair = Relation{re.To, re.From}
 			if _, ok := e[pair]; ok {
-				return verify.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
+				return types.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
 			}
 			e[pair] = struct{}{}
 		}
@@ -145,18 +102,18 @@ const Year = "2006"
 const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
-func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx context.Context) error {
+func verifyMetadata(self types.Metadata, s *State, m MetadataConfig, l echo.Logger, ctx context.Context) error {
 	if self.Kind == "" {
 		if self.Value == "" {
-			return verify.Error{E: errors.New("encountered unset metadata kind with unset value")}
+			return types.Error{E: errors.New("encountered unset metadata kind with unset value")}
 		} else {
-			return verify.Error{E: fmt.Errorf("encountered unset metadata kind with value '%s'", self.Value)}
+			return types.Error{E: fmt.Errorf("encountered unset metadata kind with value '%s'", self.Value)}
 		}
 	} else if self.Value == "" {
-		return verify.Error{E: fmt.Errorf("encountered unset value of metadata kind '%s'", self.Kind)}
+		return types.Error{E: fmt.Errorf("encountered unset value of metadata kind '%s'", self.Kind)}
 	}
 
-	for _, ml := range [][]MetadataEntry{m.Mandatory, m.Recommended, m.Optional} {
+	for _, ml := range [][]MetadataElement{m.Mandatory, m.Recommended, m.Optional} {
 		for _, me := range ml {
 			if me.Name != self.Kind {
 				continue
@@ -219,37 +176,37 @@ func (self Metadata) verify(s *State, m MetadataConfig, l echo.Logger, ctx conte
 			}
 
 			if err == nil {
-				return verify.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
-			} else if _, ok := err.(verify.Error); ok {
-				return verify.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s': %w", self.Value, self.Kind, err)}
+				return types.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s', expected type '%s'", self.Value, self.Kind, me.Type)}
+			} else if _, ok := err.(types.Error); ok {
+				return types.Error{E: fmt.Errorf("encountered invalid value '%s' of metadata kind '%s': %w", self.Value, self.Kind, err)}
 			} else {
 				return err
 			}
 		}
 	}
 
-	return verify.Error{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
+	return types.Error{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
 }
 
-func (self Relation) verify(r RelationsConfig, n int) error {
+func verifyRelation(self types.Relation, r RelationsConfig, n int) error {
 	if self.From < 0 || self.From >= n || self.To < 0 || self.To >= n || self.From == self.To {
-		return verify.Error{E: fmt.Errorf("encountered invalid relation from %d to %d", self.From, self.To)}
+		return types.Error{E: fmt.Errorf("encountered invalid relation from %d to %d", self.From, self.To)}
 	}
 
 	if !slices.Contains(r.Causal, self.Kind) && !slices.Contains(r.Noncausal, self.Kind) {
-		return verify.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
+		return types.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
 	}
 
-	return self.Position.verify()
+	return verifyPolar(self.Position)
 }
 
-func (self Polar) verify() error {
+func verifyPolar(self types.Polar) error {
 	if self.R < 0.0 {
-		return verify.Error{E: fmt.Errorf("encountered invalid radius '%f'", self.R)}
+		return types.Error{E: fmt.Errorf("encountered invalid radius '%f'", self.R)}
 	}
 
 	if self.Phi < 0.0 || self.Phi >= 2.0*math.Pi {
-		return verify.Error{E: fmt.Errorf("encountered invalid angle '%f rad'", self.Phi)}
+		return types.Error{E: fmt.Errorf("encountered invalid angle '%f rad'", self.Phi)}
 	}
 
 	return nil

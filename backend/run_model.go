@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/types"
 	"backend/verify"
 	"errors"
 	"fmt"
@@ -20,29 +21,10 @@ type NodeState struct {
 
 type Connection struct {
 	From    *NodeState
-	Formula Polynomial
-}
-
-type ModelRunRequest struct {
-	UUID            string           `json:"uuid"`
-	NodeValues      map[int]float64  `json:"nodeValues"`
-	RelationWeights []RelationWeight `json:"relationWeights"`
+	Formula types.Polynomial
 }
 
 type ModelRunResult []float64
-
-type RelationWeight struct {
-	From    int        `json:"from"`
-	To      int        `json:"to"`
-	Formula Polynomial `json:"formula"`
-}
-
-type Polynomial []Coefficient
-
-type Coefficient struct {
-	Factor   float64 `json:"factor"`
-	Exponent float64 `json:"exponent"`
-}
 
 func (self ModelRunRequest) Verify(r *RelationsConfig) error {
 	type Relation struct {
@@ -60,7 +42,7 @@ func (self ModelRunRequest) Verify(r *RelationsConfig) error {
 		pair := Relation{w.From, w.To}
 
 		if _, ok := e[pair]; ok {
-			return verify.Error{E: fmt.Errorf("encountered duplicate weight for relation from %d to %d", w.From, w.To)}
+			return types.Error{E: fmt.Errorf("encountered duplicate weight for relation from %d to %d", w.From, w.To)}
 		}
 
 		e[pair] = struct{}{}
@@ -69,7 +51,7 @@ func (self ModelRunRequest) Verify(r *RelationsConfig) error {
 	return nil
 }
 
-func (self ModelRunRequest) Run(g Graph, r *RelationsConfig) (ModelRunResult, error) {
+func (self ModelRunRequest) Run(g types.Graph, r *RelationsConfig) (ModelRunResult, error) {
 	var s ModelRunState
 	for i := range len(g.Nodes) {
 		s = append(s, &NodeState{Value: self.NodeValues[i]})
@@ -83,7 +65,7 @@ outer:
 			}
 
 			if !slices.Contains(r.Causal, re.Kind) {
-				return ModelRunResult{}, verify.Error{E: fmt.Errorf("encountered weight for non-causal relation from %d to %d", w.From, w.To)}
+				return ModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-causal relation from %d to %d", w.From, w.To)}
 			}
 
 			s[re.From].Out = append(s[re.From].Out, s[re.To])
@@ -93,7 +75,7 @@ outer:
 			continue outer
 		}
 
-		return ModelRunResult{}, verify.Error{E: fmt.Errorf("encountered weight for non-existent relation from %d to %d", w.From, w.To)}
+		return ModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-existent relation from %d to %d", w.From, w.To)}
 	}
 
 	for _, node := range s {
@@ -105,7 +87,7 @@ outer:
 	var res ModelRunResult
 	for _, node := range s {
 		if node.Indegree != -1 {
-			return ModelRunResult{}, verify.Error{E: errors.New("encountered cycle in graph")}
+			return ModelRunResult{}, types.Error{E: errors.New("encountered cycle in graph")}
 		}
 		res = append(res, node.Value+node.Change)
 	}
@@ -118,9 +100,9 @@ func (self *NodeState) recurseKahn() {
 
 	for _, in := range self.In {
 		if len(in.From.In) == 0 {
-			self.Change += in.Formula.eval(in.From.Value)
+			self.Change += eval(in.Formula, in.From.Value)
 		} else {
-			self.Change += in.Formula.eval(in.From.Change)
+			self.Change += eval(in.Formula, in.From.Change)
 		}
 	}
 
@@ -132,7 +114,7 @@ func (self *NodeState) recurseKahn() {
 	}
 }
 
-func (self Polynomial) eval(input float64) float64 {
+func eval(self types.Polynomial, input float64) float64 {
 	var out float64
 	for _, coeff := range self {
 		out += coeff.Factor * math.Pow(input, coeff.Exponent)

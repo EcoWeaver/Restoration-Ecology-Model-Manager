@@ -178,8 +178,8 @@
 
 <LineCap id="linecap-s-{source}-{target}" />
 
-{#await relationElements then re}
-	{#if !re.causal.includes(kind)}
+{#await relationElements then relationElements}
+	{#if !relationElements.causal.includes(kind)}
 		<LineCap id="linecap-e-{source}-{target}" />
 	{/if}
 {/await}
