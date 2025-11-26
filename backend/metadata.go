@@ -57,8 +57,8 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 	}
 
 	e := map[string]struct{}{}
-	for _, s := range [][]MetadataElement{m.Mandatory, m.Recommended, m.Optional} {
-		s = slices.DeleteFunc(s, func(me MetadataElement) bool {
+	for _, s := range []*[]MetadataElement{&m.Mandatory, &m.Recommended, &m.Optional} {
+		*s = slices.DeleteFunc(*s, func(me MetadataElement) bool {
 			if err != nil {
 				return false
 			}

@@ -89,7 +89,7 @@
 					<select
 						bind:value={m.value}
 						title={m.value}
-						class="picker-icon:text-black h-8 w-full cursor-pointer rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
+						class="field-sizing-content h-8 w-full cursor-pointer rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
 						required
 					>
 						<option class="hidden" value="" disabled selected>-- select an option --</option>

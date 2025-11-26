@@ -5,37 +5,28 @@
 	let { value = $bindable() }: { value: string } = $props();
 
 	function set(v: string) {
-		v = stripURL(v, "https://orcid.org/");
-
+		v = stripURL(v, "https://orcid.org/").toUpperCase();
 		if (v.length > 19) {
 			return;
 		}
-		v = v.toUpperCase();
 
-		let digits = 0;
-		let clusters = 0;
+		let idx = 0;
 		for (const t of v) {
-			if (digits === 4) {
+			if (idx % 5 === 4) {
 				if (t !== "-") {
 					return;
 				}
 			} else if (t < "0" || t > "9") {
-				if (clusters === 3 && digits === 3 && t === "X") {
-					break;
+				if (idx !== 18 || t !== "X") {
+					return;
 				}
-				return;
 			}
 
-			if (digits === 4) {
-				digits = 0;
-				clusters += 1;
-			} else {
-				digits += 1;
-			}
+			idx += 1;
 		}
 
 		value = v;
 	}
 </script>
 
-<Input placeholder="orcid" bind:value={() => value, set} type="text" />
+<Input placeholder="orcid" bind:value={() => value, set} />

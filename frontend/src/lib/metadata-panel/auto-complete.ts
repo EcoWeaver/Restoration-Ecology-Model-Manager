@@ -10,14 +10,12 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 	);
 	const suggestions: {
 		status: string;
-		canonicalName?: string;
+		canonicalName: string;
 	}[] = await response.json();
-	const filtered = suggestions
-		.filter((suggestion) => suggestion.status === "ACCEPTED")
-		.map((suggestion) => suggestion.canonicalName)
-		.filter((suggestion) => suggestion !== undefined);
 
-	return filtered;
+	return suggestions
+		.filter((suggestion) => suggestion.status === "ACCEPTED")
+		.map((suggestion) => suggestion.canonicalName);
 }
 
 export async function suggestOLS4(value: string, ols4: OLS4): Promise<string[]> {
@@ -35,7 +33,6 @@ export async function suggestOLS4(value: string, ols4: OLS4): Promise<string[]> 
 			}[];
 		};
 	} = await response.json();
-	const filtered = suggestions.response.docs.map((suggestion) => suggestion.autosuggest);
 
-	return filtered;
+	return suggestions.response.docs.map((suggestion) => suggestion.autosuggest);
 }

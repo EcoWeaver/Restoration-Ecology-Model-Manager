@@ -8,9 +8,9 @@
 			return;
 		}
 
-		let digits = 4;
+		let idx = 0;
 		for (const t of v) {
-			if (digits === 0) {
+			if (idx === 4 || idx === 7) {
 				if (t !== "-") {
 					return;
 				}
@@ -18,15 +18,11 @@
 				return;
 			}
 
-			if (digits === 0) {
-				digits = 2;
-			} else {
-				digits -= 1;
-			}
+			idx += 1;
 		}
 
 		value = v;
 	}
 </script>
 
-<Input placeholder="date" bind:value={() => value, set} type="text" />
+<Input placeholder="date" bind:value={() => value, set} />
