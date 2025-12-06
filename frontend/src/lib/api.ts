@@ -2,7 +2,7 @@ import { env } from "$env/dynamic/public";
 
 export const apiBase = env.PUBLIC_API_URL || "http://localhost:8080";
 
-async function req<T>(method: string, path: string, body?: unknown): Promise<T> {
+export async function req<T>(method: string, path: string, body?: unknown): Promise<T> {
 	const res = await fetch(`${apiBase}/${path}`, {
 		method,
 		body: body === undefined ? undefined : JSON.stringify(body),
@@ -29,10 +29,6 @@ export function relationElements(): Promise<RelationElements> {
 }
 
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
-
-export function putModel(model: Model): Promise<PutModelResult> {
-	return req<PutModelResult>("PUT", "model", model);
-}
 
 export type BackendError = {
 	message: string;

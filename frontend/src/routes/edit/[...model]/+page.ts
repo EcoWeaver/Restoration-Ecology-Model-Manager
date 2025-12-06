@@ -3,10 +3,7 @@ import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, params }) => {
-	const apiUrl = new URL("/model", apiBase);
-	apiUrl.searchParams.set("uuid", params.model);
-
-	const res = await fetch(apiUrl);
+	const res = await fetch(`${apiBase}/model?uuid=${encodeURIComponent(params.model)}`);
 	if (!res.ok) {
 		return error(res.status, await res.json());
 	}

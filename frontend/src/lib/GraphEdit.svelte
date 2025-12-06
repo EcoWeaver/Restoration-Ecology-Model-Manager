@@ -7,13 +7,13 @@
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import { beforeNavigate, goto } from "$app/navigation";
 	import {
-		apiBase,
-		putModel,
+		req,
 		type BackendError,
 		type Metadata,
 		type MetadataElements,
 		type Model,
 		type PostModelChangedResult,
+		type PutModelResult,
 	} from "./api";
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
@@ -58,12 +58,8 @@
 
 		let changed: boolean;
 		if (model.parent) {
-			const res = await fetch(`${apiBase}/model/changed`, {
-				method: "POST",
-				body: storage,
-			});
-			const s: PostModelChangedResult = await res.json();
-			changed = s.changed;
+			const res = await req<PostModelChangedResult>("POST", `model/changed`, model);
+			changed = res.changed;
 		} else {
 			changed =
 				!!model.graph.nodes?.length ||
@@ -104,7 +100,11 @@
 	async function save() {
 		try {
 			startNavigate();
-			const res = await putModel({ graph: flowToApi(nodes, edges), metadata, parent });
+			const res = await req<PutModelResult>("PUT", "model", {
+				graph: flowToApi(nodes, edges),
+				metadata,
+				parent,
+			});
 			await goto(resolve(`/view/${res.uuid}`));
 		} catch (err: unknown) {
 			const error = err as BackendError;
