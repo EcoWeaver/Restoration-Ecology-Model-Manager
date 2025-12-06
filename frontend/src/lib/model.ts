@@ -65,9 +65,9 @@ export async function saveModel(
 
 	const relations: ApiRelation[] = e.map((e) => {
 		const from = n.findIndex((n) => n.id === e.source);
-		const to = n.findIndex((n) => n.id === e.target)!;
+		const to = n.findIndex((n) => n.id === e.target);
 
-		const { kind, position } = e.data!;
+		const { kind, position } = e.data ?? defaultEdge(true).data!;
 		if (position.r < 0) {
 			position.r *= -1;
 			position.phi += Math.PI;

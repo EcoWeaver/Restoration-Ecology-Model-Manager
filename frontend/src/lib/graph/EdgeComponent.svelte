@@ -98,10 +98,10 @@
 		const source = sourceNode.current!;
 		const target = targetNode.current!;
 
-		const sourceX = source.internals.positionAbsolute.x + source.measured!.width! / 2;
-		const sourceY = source.internals.positionAbsolute.y + source.measured!.height! / 2;
-		const targetX = target.internals.positionAbsolute.x + target.measured!.width! / 2;
-		const targetY = target.internals.positionAbsolute.y + target.measured!.height! / 2;
+		const sourceX = source.internals.positionAbsolute.x + source.measured.width! / 2;
+		const sourceY = source.internals.positionAbsolute.y + source.measured.height! / 2;
+		const targetX = target.internals.positionAbsolute.x + target.measured.width! / 2;
+		const targetY = target.internals.positionAbsolute.y + target.measured.height! / 2;
 
 		const middleX = (sourceX + targetX) / 2;
 		const middleY = (sourceY + targetY) / 2;
@@ -109,8 +109,8 @@
 		const alpha = Math.atan2(targetY - sourceY, targetX - sourceX);
 
 		const offset = polarToCartesian({
-			r: data!.position!.r,
-			phi: data!.position!.phi + alpha,
+			r: data!.position.r,
+			phi: data!.position.phi + alpha,
 		});
 
 		const labelX = middleX + offset.x;
@@ -162,13 +162,13 @@
 	function onpointermove(e: PointerEvent) {
 		const pos = screenToFlowPosition({ x: e.pageX, y: e.pageY });
 		if (!drag.offset) {
-			drag.offset = { x: pos.x - labelX!, y: pos.y - labelY! };
+			drag.offset = { x: pos.x - labelX, y: pos.y - labelY };
 		}
 		position = cartesianToPolar({
-			x: pos.x - drag.offset.x - middleX!,
-			y: pos.y - drag.offset.y - middleY!,
+			x: pos.x - drag.offset.x - middleX,
+			y: pos.y - drag.offset.y - middleY,
 		});
-		position.phi -= alpha!;
+		position.phi -= alpha;
 	}
 
 	function deleteSelf() {
