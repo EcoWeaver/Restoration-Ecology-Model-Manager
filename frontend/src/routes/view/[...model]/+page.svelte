@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-	<title>{model.metadata.find(({ kind }) => kind === "title")?.value ?? model.uuid}</title>
+	<title>{model.metadata.find(({ kind }) => kind === "title")!.value}</title>
 </svelte:head>
 
 <div class="absolute z-10 w-full bg-white dark:bg-neutral-800">

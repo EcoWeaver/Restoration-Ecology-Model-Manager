@@ -4,7 +4,7 @@
 	import { MediaQuery } from "svelte/reactivity";
 
 	const preference = new MediaQuery("prefers-color-scheme: dark");
-	let storage = $state(browser ? (localStorage?.getItem("theme") ?? "system") : null);
+	let storage = $state(browser ? (localStorage.getItem("theme") ?? "system") : null);
 	let current = $derived(storage === "dark" || (storage === "system" && preference.current));
 
 	function invertTheme(theme: "dark" | "light"): "dark" | "light" {

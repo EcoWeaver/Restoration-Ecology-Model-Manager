@@ -4,12 +4,14 @@ import (
 	"backend/types"
 	"backend/util"
 	"backend/verify"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -24,33 +26,39 @@ type State struct {
 	DOICache     verify.Cache
 	ORCIDCache   verify.Cache
 	SpeciesCache verify.Cache
-	OLS4Caches   map[types.OLS4]*verify.Cache
+	OLS4Caches   sync.Map
 }
 
-type SaveResult struct {
+type GetModelResult struct {
+	UUID     string            `json:"uuid"`
+	Uploaded time.Time         `json:"uploaded"`
+	Graph    types.Graph       `json:"graph"`
+	Parent   *PostSearchResult `json:"parent"`
+	Metadata []types.Metadata  `json:"metadata"`
+}
+
+type PutModelResult struct {
 	UUID string `json:"uuid"`
 }
 
-type ModelResult struct {
-	UUID     string           `json:"uuid"`
-	Uploaded time.Time        `json:"uploaded"`
-	Graph    types.Graph      `json:"graph"`
-	Parent   *SearchResult    `json:"parent"`
-	Metadata []types.Metadata `json:"metadata"`
+type PostModelRunRequest struct {
+	UUID            string                 `json:"uuid"`
+	NodeValues      map[int]float64        `json:"nodeValues"`
+	RelationWeights []types.RelationWeight `json:"relationWeights"`
 }
 
-type SearchResult struct {
+type PostModelRunResult []float64
+
+type PostModelChangedResult struct {
+	Changed bool `json:"changed"`
+}
+
+type PostSearchResult struct {
 	UUID       string    `json:"uuid"`
 	Uploaded   time.Time `json:"uploaded"`
 	Identifier string    `json:"identifier"`
 	Title      string    `json:"title"`
 	ModelType  string    `json:"modelType"`
-}
-
-type ModelRunRequest struct {
-	UUID            string                 `json:"uuid"`
-	NodeValues      map[int]float64        `json:"nodeValues"`
-	RelationWeights []types.RelationWeight `json:"relationWeights"`
 }
 
 // GetMetadata godoc
@@ -75,7 +83,7 @@ func (self *State) GetMetadata(c echo.Context) error {
 //	@Description	Gets a model by its UUID.
 //	@Produce		json
 //	@Param			uuid	query		string	true	"uuid"
-//	@Success		200		{object}	ModelResult
+//	@Success		200		{object}	GetModelResult
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
@@ -125,9 +133,9 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}
 
-	var sr *SearchResult
+	var sr *PostSearchResult
 	if parent != nil {
-		sr = &SearchResult{UUID: *parent}
+		sr = &PostSearchResult{UUID: *parent}
 
 		query = `
 		SELECT
@@ -158,7 +166,7 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}()
 
-	return c.JSON(http.StatusOK, ModelResult{modelID, uploaded, graph, sr, metadata})
+	return c.JSON(http.StatusOK, GetModelResult{modelID, uploaded, graph, sr, metadata})
 }
 
 // PutModel godoc
@@ -168,7 +176,7 @@ func (self *State) GetModel(c echo.Context) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			model	body		types.Model	true	"model"
-//	@Success		201		{object}	SaveResult
+//	@Success		201		{object}	PutModelResult
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		404		{object}	echo.HTTPError
 //	@Failure		409		{object}	echo.HTTPError
@@ -203,23 +211,10 @@ func (self *State) PutModel(c echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	if m.Parent != nil {
-		query := `
-		SELECT
-			models.graph,
-			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
-		FROM
-			models
-			JOIN metadata ON models.model_id = metadata.model_id
-		WHERE
-			models.model_id = $1
-		GROUP BY
-			models.graph`
+		changed, err := modelChanged(conn, m, ctx)
 
-		var graph types.Graph
-		var metadata []types.Metadata
-		if err = conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
-			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", *m.Parent)
+		if err != nil {
+			if _, ok := err.(types.Error); ok {
 				c.Logger().Warn(err)
 				return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
 			} else {
@@ -227,7 +222,7 @@ func (self *State) PutModel(c echo.Context) error {
 			}
 		}
 
-		if slices.Equal(m.Graph.Nodes, graph.Nodes) && util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) && util.SlicesEqualUnordered(m.Metadata, metadata) {
+		if !changed {
 			err = fmt.Errorf("model with uuid '%s' wasn't changed", *m.Parent)
 			c.Logger().Warn(err)
 			return c.JSON(http.StatusConflict, echo.HTTPError{Message: err.Error()})
@@ -270,7 +265,7 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, SaveResult{modelID})
+	return c.JSON(http.StatusCreated, PutModelResult{modelID})
 }
 
 // GetRelations godoc
@@ -296,7 +291,7 @@ func (self *State) GetRelations(c echo.Context) error {
 //	@Accept			json
 //	@Produce		json
 //	@Param			queries	body		[]types.Metadata	true	"queries"
-//	@Success		200		{object}	[]SearchResult
+//	@Success		200		{object}	[]PostSearchResult
 //	@Failure		400		{object}	echo.HTTPError
 //	@Failure		500		{object}	echo.HTTPError
 //	@Router			/search	[post]
@@ -398,10 +393,10 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	var sr SearchResult
-	var r []SearchResult
+	var sr PostSearchResult
+	var res []PostSearchResult
 	_, err = pgx.ForEachRow(rows, []any{&sr.UUID, &sr.Uploaded, &sr.Identifier, &sr.Title, &sr.ModelType}, func() error {
-		r = append(r, sr)
+		res = append(res, sr)
 		return nil
 	})
 	if err != nil {
@@ -412,7 +407,57 @@ func (self *State) PostSearch(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, r)
+	return c.JSON(http.StatusOK, res)
+}
+
+// PostModelChanged godoc
+//
+//	@Summary		Compare a model to its parent
+//	@Description	Checks whether the provided model is equal to its parent, ignoring edge and metadata order.
+//	@Accept			json
+//	@Produce		json
+//	@Param			state			body		types.Model	true	"state"
+//	@Success		200				{object}	PostModelChangedResult
+//	@Failure		400				{object}	echo.HTTPError
+//	@Failure		404				{object}	echo.HTTPError
+//	@Failure		500				{object}	echo.HTTPError
+//	@Router			/model/changed	[post]
+func (self *State) PostModelChanged(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return err
+	}
+
+	var m types.Model
+	if err = json.Unmarshal(body, &m); err != nil {
+		c.Logger().Warn(err)
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+	}
+
+	if m.Parent == nil {
+		err = fmt.Errorf("model with uuid '%s' has no parent", *m.Parent)
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+	}
+
+	conn, err := self.DBPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Rollback(ctx)
+
+	changed, err := modelChanged(conn, m, ctx)
+	if err != nil {
+		if _, ok := err.(types.Error); ok {
+			c.Logger().Warn(err)
+			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
+		} else {
+			return err
+		}
+	}
+
+	return c.JSON(http.StatusOK, PostModelChangedResult{changed})
 }
 
 // PostModelRun godoc
@@ -421,8 +466,8 @@ func (self *State) PostSearch(c echo.Context) error {
 //	@Description	Runs a model with provided initial states and edge transfer functions.
 //	@Accept			json
 //	@Produce		json
-//	@Param			state		body		ModelRunRequest	true	"state"
-//	@Success		200			{object}	ModelRunResult
+//	@Param			state		body		PostModelRunRequest	true	"state"
+//	@Success		200			{object}	PostModelRunResult
 //	@Failure		400			{object}	echo.HTTPError
 //	@Failure		404			{object}	echo.HTTPError
 //	@Failure		500			{object}	echo.HTTPError
@@ -435,7 +480,7 @@ func (self *State) PostModelRun(c echo.Context) error {
 		return err
 	}
 
-	var mr ModelRunRequest
+	var mr PostModelRunRequest
 	if err = json.Unmarshal(body, &mr); err != nil {
 		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
@@ -487,4 +532,31 @@ func (self *State) PostModelRun(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
+}
+
+func modelChanged(conn pgx.Tx, m types.Model, ctx context.Context) (bool, error) {
+	query := `
+		SELECT
+			models.graph,
+			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
+		FROM
+			models
+			JOIN metadata ON models.model_id = metadata.model_id
+		WHERE
+			models.model_id = $1
+		GROUP BY
+			models.graph`
+
+	var graph types.Graph
+	var metadata []types.Metadata
+	if err := conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
+		if err == pgx.ErrNoRows {
+			err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", *m.Parent)
+			return false, types.Error{E: err}
+		} else {
+			return false, err
+		}
+	}
+
+	return !slices.Equal(m.Graph.Nodes, graph.Nodes) || !util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) || !util.SlicesEqualUnordered(m.Metadata, metadata), nil
 }

@@ -107,7 +107,7 @@ export class History {
 			const oldNode = nodesMap.get(node.id)!;
 			if (oldNode.position.x !== node.position.x || oldNode.position.y !== node.position.y) {
 				// if the last change was also "changeNodePosition", collapse the two events
-				if (this.undoHist.length) {
+				if (this.undoHist.length > 0) {
 					const undoHistEnd = this.undoHist[this.undoHist.length - 1];
 					if (undoHistEnd.tag === "changeNodePosition" && undoHistEnd.id === node.id) {
 						return "collapsed";
@@ -120,7 +120,7 @@ export class History {
 				};
 			} else if (oldNode.data.body !== node.data.body) {
 				// if the last change was also "changeNodeBody", collapse the two events
-				if (this.undoHist.length) {
+				if (this.undoHist.length > 0) {
 					const undoHistEnd = this.undoHist[this.undoHist.length - 1];
 					if (undoHistEnd.tag === "changeNodeBody" && undoHistEnd.id === node.id) {
 						return "collapsed";
@@ -153,7 +153,7 @@ export class History {
 				oldData.position.phi !== newData.position.phi
 			) {
 				// if the last change was also "changeEdgePosition", collapse the two events
-				if (this.undoHist.length) {
+				if (this.undoHist.length > 0) {
 					const undoHistEnd = this.undoHist[this.undoHist.length - 1];
 					if (undoHistEnd.tag === "changeEdgePosition" && undoHistEnd.id === edge.id) {
 						return "collapsed";
@@ -237,7 +237,7 @@ export class History {
 	}
 
 	canUndo(): boolean {
-		return this.undoHist.length !== 0;
+		return this.undoHist.length > 0;
 	}
 
 	undo(): [Node[], Edge[]] {
@@ -250,7 +250,7 @@ export class History {
 	}
 
 	canRedo(): boolean {
-		return this.redoHist.length !== 0;
+		return this.redoHist.length > 0;
 	}
 
 	redo(): [Node[], Edge[]] {

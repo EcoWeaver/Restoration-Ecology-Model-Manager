@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "backend/docs"
-	"backend/types"
 	"backend/verify"
 	"context"
 	"os"
@@ -58,13 +57,13 @@ func main() {
 		DOICache:     verify.DOICache(),
 		ORCIDCache:   verify.ORCIDCache(),
 		SpeciesCache: verify.SpeciesCache(),
-		OLS4Caches:   map[types.OLS4]*verify.Cache{},
 	}
 
 	e.GET("/metadata", state.GetMetadata)
 
 	e.GET("/model", state.GetModel)
 	e.PUT("/model", state.PutModel)
+	e.POST("/model/changed", state.PostModelChanged)
 	e.POST("/model/run", state.PostModelRun)
 
 	e.GET("/relations", state.GetRelations)

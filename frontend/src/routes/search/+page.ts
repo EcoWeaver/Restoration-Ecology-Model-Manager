@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { apiBase, type SearchResult } from "$lib/api";
+import { apiBase, type PostSearchResult } from "$lib/api";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, url }) => {
@@ -9,7 +9,7 @@ export const load: PageLoad = async ({ fetch, url }) => {
 		return error(res.status, await res.json());
 	}
 
-	const queryItems: SearchResult[] = (await res.json()) ?? [];
+	const queryItems: PostSearchResult[] = (await res.json()) ?? [];
 
 	// map from identifier => oldest date for that identifier
 	const order = new Map<string, string>();

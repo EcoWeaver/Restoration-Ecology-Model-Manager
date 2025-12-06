@@ -30,27 +30,31 @@ export function relationElements(): Promise<RelationElements> {
 
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 
-export function putModel(model: Model): Promise<SaveResult> {
-	return req<SaveResult>("PUT", "model", model);
+export function putModel(model: Model): Promise<PutModelResult> {
+	return req<PutModelResult>("PUT", "model", model);
 }
 
 export type BackendError = {
 	message: string;
 };
 
-export type SaveResult = {
-	uuid: string;
-};
-
-export type ModelResult = {
+export type GetModelResult = {
 	uuid: string;
 	uploaded: string;
 	graph: Graph;
 	metadata: Metadata[];
-	parent?: SearchResult;
+	parent?: PostSearchResult;
 };
 
-export type SearchResult = {
+export type PutModelResult = {
+	uuid: string;
+};
+
+export type PostModelChangedResult = {
+	changed: boolean;
+};
+
+export type PostSearchResult = {
 	uuid: string;
 	uploaded: string;
 	identifier: string;
@@ -65,8 +69,8 @@ export type Model = {
 };
 
 export type Graph = {
-	nodes: Node[];
-	relations: Relation[];
+	nodes?: Node[];
+	relations?: Relation[];
 };
 
 export type Metadata = {

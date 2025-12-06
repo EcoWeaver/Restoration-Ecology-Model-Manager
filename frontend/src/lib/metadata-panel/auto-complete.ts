@@ -5,13 +5,13 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 		return [];
 	}
 
-	const response = await fetch(
+	const res = await fetch(
 		`https://api.gbif.org/v1/species/suggest?rank=SPECIES&q=${encodeURIComponent(value)}`,
 	);
 	const suggestions: {
 		status: string;
 		canonicalName: string;
-	}[] = await response.json();
+	}[] = await res.json();
 
 	return suggestions
 		.filter((suggestion) => suggestion.status === "ACCEPTED")
@@ -23,7 +23,7 @@ export async function suggestOLS4(value: string, ols4: OLS4): Promise<string[]> 
 		return [];
 	}
 
-	const response = await fetch(
+	const res = await fetch(
 		`https://www.ebi.ac.uk/ols4/api/suggest?ontology=${ols4.onto}&childrenOf=${ols4.iri}&q=${encodeURIComponent(value)}`,
 	);
 	const suggestions: {
@@ -32,7 +32,7 @@ export async function suggestOLS4(value: string, ols4: OLS4): Promise<string[]> 
 				autosuggest: string;
 			}[];
 		};
-	} = await response.json();
+	} = await res.json();
 
 	return suggestions.response.docs.map((suggestion) => suggestion.autosuggest);
 }

@@ -24,9 +24,7 @@ type Connection struct {
 	Formula types.Polynomial
 }
 
-type ModelRunResult []float64
-
-func (self ModelRunRequest) Verify(r *RelationsConfig) error {
+func (self PostModelRunRequest) Verify(r *RelationsConfig) error {
 	type Relation struct {
 		From int
 		To   int
@@ -51,7 +49,7 @@ func (self ModelRunRequest) Verify(r *RelationsConfig) error {
 	return nil
 }
 
-func (self ModelRunRequest) Run(g types.Graph, r *RelationsConfig) (ModelRunResult, error) {
+func (self PostModelRunRequest) Run(g types.Graph, r *RelationsConfig) (PostModelRunResult, error) {
 	var s ModelRunState
 	for i := range len(g.Nodes) {
 		s = append(s, &NodeState{Value: self.NodeValues[i]})
@@ -65,7 +63,7 @@ outer:
 			}
 
 			if !slices.Contains(r.Causal, re.Kind) {
-				return ModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-causal relation from %d to %d", w.From, w.To)}
+				return PostModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-causal relation from %d to %d", w.From, w.To)}
 			}
 
 			s[re.From].Out = append(s[re.From].Out, s[re.To])
@@ -75,7 +73,7 @@ outer:
 			continue outer
 		}
 
-		return ModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-existent relation from %d to %d", w.From, w.To)}
+		return PostModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-existent relation from %d to %d", w.From, w.To)}
 	}
 
 	for _, node := range s {
@@ -84,10 +82,10 @@ outer:
 		}
 	}
 
-	var res ModelRunResult
+	var res PostModelRunResult
 	for _, node := range s {
 		if node.Indegree != -1 {
-			return ModelRunResult{}, types.Error{E: errors.New("encountered cycle in graph")}
+			return PostModelRunResult{}, types.Error{E: errors.New("encountered cycle in graph")}
 		}
 		res = append(res, node.Value+node.Change)
 	}

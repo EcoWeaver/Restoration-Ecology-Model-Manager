@@ -1,13 +1,5 @@
 import type { Node as FlowNode, Edge as FlowEdge } from "@xyflow/svelte";
-import {
-	putModel,
-	type Node as ApiNode,
-	type Relation as ApiRelation,
-	type Graph,
-	type Metadata,
-	type SaveResult,
-	type Model,
-} from "./api";
+import { type Node as ApiNode, type Relation as ApiRelation, type Graph } from "./api";
 
 export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & {
 	dragHandle: ".drag-handle";
@@ -48,13 +40,8 @@ export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edg
 	return { nodes, edges };
 }
 
-export async function saveModel(
-	parent: string | undefined,
-	metadata: Metadata[],
-	n: Node[],
-	e: Edge[],
-): Promise<SaveResult> {
-	const nodes: ApiNode[] = n.map((n) => {
+export function toModel(nodes: Node[], edges: Edge[]): Graph {
+	const n: ApiNode[] = nodes.map((n) => {
 		const { body, color } = n.data;
 		return {
 			body,
@@ -63,9 +50,9 @@ export async function saveModel(
 		};
 	});
 
-	const relations: ApiRelation[] = e.map((e) => {
-		const from = n.findIndex((n) => n.id === e.source);
-		const to = n.findIndex((n) => n.id === e.target);
+	const relations: ApiRelation[] = edges.map((e) => {
+		const from = nodes.findIndex((n) => n.id === e.source);
+		const to = nodes.findIndex((n) => n.id === e.target);
 
 		const { kind, position } = e.data ?? defaultEdge(true).data!;
 		if (position.r < 0) {
@@ -82,12 +69,8 @@ export async function saveModel(
 		return { from, to, kind, position };
 	});
 
-	const graph = { nodes, relations };
-	const request: Model = {
-		metadata,
-		graph,
-		parent,
+	return {
+		nodes: n,
+		relations,
 	};
-
-	return await putModel(request);
 }

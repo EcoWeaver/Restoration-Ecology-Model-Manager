@@ -1,27 +1,36 @@
 <script lang="ts">
 	import { CircleX, Plus, Save } from "@lucide/svelte";
 	import Graph from "$lib/Graph.svelte";
-	import { defaultEdge, saveModel } from "$lib/model.js";
+	import { apiToFlow, defaultEdge, toModel as flowToApi } from "$lib/model.js";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import MetadataPanel from "$lib/MetadataPanel.svelte";
 	import { beforeNavigate, goto } from "$app/navigation";
-	import type { BackendError, Metadata, MetadataElements } from "./api";
+	import {
+		apiBase,
+		putModel,
+		type BackendError,
+		type Metadata,
+		type MetadataElements,
+		type Model,
+		type PostModelChangedResult,
+	} from "./api";
 	import Header from "./Header.svelte";
 	import Alert from "./Alert.svelte";
 	import { clearNavigate, startNavigate } from "./LoadingSpinner.svelte";
 	import { type XYPosition, useStore, useSvelteFlow, useUpdateNodeInternals } from "@xyflow/svelte";
 	import { History } from "./graph/history.svelte";
 	import { resolve } from "$app/paths";
+	import { browser } from "$app/environment";
 
 	let {
-		uuid,
+		parent,
 		metadata = $bindable(),
 		metadataElements,
 		nodes: initialNodes,
 		edges: initialEdges,
 	}: {
-		uuid?: string;
+		parent?: string;
 		metadata: Metadata[];
 		metadataElements: MetadataElements;
 		nodes: Node[];
@@ -34,6 +43,53 @@
 
 	let nodes: Node[] = $state.raw(initialNodes);
 	let edges: Edge[] = $state.raw(initialEdges);
+
+	maybeResumeEditing();
+	async function maybeResumeEditing() {
+		const storage = browser ? localStorage.getItem("resumeEditing") : null;
+		if (!storage) {
+			return;
+		}
+
+		const model: Model = JSON.parse(storage);
+		if (model.parent !== parent) {
+			return;
+		}
+
+		let changed: boolean;
+		if (model.parent) {
+			const res = await fetch(`${apiBase}/model/changed`, {
+				method: "POST",
+				body: storage,
+			});
+			const s: PostModelChangedResult = await res.json();
+			changed = s.changed;
+		} else {
+			changed =
+				!!model.graph.nodes?.length ||
+				!!model.metadata.length ||
+				!!model.metadata.filter((m) => m.value !== "").length;
+		}
+
+		if (!changed || !confirm("Resume where you left off?")) {
+			return;
+		}
+
+		metadata = model.metadata;
+		const { nodes: newNodes, edges: newEdges } = apiToFlow(model.graph, true);
+		nodes = newNodes;
+		edges = newEdges;
+	}
+
+	$effect(() => {
+		const nodes_ = nodes;
+		const edges_ = edges;
+		const metadata_ = metadata;
+		localStorage.setItem(
+			"resumeEditing",
+			JSON.stringify({ graph: flowToApi(nodes_, edges_), metadata: metadata_, parent }),
+		);
+	});
 
 	const history = new History(initialNodes, initialEdges, defaultEdge(true), updateNodeInternals);
 	$effect(() =>
@@ -48,7 +104,7 @@
 	async function save() {
 		try {
 			startNavigate();
-			const res = await saveModel(uuid, metadata, nodes, edges);
+			const res = await putModel({ graph: flowToApi(nodes, edges), metadata, parent });
 			await goto(resolve(`/view/${res.uuid}`));
 		} catch (err: unknown) {
 			const error = err as BackendError;
@@ -87,7 +143,7 @@
 		if (nav.type === "leave" || nav.willUnload) {
 			nav.cancel();
 		} else if (nav.type !== "goto" || nav.to?.route.id !== "/view/[...model]") {
-			const doNavigate = confirm("Leave site? Unsaved changes will be lost.");
+			const doNavigate = confirm("Leave site? Unsaved changes may be lost.");
 			if (!doNavigate) {
 				nav.cancel();
 			}
@@ -132,7 +188,7 @@
 			<span class="pl-2">save</span>
 		</button>
 		<a
-			href={resolve(uuid ? `/view/${uuid}` : "/")}
+			href={resolve(parent ? `/view/${parent}` : "/")}
 			title="cancel editing"
 			class="flex h-10 cursor-pointer items-center rounded-md bg-red-300 px-3 outline-offset-2 outline-red-400 hover:bg-red-400 focus-visible:outline-2 dark:bg-red-500"
 			data-sveltekit-preload-data="tap"

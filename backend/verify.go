@@ -147,11 +147,9 @@ func verifyMetadata(self types.Metadata, s *State, m MetadataConfig, l echo.Logg
 					return nil
 				}
 			case "ols4":
-				if _, ok := s.OLS4Caches[*me.OLS4]; !ok {
-					c := verify.OLS4Cache(*me.OLS4)
-					s.OLS4Caches[*me.OLS4] = &c
-				}
-				if err = s.OLS4Caches[*me.OLS4].Verify(self.Value, ctx); err == nil {
+				ca := verify.OLS4Cache(*me.OLS4)
+				c, _ := s.OLS4Caches.LoadOrStore(*me.OLS4, &ca)
+				if err = c.(*verify.Cache).Verify(self.Value, ctx); err == nil {
 					return nil
 				}
 			case "orcid":

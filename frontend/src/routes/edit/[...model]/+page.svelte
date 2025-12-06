@@ -11,9 +11,9 @@
 </script>
 
 <svelte:head>
-	<title>editing {metadata.find(({ kind }) => kind === "title")?.value ?? uuid}</title>
+	<title>edit {metadata.find(({ kind }) => kind === "title")!.value}</title>
 </svelte:head>
 
 <SvelteFlowProvider>
-	<GraphEdit {uuid} bind:metadata {metadataElements} {nodes} {edges} />
+	<GraphEdit parent={uuid} bind:metadata {metadataElements} {nodes} {edges} />
 </SvelteFlowProvider>
