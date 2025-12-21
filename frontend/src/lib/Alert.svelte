@@ -7,22 +7,22 @@
 	let isError = $state(false);
 	let timeoutId = $state<number>();
 
-	export function error(err: string) {
+	function startTimer(duration: number) {
 		clearTimeout(timeoutId);
-
-		text = err;
 		open = true;
+		timeoutId = setTimeout(() => (open = false), duration);
+	}
+
+	export function error(err: string) {
+		text = err;
 		isError = true;
-		timeoutId = setTimeout(() => (open = false), 6000);
+		startTimer(3000);
 	}
 
 	export function info(info: string) {
-		clearTimeout(timeoutId);
-
 		text = info;
-		open = true;
 		isError = false;
-		timeoutId = setTimeout(() => (open = false), 3000);
+		startTimer(3000);
 	}
 </script>
 
@@ -31,6 +31,8 @@
 		transition:fly={{ duration: 100, y: -50 }}
 		role="alert"
 		class="t-0 absolute z-200 mt-18 flex w-full justify-center"
+		onmouseenter={() => clearTimeout(timeoutId)}
+		onmouseleave={() => startTimer(1000)}
 	>
 		<span
 			class:bg-red-300={isError}
