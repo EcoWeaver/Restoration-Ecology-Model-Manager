@@ -72,7 +72,7 @@
 									<a
 										class="mb-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 										title={model.parent.title}
-										href={resolve("/view/{model.parent.uuid}")}
+										href={resolve(`/view/${model.parent.uuid}`)}
 									>
 										"{model.parent.title}"
 									</a>
