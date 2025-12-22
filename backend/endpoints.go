@@ -30,11 +30,11 @@ type State struct {
 }
 
 type GetModelResult struct {
-	UUID     string            `json:"uuid"`
-	Uploaded time.Time         `json:"uploaded"`
-	Graph    types.Graph       `json:"graph"`
-	Parent   *PostSearchResult `json:"parent"`
-	Metadata []types.Metadata  `json:"metadata"`
+	UUID     string           `json:"uuid"`
+	Uploaded time.Time        `json:"uploaded"`
+	Graph    types.Graph      `json:"graph"`
+	Parent   *Parent          `json:"parent"`
+	Metadata []types.Metadata `json:"metadata"`
 }
 
 type PutModelResult struct {
@@ -59,6 +59,11 @@ type PostSearchResult struct {
 	Identifier string    `json:"identifier"`
 	Title      string    `json:"title"`
 	ModelType  string    `json:"modelType"`
+}
+
+type Parent struct {
+	UUID  string `json:"uuid"`
+	Title string `json:"title"`
 }
 
 // GetMetadata godoc
@@ -121,9 +126,9 @@ func (self *State) GetModel(c echo.Context) error {
 
 	var uploaded time.Time
 	var graph types.Graph
-	var parent *string
+	var parentUUID *string
 	var metadata []types.Metadata
-	if err = conn.QueryRow(ctx, query, modelID).Scan(&uploaded, &graph, &parent, &metadata); err != nil {
+	if err = conn.QueryRow(ctx, query, modelID).Scan(&uploaded, &graph, &parentUUID, &metadata); err != nil {
 		if err == pgx.ErrNoRows {
 			err = fmt.Errorf("model with uuid '%s' not found", modelID)
 			c.Logger().Warn(err)
@@ -133,25 +138,19 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}
 
-	var sr *PostSearchResult
-	if parent != nil {
-		sr = &PostSearchResult{UUID: *parent}
+	var parent *Parent
+	if parentUUID != nil {
+		parent = &Parent{UUID: *parentUUID}
 
 		query = `
 		SELECT
-			models.uploaded,
-			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'model type' THEN metadata.value END)
+			metadata.value
 		FROM
-			models
-			JOIN metadata ON models.model_id = metadata.model_id
+			metadata
 		WHERE
-			models.model_id = $1
-		GROUP BY
-			models.uploaded`
+			metadata.model_id = $1 AND metadata.kind = 'title'`
 
-		if err := conn.QueryRow(ctx, query, *parent).Scan(&sr.Uploaded, &sr.Identifier, &sr.Title, &sr.ModelType); err != nil {
+		if err := conn.QueryRow(ctx, query, *parentUUID).Scan(&parent.Title); err != nil {
 			return err
 		}
 	}
@@ -161,12 +160,12 @@ func (self *State) GetModel(c echo.Context) error {
 	}
 
 	go func() {
-		if err, ok := verifyModel(types.Model{Graph: graph, Parent: parent, Metadata: metadata}, self, c.Logger(), ctx).(types.Error); ok {
+		if err, ok := verifyModel(types.Model{Graph: graph, Parent: parentUUID, Metadata: metadata}, self, c.Logger(), ctx).(types.Error); ok {
 			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with uuid '%s': %w", modelID, err))
 		}
 	}()
 
-	return c.JSON(http.StatusOK, GetModelResult{modelID, uploaded, graph, sr, metadata})
+	return c.JSON(http.StatusOK, GetModelResult{modelID, uploaded, graph, parent, metadata})
 }
 
 // PutModel godoc

@@ -8,10 +8,8 @@ export async function req<T>(method: string, path: string, body?: unknown): Prom
 		body: body === undefined ? undefined : JSON.stringify(body),
 	});
 
-	if (res.status === 200 || res.status === 201) {
-		return res.json();
-	} else if (res.ok) {
-		return undefined as T;
+	if (res.ok) {
+		return await res.json();
 	} else {
 		throw await res.json();
 	}
@@ -39,7 +37,7 @@ export type GetModelResult = {
 	uploaded: string;
 	graph: Graph;
 	metadata: Metadata[];
-	parent?: PostSearchResult;
+	parent?: Parent;
 };
 
 export type PutModelResult = {
@@ -56,6 +54,11 @@ export type PostSearchResult = {
 	identifier: string;
 	title: string;
 	modelType: string;
+};
+
+export type Parent = {
+	uuid: string;
+	title: string;
 };
 
 export type Model = {
