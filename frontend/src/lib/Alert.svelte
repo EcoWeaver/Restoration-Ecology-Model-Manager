@@ -6,11 +6,14 @@
 	let text = $state("");
 	let isError = $state(false);
 	let timeoutId = $state<number>();
+	let expiresAt = $state(0);
+	let hoverStart = $state(0);
 
 	function startTimer(duration: number) {
 		clearTimeout(timeoutId);
 		open = true;
 		timeoutId = setTimeout(() => (open = false), duration);
+		expiresAt = Date.now() + duration;
 	}
 
 	export function error(err: string) {
@@ -31,8 +34,18 @@
 		transition:fly={{ duration: 100, y: -50 }}
 		role="alert"
 		class="t-0 absolute z-200 mt-18 flex w-full justify-center"
-		onmouseenter={() => clearTimeout(timeoutId)}
-		onmouseleave={() => startTimer(1000)}
+		onmouseenter={() => {
+			hoverStart = Date.now();
+			clearTimeout(timeoutId);
+		}}
+		onmouseleave={() => {
+			const now = Date.now();
+			if (now - hoverStart >= 500) {
+				startTimer(500);
+			} else {
+				startTimer(Math.max(expiresAt - now, 500));
+			}
+		}}
 	>
 		<span
 			class:bg-red-300={isError}
