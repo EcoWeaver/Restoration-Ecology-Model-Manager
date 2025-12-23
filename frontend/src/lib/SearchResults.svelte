@@ -118,9 +118,9 @@
 -->
 {#if browser}
 	{#if sortedItems.length > 0}
-		<div class="p-4 pt-2">
+		<div class="p-4 pt-0">
 			<div class="table w-full border-collapse p-2 text-lg">
-				<div class="mb-2 table-row border-b border-neutral-300">
+				<div class="table-row border-b border-neutral-300">
 					{#snippet header(column: SortColumn, value?: string)}
 						{@const text = value ?? column}
 						<span class="table-cell px-1 py-3 font-semibold">

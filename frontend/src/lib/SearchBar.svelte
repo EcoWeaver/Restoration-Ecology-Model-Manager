@@ -196,7 +196,7 @@
 	{#if focused && suggestions.length !== 0 && !chipsEditing.includes(true)}
 		<div
 			style={inputElementOffset ? `left: ${inputElementOffset}px` : undefined}
-			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 bg-white p-2 py-1 shadow-xl dark:bg-neutral-800"
+			class="absolute mt-2 -ml-4 max-h-96 min-w-64 overflow-y-scroll rounded-md border border-neutral-600 bg-white p-1.75 py-1 shadow-xl dark:bg-neutral-800"
 			tabindex="-1"
 		>
 			{#each suggestions as suggestion, idx (suggestion)}
