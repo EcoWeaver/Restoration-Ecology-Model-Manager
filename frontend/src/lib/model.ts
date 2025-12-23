@@ -1,9 +1,7 @@
 import type { Node as FlowNode, Edge as FlowEdge } from "@xyflow/svelte";
 import { type Node as ApiNode, type Relation as ApiRelation, type Graph } from "./api";
 
-export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom"> & {
-	dragHandle: ".drag-handle";
-};
+export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom">;
 export type Edge = FlowEdge<Omit<ApiRelation, "from" | "to"> & { editable: boolean }, "custom">;
 
 export function defaultEdge(editable: boolean): Partial<Edge> {

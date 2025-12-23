@@ -3,9 +3,7 @@
 	import { Move, Palette, Trash2 } from "@lucide/svelte";
 	import type { Node } from "$lib/model";
 
-	// dragHandle is used internally by svelte-flow to make this node draggable only on .drag-handle elements
-	// eslint-disable-next-line svelte/no-unused-props
-	const { id, data }: NodeProps<Omit<Node, "dragHandle"> & { dragHandle?: string }> = $props();
+	const { id, data }: NodeProps<Node> = $props();
 
 	const { updateNodeData, deleteElements } = useSvelteFlow();
 	const connection = useConnection();
