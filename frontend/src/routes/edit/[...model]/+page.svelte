@@ -12,14 +12,11 @@
 	import Alert from "$lib/Alert.svelte";
 
 	let { data } = $props();
-	const { metadataElements, model } = data;
-
-	const graph = apiToFlow(model.graph, true);
-	const parent = model.parent;
-
-	let nodes = $state.raw(graph.nodes);
-	let edges = $state.raw(graph.edges);
-	let metadata = $state(model.metadata);
+	const { metadataElements, model } = $derived(data);
+	let { nodes, edges } = $derived(apiToFlow(model.graph, true));
+	let metadata = $derived(model.metadata);
+	const parent = $derived(model.parent);
+	const title = $derived(metadata.find(({ kind }) => kind === "title")?.value ?? "");
 
 	$effect(() => {
 		const nodes_ = nodes;
@@ -31,8 +28,6 @@
 			parent,
 		});
 	});
-
-	const title = $derived(metadata.find(({ kind }) => kind === "title")?.value ?? "");
 
 	let alert: ReturnType<typeof Alert>;
 

@@ -32,7 +32,7 @@
 	} = $props();
 
 	const { screenToFlowPosition } = useSvelteFlow();
-	const editable = addNode !== undefined;
+	const editable = $derived(addNode !== undefined);
 
 	const onconnectend: OnConnectEnd = (event, connectionState) => {
 		if (!addNode || connectionState.isValid) {

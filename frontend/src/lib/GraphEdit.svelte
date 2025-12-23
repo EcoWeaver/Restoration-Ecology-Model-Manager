@@ -4,13 +4,7 @@
 	import { defaultEdge } from "$lib/model.js";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
-	import {
-		type Metadata,
-		type MetadataElements,
-		type MetadataType,
-		type OLS4,
-		type Parent,
-	} from "./api";
+	import { type Metadata, type MetadataElement, type MetadataElements, type Parent } from "./api";
 	import Header from "./Header.svelte";
 	import { type XYPosition, useStore, useSvelteFlow, useUpdateNodeInternals } from "@xyflow/svelte";
 	import { History } from "./graph/history.svelte";
@@ -95,16 +89,13 @@
 		}
 	}
 
-	type FlatMeta = {
-		type?: MetadataType;
-		choices?: string[];
-		ols4?: OLS4;
-	};
-
-	const flatMetadata = new Map<string, FlatMeta>();
-	for (const { name, type, choices, ols4 } of Object.values(metadataElements).flat()) {
-		flatMetadata.set(name, { type, choices, ols4 });
-	}
+	const flatMetadata = $derived.by(() => {
+		const map = new Map<string, Omit<MetadataElement, "name">>();
+		for (const { name, type, choices, ols4 } of Object.values(metadataElements).flat()) {
+			map.set(name, { type, choices, ols4 });
+		}
+		return map;
+	});
 
 	const panelEntries: (Metadata & { mandatory: boolean })[] = $state([]);
 

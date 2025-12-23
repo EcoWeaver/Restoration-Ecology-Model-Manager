@@ -12,7 +12,7 @@
 	import type { MetadataType } from "$lib/api.js";
 
 	let { data } = $props();
-	let { model, metadataElements } = $derived(data);
+	let { metadataElements, model } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
 	const { metadata, parent } = $derived(model);
 	const title = $derived(metadata.find(({ kind }) => kind === "title")!.value);

@@ -21,8 +21,8 @@
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
 
 	const { updateEdge, getZoom, deleteElements, screenToFlowPosition } = useSvelteFlow();
-	const sourceNode = useInternalNode(source);
-	const targetNode = useInternalNode(target);
+	const sourceNode = $derived(useInternalNode(source));
+	const targetNode = $derived(useInternalNode(target));
 
 	const relationElements = getRelationElements();
 
