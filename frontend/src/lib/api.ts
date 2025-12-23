@@ -1,4 +1,5 @@
 import { env } from "$env/dynamic/public";
+import { createContext } from "svelte";
 
 export const apiBase = env.PUBLIC_API_URL || "http://localhost:8080";
 
@@ -15,18 +16,15 @@ export async function req<T>(method: string, path: string, body?: unknown): Prom
 	}
 }
 
+export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>;
 
-let relationElementsCache: Promise<RelationElements> | undefined;
-export function relationElements(): Promise<RelationElements> {
-	if (!relationElementsCache) {
-		relationElementsCache = req<RelationElements>("GET", "relations");
-	}
-
-	return relationElementsCache;
-}
-
-export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
+export const [useMetadataElements, setMetadataElements] = createContext<{
+	getMetadataElements: () => MetadataElements;
+}>();
+export const [useRelationElements, setRelationElements] = createContext<{
+	getRelationElements: () => RelationElements;
+}>();
 
 export type BackendError = {
 	message: string;

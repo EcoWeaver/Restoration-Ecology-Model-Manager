@@ -4,7 +4,8 @@
 	import SearchResults from "$lib/SearchResults.svelte";
 
 	let { data } = $props();
-	let { items, params: searchParams, metadataElements } = $derived(data);
+
+	let { items, params: searchParams } = $derived(data);
 
 	let params = $derived<ChipElement[]>(searchParams.map(([kind, value]) => ({ kind, value })));
 </script>
@@ -13,6 +14,6 @@
 	<title>search uploaded models</title>
 </svelte:head>
 
-<Header {metadataElements} {params} />
+<Header {params} />
 
 <SearchResults {items} route="view" />

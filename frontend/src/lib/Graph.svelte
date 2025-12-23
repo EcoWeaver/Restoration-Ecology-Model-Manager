@@ -22,13 +22,13 @@
 		edges = $bindable(),
 		addNode,
 		onmoveend,
-		panel,
+		children: panel,
 	}: {
 		nodes: Node[];
 		edges: Edge[];
 		addNode?: (pos: XYPosition) => string;
 		onmoveend?: OnMove;
-		panel: Snippet;
+		children: Snippet;
 	} = $props();
 
 	const { screenToFlowPosition } = useSvelteFlow();

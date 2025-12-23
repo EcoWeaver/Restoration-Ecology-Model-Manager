@@ -4,19 +4,16 @@
 	import type { Snippet } from "svelte";
 	import DarkLight from "./DarkLight.svelte";
 	import SearchBar from "./SearchBar.svelte";
-	import { type MetadataElements } from "./api";
 	import { resolve } from "$app/paths";
 	import { goto } from "$app/navigation";
 	import { newLocalModel } from "./local";
 
 	let {
-		metadataElements,
 		params,
 		newModel = false,
 		yourModels = true,
 		children,
 	}: {
-		metadataElements: MetadataElements;
 		params?: ChipElement[];
 		newModel?: boolean;
 		yourModels?: boolean;
@@ -34,7 +31,7 @@
 	</a>
 
 	<div class="flex min-w-0 grow">
-		<SearchBar {metadataElements} {params} />
+		<SearchBar {params} />
 	</div>
 
 	{#if yourModels}

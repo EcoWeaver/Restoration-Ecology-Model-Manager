@@ -4,18 +4,13 @@
 	import Chip, { type ChipElement } from "./search/Chip.svelte";
 	import { metadataSuggest } from "./search/suggestions";
 	import { Search as SearchIcon } from "@lucide/svelte";
-	import type { MetadataElements } from "./api";
 	import { resolve } from "$app/paths";
+	import { useMetadataElements } from "./api";
 
-	let {
-		metadataElements,
-		params = [],
-	}: {
-		metadataElements: MetadataElements;
-		params?: ChipElement[];
-	} = $props();
+	let { params = [] }: { params?: ChipElement[] } = $props();
 
-	const suggest = metadataSuggest(metadataElements);
+	const { getMetadataElements } = useMetadataElements();
+	const suggest = metadataSuggest(getMetadataElements());
 
 	let input = $state("");
 	let chip = $state<ChipElement>();
@@ -23,8 +18,8 @@
 	// inside of the $derived.
 	// see https://github.com/sveltejs/svelte/issues/16189
 	let chips = $derived.by(() => {
-		const v = $state(params);
-		return v;
+		const chips = $state(params);
+		return chips;
 	});
 
 	let selected = $state<number>(-1);

@@ -3,9 +3,6 @@
 	import { deleteLocalModel, getLocalModels } from "$lib/local.js";
 	import SearchResults from "$lib/SearchResults.svelte";
 
-	let { data } = $props();
-	let { metadataElements } = $derived(data);
-
 	function placeholder<T extends Record<string, string>>(obj: T): T {
 		return Object.fromEntries(
 			Object.entries(obj).map(([key, value]) => [key, value === "" ? "n/a" : value]),
@@ -26,7 +23,7 @@
 	<title>view your local models</title>
 </svelte:head>
 
-<Header {metadataElements} newModel={true} yourModels={false} />
+<Header newModel={true} yourModels={false} />
 
 <SearchResults
 	{items}

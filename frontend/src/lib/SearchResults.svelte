@@ -5,7 +5,7 @@
 	import type { PostSearchResult } from "./api";
 
 	let {
-		items: originalItems,
+		items,
 		route,
 		del,
 	}: {
@@ -13,36 +13,6 @@
 		route: "edit" | "view";
 		del?: (uuid: string) => void;
 	} = $props();
-
-	// map from identifier => oldest date for that identifier
-	const order = new Map<string, string>();
-	for (const { identifier, uploaded } of originalItems) {
-		const prev = order.get(identifier);
-		if (prev == null || prev > uploaded) {
-			// set to the current if there is none
-			// or replace if the current uploaded date is older
-			order.set(identifier, uploaded);
-		}
-	}
-
-	originalItems.sort((a, b) => {
-		// if the identifiers are unequal, compare
-		// the oldest creation dates for each identifier
-		// this groups the identifiers together
-		if (a.identifier !== b.identifier) {
-			const l = order.get(a.identifier)!;
-			const r = order.get(b.identifier)!;
-
-			// sort the identifiers in reverse (b cmp a) to
-			// put newer identifiers at the top
-			return r.localeCompare(l, "en");
-		}
-
-		// if they have the same identifier sort their uploaded dates
-		// don't sort in reverse (a cmp b) to have ascending creation
-		// dates per identifier
-		return a.uploaded.localeCompare(b.uploaded, "en");
-	});
 
 	function dateFormat(d: Date, short: boolean): string {
 		const year = d.getFullYear();
@@ -72,6 +42,42 @@
 
 	let sortState = $state<SortState>();
 
+	let initialItems = $derived.by(() => {
+		const initialItems = $state.snapshot(items);
+
+		// map from identifier => oldest date for that identifier
+		const order = new Map<string, string>();
+		for (const { identifier, uploaded } of initialItems) {
+			const prev = order.get(identifier);
+			if (prev == null || prev > uploaded) {
+				// set to the current if there is none
+				// or replace if the current uploaded date is older
+				order.set(identifier, uploaded);
+			}
+		}
+
+		initialItems.sort((a, b) => {
+			// if the identifiers are unequal, compare
+			// the oldest creation dates for each identifier
+			// this groups the identifiers together
+			if (a.identifier !== b.identifier) {
+				const l = order.get(a.identifier)!;
+				const r = order.get(b.identifier)!;
+
+				// sort the identifiers in reverse (b cmp a) to
+				// put newer identifiers at the top
+				return r.localeCompare(l, "en");
+			}
+
+			// if they have the same identifier sort their uploaded dates
+			// don't sort in reverse (a cmp b) to have ascending creation
+			// dates per identifier
+			return a.uploaded.localeCompare(b.uploaded, "en");
+		});
+
+		return initialItems;
+	});
+
 	function toggleState(column: SortColumn) {
 		if (sortState?.column === column) {
 			if (sortState.type === "ascending") {
@@ -85,21 +91,20 @@
 	}
 
 	$effect(() => {
-		// reset sort state when navigating between /search/ pages
-		$state.snapshot(originalItems);
+		$state.snapshot(initialItems);
 		sortState = undefined;
 	});
 
-	let items = $derived.by(() => {
-		if (sortState == null) {
-			return originalItems;
+	let sortedItems = $derived.by(() => {
+		if (sortState === undefined) {
+			return initialItems;
 		} else {
 			const { column, type } = sortState;
-			return [...originalItems].sort((l, r) => {
+			return [...initialItems].sort((l, r) => {
 				const lv = l[column];
 				const rv = r[column];
 
-				const cmp = lv.toString().localeCompare(rv.toString(), "en");
+				const cmp = lv.localeCompare(rv, "en");
 				return type === "ascending" ? cmp : -cmp;
 			});
 		}
@@ -112,7 +117,7 @@
 	loaded a little later than the header.
 -->
 {#if browser}
-	{#if items.length > 0}
+	{#if sortedItems.length > 0}
 		<div class="p-4 pt-2">
 			<div class="table w-full border-collapse p-2 text-lg">
 				<div class="mb-2 table-row border-b border-neutral-300">
@@ -145,7 +150,7 @@
 
 					{@render header("uploaded", route === "view" ? "uploaded" : "accessed")}
 				</div>
-				{#each items as { uuid, title, modelType, identifier, uploaded } (uuid)}
+				{#each sortedItems as { uuid, title, modelType, identifier, uploaded } (uuid)}
 					{@const date = new Date(uploaded)}
 					<a
 						href={resolve(`/${route}/${uuid}`)}

@@ -11,20 +11,20 @@
 	import type { Edge } from "$lib/model";
 	import {
 		cartesianToPolar,
-		relationElements as getRelationElements,
+		useRelationElements,
 		polarToCartesian,
 		type Cartesian,
 	} from "$lib/api";
 	import { Move, RotateCcw, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
+	import { untrack } from "svelte";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
 
+	const { getRelationElements } = useRelationElements();
 	const { updateEdge, getZoom, deleteElements, screenToFlowPosition } = useSvelteFlow();
 	const sourceNode = $derived(useInternalNode(source));
 	const targetNode = $derived(useInternalNode(target));
-
-	const relationElements = getRelationElements();
 
 	function nodeIntersection(intersectionNode: InternalNode, target: Cartesian): Cartesian {
 		// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
@@ -136,19 +136,14 @@
 	$effect(() => {
 		const kind_ = kind;
 		const position_ = position;
-		relationElements.then((re) => {
-			updateEdge(
-				id,
-				{
-					markerStart: `linecap-s-${source}-${target}`,
-					markerEnd: re.causal.includes(kind_)
-						? { type: MarkerType.ArrowClosed, color: null }
-						: `linecap-e-${source}-${target}`,
-					data: { kind: kind_, editable: data!.editable, position: position_ },
-				},
-				{ replace: true },
-			);
-		});
+		const edge = untrack(() => ({
+			markerStart: `linecap-s-${source}-${target}`,
+			markerEnd: getRelationElements().causal.includes(kind)
+				? { type: MarkerType.ArrowClosed, color: null }
+				: `linecap-e-${source}-${target}`,
+			data: { kind: kind_, editable: data!.editable, position: position_ },
+		}));
+		updateEdge(id, edge, { replace: true });
 	});
 
 	const drag: {
@@ -178,11 +173,9 @@
 
 <LineCap id="linecap-s-{source}-{target}" />
 
-{#await relationElements then relationElements}
-	{#if !relationElements.causal.includes(kind)}
-		<LineCap id="linecap-e-{source}-{target}" />
-	{/if}
-{/await}
+{#if !getRelationElements().causal.includes(kind)}
+	<LineCap id="linecap-e-{source}-{target}" />
+{/if}
 
 <BaseEdge {id} {path} {markerStart} {markerEnd} />
 <EdgeLabel x={labelX} y={labelY} class="text-base!">
@@ -193,15 +186,13 @@
 				title={kind}
 				class="field-sizing-content h-10 cursor-pointer rounded-full bg-neutral-200 px-2 text-center outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 			>
-				{#await relationElements then relationElements}
-					{#each Object.entries(relationElements) as [group, values] (group)}
-						<optgroup label={group} style:font-size="{getZoom()}em">
-							{#each values as value (value)}
-								<option {value}>{value}</option>
-							{/each}
-						</optgroup>
-					{/each}
-				{/await}
+				{#each Object.entries(getRelationElements()) as [group, values] (group)}
+					<optgroup label={group} style:font-size="{getZoom()}em">
+						{#each values as value (value)}
+							<option {value}>{value}</option>
+						{/each}
+					</optgroup>
+				{/each}
 			</select>
 			<div class="ml-1 h-10 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700">
 				<div

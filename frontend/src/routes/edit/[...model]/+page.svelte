@@ -12,7 +12,8 @@
 	import Alert from "$lib/Alert.svelte";
 
 	let { data } = $props();
-	const { metadataElements, model } = $derived(data);
+
+	const { model } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, true));
 	let metadata = $derived(model.metadata);
 	const parent = $derived(model.parent);
@@ -73,7 +74,7 @@
 <Alert bind:this={alert} />
 
 <SvelteFlowProvider>
-	<GraphEdit {parent} {metadataElements} bind:metadata bind:nodes bind:edges>
+	<GraphEdit {parent} bind:metadata bind:nodes bind:edges>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="check"

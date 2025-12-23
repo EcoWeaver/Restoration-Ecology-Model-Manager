@@ -5,16 +5,16 @@
 	import { slide } from "svelte/transition";
 
 	let {
-		children,
 		onaddmetadata,
 		history,
+		children,
 	}: {
-		children: Snippet;
 		onaddmetadata?: MouseEventHandler<HTMLButtonElement>;
 		history?: {
 			undo?: MouseEventHandler<HTMLButtonElement>;
 			redo?: MouseEventHandler<HTMLButtonElement>;
 		};
+		children: Snippet;
 	} = $props();
 
 	let show = $state(true);
