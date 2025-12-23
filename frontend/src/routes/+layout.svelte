@@ -7,15 +7,13 @@
 </script>
 
 <svelte:head>
-	<script>
-		{
-			const theme = localStorage.getItem("theme") ?? "system";
-			document.documentElement.classList.toggle(
-				"dark",
-				theme === "dark" ||
-					(theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches),
-			);
-		}
+	<script lang="ts">
+		const theme = localStorage.getItem("theme") ?? "system";
+		document.documentElement.classList.toggle(
+			"dark",
+			theme === "dark" ||
+				(theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches),
+		);
 	</script>
 </svelte:head>
 

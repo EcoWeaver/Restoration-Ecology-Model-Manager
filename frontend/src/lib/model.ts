@@ -40,7 +40,7 @@ export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edg
 	return { nodes, edges };
 }
 
-export function toModel(nodes: Node[], edges: Edge[]): Graph {
+export function flowToApi(nodes: Node[], edges: Edge[]): Graph {
 	const n: ApiNode[] = nodes.map((n) => {
 		const { body, color } = n.data;
 		return {

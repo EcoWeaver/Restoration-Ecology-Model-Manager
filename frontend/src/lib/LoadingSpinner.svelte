@@ -19,7 +19,7 @@
 	}
 </script>
 
-<script>
+<script lang="ts">
 	$effect(() => {
 		if (navigating.to) {
 			startNavigate();

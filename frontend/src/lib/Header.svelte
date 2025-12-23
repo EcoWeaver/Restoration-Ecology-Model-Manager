@@ -1,21 +1,25 @@
 <script lang="ts">
-	import { CodeXml, House, Plus } from "@lucide/svelte";
+	import { CodeXml, House, List, Plus } from "@lucide/svelte";
 	import type { ChipElement } from "./search/Chip.svelte";
 	import type { Snippet } from "svelte";
 	import DarkLight from "./DarkLight.svelte";
-	import MetadataSearch from "./MetadataSearch.svelte";
+	import SearchBar from "./SearchBar.svelte";
 	import { type MetadataElements } from "./api";
 	import { resolve } from "$app/paths";
+	import { goto } from "$app/navigation";
+	import { newLocalModel } from "./local";
 
 	let {
 		metadataElements,
 		params,
+		newModel = false,
+		yourModels = true,
 		children,
-		createModel = true,
 	}: {
 		metadataElements: MetadataElements;
 		params?: ChipElement[];
-		createModel?: boolean;
+		newModel?: boolean;
+		yourModels?: boolean;
 		children?: Snippet;
 	} = $props();
 </script>
@@ -30,18 +34,29 @@
 	</a>
 
 	<div class="flex min-w-0 grow">
-		<MetadataSearch {metadataElements} {params} />
+		<SearchBar {metadataElements} {params} />
 	</div>
 
-	{#if createModel}
+	{#if yourModels}
 		<a
 			href={resolve("/edit")}
+			title="view your local models"
+			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 font-medium outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
+		>
+			<List />
+			<span class="pl-2 select-none">your models</span>
+		</a>
+	{/if}
+
+	{#if newModel}
+		<button
+			onclick={() => goto(resolve(`/edit/${newLocalModel()}`))}
 			title="create new model"
-			class="flex h-10 items-center rounded-md bg-indigo-300 px-2 font-medium outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
+			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 font-medium outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 		>
 			<Plus />
-			<span class="px-1 select-none">model</span>
-		</a>
+			<span class="pl-2 select-none">model</span>
+		</button>
 	{/if}
 
 	{@render children?.()}

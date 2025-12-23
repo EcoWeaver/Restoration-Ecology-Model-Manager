@@ -44,10 +44,6 @@ export type PutModelResult = {
 	uuid: string;
 };
 
-export type PostModelChangedResult = {
-	changed: boolean;
-};
-
 export type PostSearchResult = {
 	uuid: string;
 	uploaded: string;

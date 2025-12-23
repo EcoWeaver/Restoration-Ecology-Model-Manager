@@ -12,7 +12,7 @@
 </svelte:head>
 
 <div class="absolute w-full">
-	<Header {metadataElements} />
+	<Header {metadataElements} newModel={true} />
 </div>
 
 <div class="img absolute -z-10 flex h-full w-full items-center justify-center p-20 pt-34">

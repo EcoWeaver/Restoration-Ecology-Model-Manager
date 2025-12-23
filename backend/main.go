@@ -63,8 +63,8 @@ func main() {
 
 	e.GET("/model", state.GetModel)
 	e.PUT("/model", state.PutModel)
-	e.POST("/model/changed", state.PostModelChanged)
 	e.POST("/model/run", state.PostModelRun)
+	e.POST("/model/verify", state.PostModelVerify)
 
 	e.GET("/relations", state.GetRelations)
 

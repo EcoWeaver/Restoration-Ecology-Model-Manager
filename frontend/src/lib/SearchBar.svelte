@@ -168,9 +168,9 @@
 	onresize={() => computeInputElementOffset()}
 	{onfocusout}
 >
-	<span
+	<div
 		class:pl-3={chips.length === 0 && !chip}
-		class="relative z-10 flex h-full items-center gap-1.5 px-1"
+		class="relative z-10 flex h-full items-center gap-0.75 px-0.75"
 	>
 		{#each chips, idx (idx)}
 			<Chip
@@ -189,14 +189,14 @@
 
 		<input
 			class="block field-sizing-content min-w-24 grow focus-visible:outline-none"
-			placeholder={chips.length === 0 && !chip ? "search by metadata" : undefined}
+			placeholder={chips.length === 0 && !chip ? "search uploaded models" : undefined}
 			bind:this={inputElement}
 			bind:value={input}
 			onkeydown={key}
 			onfocus={() => (focused = true)}
 			type="text"
 		/>
-	</span>
+	</div>
 
 	{#if focused && suggestions.length !== 0 && !chipsEditing.includes(true)}
 		<div

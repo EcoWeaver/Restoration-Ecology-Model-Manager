@@ -46,7 +46,7 @@
 	}
 </script>
 
-<span class="flex items-center gap-0.5">
+<div class="flex items-center gap-0.5">
 	<div class="h-8 content-center rounded-l bg-neutral-200 px-2 text-nowrap dark:bg-neutral-600">
 		{chip.kind}
 	</div>
@@ -75,4 +75,4 @@
 			</button>
 		</div>
 	{/if}
-</span>
+</div>

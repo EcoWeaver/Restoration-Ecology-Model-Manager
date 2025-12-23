@@ -6,14 +6,18 @@
 	import Alert from "$lib/Alert.svelte";
 	import { apiToFlow } from "$lib/model";
 	import { SvelteFlowProvider } from "@xyflow/svelte";
-	import type { MetadataType } from "$lib/api.js";
 	import { resolve } from "$app/paths";
+	import { newLocalModel } from "$lib/local.js";
+	import { goto } from "$app/navigation";
+	import type { MetadataType } from "$lib/api.js";
 
 	let { data } = $props();
 	let { model, metadataElements } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
+	const { metadata, parent } = $derived(model);
+	const title = $derived(metadata.find(({ kind }) => kind === "title")!.value);
 
-	const metadataMap = $derived.by(() => {
+	const flatMetadata = $derived.by(() => {
 		const map = new Map<string, MetadataType | undefined>();
 		for (const { name, type } of Object.values(metadataElements).flat()) {
 			map.set(name, type);
@@ -22,6 +26,20 @@
 	});
 
 	let alert: ReturnType<typeof Alert>;
+
+	function edit() {
+		const localUUID = newLocalModel({
+			graph: model.graph,
+			metadata,
+			parent: {
+				uuid: model.uuid,
+				title,
+			},
+		});
+
+		goto(resolve(`/edit/${localUUID}`));
+	}
+
 	async function share() {
 		await navigator.clipboard.writeText(window.location.href);
 		alert.info("link copied to clipboard");
@@ -29,19 +47,19 @@
 </script>
 
 <svelte:head>
-	<title>{model.metadata.find(({ kind }) => kind === "title")!.value}</title>
+	<title>{title}</title>
 </svelte:head>
 
 <div class="absolute z-10 w-full bg-white dark:bg-neutral-800">
 	<Header {metadataElements}>
-		<a
+		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
-			title="edit model"
-			href={resolve(`/edit/${model.uuid}`)}
+			title="edit"
+			onclick={edit}
 		>
 			<PencilLine strokeWidth={1.7} />
 			<span class="pl-2 select-none">edit</span>
-		</a>
+		</button>
 
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
@@ -63,28 +81,28 @@
 				<PanelComponent>
 					<div class="table">
 						<div class="table-row">
-							<h2 class="mb-2 table-cell text-xl font-bold select-text">Metadata</h2>
-							{#if model.parent}
+							<h2 class="table-cell pr-2 text-xl font-bold select-text">Metadata</h2>
+							{#if parent}
 								<span
-									class="mb-2 table-cell max-w-lg overflow-hidden px-2 pt-1 text-ellipsis whitespace-nowrap select-text"
+									class="table-cell max-w-lg overflow-hidden pl-2 text-ellipsis whitespace-nowrap select-text"
 								>
 									based on
 									<a
-										class="mb-2 text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-										title={model.parent.title}
-										href={resolve(`/view/${model.parent.uuid}`)}
+										class="text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+										title={parent.title}
+										href={resolve(`/view/${parent.uuid}`)}
 									>
-										"{model.parent.title}"
+										"{parent.title}"
 									</a>
 								</span>
 							{/if}
 						</div>
 						<div class="table-row">
-							<div class="text-l table-cell py-1 pr-2 font-bold select-text">kind</div>
-							<div class="text-l table-cell py-1 pl-2 font-bold select-text">value</div>
+							<div class="table-cell py-1 pr-2 font-bold select-text">kind</div>
+							<div class="table-cell py-1 pl-2 font-bold select-text">value</div>
 						</div>
-						{#each model.metadata as { kind, value }, idx (idx)}
-							{@const type = metadataMap.get(kind)}
+						{#each metadata as { kind, value }, idx (idx)}
+							{@const type = flatMetadata.get(kind)}
 
 							<div class="table-row">
 								<div class="table-cell py-1 pr-2 select-text">{kind}</div>
