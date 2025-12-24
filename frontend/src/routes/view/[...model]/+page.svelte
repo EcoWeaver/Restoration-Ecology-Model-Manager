@@ -57,8 +57,8 @@
 			title="edit"
 			onclick={edit}
 		>
-			<PencilLine strokeWidth={1.7} />
-			<span class="pl-2 select-none">edit</span>
+			<PencilLine strokeWidth={1.75} />
+			<div class="pl-2">edit</div>
 		</button>
 
 		<button
@@ -67,7 +67,7 @@
 			onclick={share}
 		>
 			<Link />
-			<span class="pl-2 select-none">share</span>
+			<div class="pl-2">share</div>
 		</button>
 	</Header>
 </div>
@@ -80,10 +80,10 @@
 			<PanelComponent>
 				<div class="table">
 					<div class="table-row">
-						<h2 class="table-cell pr-2 text-xl font-bold select-text">Metadata</h2>
+						<h2 class="table-cell pr-2 pb-2 text-xl font-bold select-text">Metadata</h2>
 						{#if parent}
-							<span
-								class="table-cell max-w-lg overflow-hidden pl-2 text-ellipsis whitespace-nowrap select-text"
+							<div
+								class="table-cell max-w-lg overflow-hidden pb-2 pl-2 text-ellipsis whitespace-nowrap select-text"
 							>
 								based on
 								<a
@@ -93,7 +93,7 @@
 								>
 									"{parent.title}"
 								</a>
-							</span>
+							</div>
 						{/if}
 					</div>
 					<div class="table-row">

@@ -39,7 +39,7 @@
 			class:hover:bg-neutral-300={history.undo}
 			class:dark:hover:bg-neutral-600={history.undo}
 			class:text-neutral-400={!history.undo}
-			class="cursor right-0 block rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
+			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 		>
 			<UndoIcon />
 		</button>
@@ -50,7 +50,7 @@
 			class:hover:bg-neutral-300={history.redo}
 			class:dark:hover:bg-neutral-600={history.redo}
 			class:text-neutral-400={!history.redo}
-			class="cursor right-0 block rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
+			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 		>
 			<RedoIcon />
 		</button>
@@ -61,10 +61,10 @@
 			title="add metadata"
 			transition:slide={{ duration: 100, axis: "x" }}
 			onclick={onaddmetadata}
-			class="cursor right-0 flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 px-4 py-1 text-nowrap outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+			class="flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 p-2 pr-3 text-nowrap outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:bg-neutral-700 dark:hover:bg-neutral-600"
 		>
-			<PlusIcon class="inline size-5.5" />
-			<span>add metadata</span>
+			<PlusIcon />
+			<div>add metadata</div>
 		</button>
 	{/if}
 
@@ -75,7 +75,7 @@
 		class:bg-neutral-200={!show}
 		class:dark:bg-neutral-600={show}
 		class:dark:bg-neutral-700={!show}
-		class="cursor right-0 block cursor-pointer rounded-full p-2 outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:hover:bg-neutral-600"
+		class="cursor-pointer rounded-full p-2 outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:hover:bg-neutral-600"
 	>
 		<SquareChartGantt />
 	</button>

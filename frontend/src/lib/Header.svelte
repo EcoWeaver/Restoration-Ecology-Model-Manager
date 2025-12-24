@@ -23,36 +23,36 @@
 
 <div class="flex items-center gap-4 p-4" role="navigation">
 	<a
+		class="rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 		title="home"
-		class="rounded-4xl outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 		href={resolve("/")}
 	>
 		<House />
 	</a>
 
-	<div class="flex min-w-0 grow">
+	<div class="flex grow">
 		<SearchBar {params} />
 	</div>
 
 	{#if yourModels}
 		<a
-			href={resolve("/edit")}
+			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="view your local models"
-			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 font-medium outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
+			href={resolve("/edit")}
 		>
 			<List />
-			<span class="pl-2 select-none">your models</span>
+			<div class="pl-2 select-none">your models</div>
 		</a>
 	{/if}
 
 	{#if newModel}
 		<button
-			onclick={() => goto(resolve(`/edit/${newLocalModel()}`))}
+			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="create new model"
-			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 font-medium outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
+			onclick={() => goto(resolve(`/edit/${newLocalModel()}`))}
 		>
 			<Plus />
-			<span class="pl-2 select-none">model</span>
+			<div class="pl-2">model</div>
 		</button>
 	{/if}
 

@@ -32,20 +32,10 @@
 </script>
 
 <button
-	class="dark-light cursor-pointer rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
+	class="cursor-pointer rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 	title="toggle dark/light theme"
 	onclick={toggle}
 >
-	<span class="sun hidden"><Sun /></span>
-	<span class="moon"><Moon /></span>
+	<Sun class="hidden dark:block" />
+	<Moon class="dark:hidden" />
 </button>
-
-<style>
-	:global(.dark) .dark-light .sun {
-		display: unset;
-	}
-
-	:global(.dark) .dark-light .moon {
-		display: none;
-	}
-</style>

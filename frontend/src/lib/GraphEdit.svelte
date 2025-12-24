@@ -119,7 +119,7 @@
 	});
 </script>
 
-<div class="t-0 absolute z-10 w-full bg-white dark:bg-neutral-800">
+<div class="absolute z-10 w-full bg-white dark:bg-neutral-800">
 	<Header>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
@@ -127,7 +127,7 @@
 			onclick={() => addNode()}
 		>
 			<Plus />
-			<span class="pl-2">node</span>
+			<div class="pl-2">node</div>
 		</button>
 		{@render children()}
 	</Header>
@@ -144,25 +144,25 @@
 		>
 			<div class="table">
 				<div class="table-row">
-					<h2 class=" table-cell px-2 text-xl font-bold">Metadata</h2>
+					<h2 class="table-cell px-2 pb-2 text-xl font-bold select-text">Metadata</h2>
 					{#if parent}
-						<span
-							class="table-cell max-w-lg overflow-hidden px-2 text-ellipsis whitespace-nowrap select-text"
+						<div
+							class="table-cell max-w-lg overflow-hidden px-2 pb-2 text-ellipsis whitespace-nowrap select-text"
 						>
 							based on
 							<a
-								class=" text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
+								class="text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
 								title={parent.title}
 								href={resolve(`/view/${parent.uuid}`)}
 							>
 								"{parent.title}"
 							</a>
-						</span>
+						</div>
 					{/if}
 				</div>
 				<div class="table-row">
-					<span class="table-cell px-2 py-2 font-bold">kind</span>
-					<span class="table-cell px-2 py-2 font-bold">value</span>
+					<div class="table-cell px-2 py-1 font-bold select-text">kind</div>
+					<div class="table-cell px-2 py-1 font-bold select-text">value</div>
 				</div>
 				{#each panelEntries as m, idx (idx)}
 					{@const { type, choices, ols4 } = flatMetadata.get(m.kind) || {}}
@@ -201,9 +201,9 @@
 								>
 									<option class="hidden" value="" disabled selected>-- select an option --</option>
 									{#each choices! as choice (choice)}
-										<option class="cursor-pointer dark:bg-neutral-700" value={choice}
-											>{choice}</option
-										>
+										<option class="cursor-pointer dark:bg-neutral-700" value={choice}>
+											{choice}
+										</option>
 									{/each}
 								</select>
 							{:else if type === "doi"}
@@ -236,7 +236,7 @@
 						{#if !m.mandatory}
 							<div class="relative table-cell">
 								<button
-									class="absolute top-2 left-2 inline h-6 cursor-pointer rounded-4xl outline-red-500 hover:bg-red-500/25 focus-visible:outline-2"
+									class="absolute top-2 left-2 h-6 cursor-pointer rounded-full outline-red-500 hover:bg-red-500/25 focus-visible:outline-2"
 									title="delete this metadata entry"
 									onclick={() => panelEntries.splice(idx, 1)}
 								>

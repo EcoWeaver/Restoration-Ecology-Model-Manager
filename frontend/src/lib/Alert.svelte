@@ -33,30 +33,34 @@
 	<div
 		transition:fly={{ duration: 100, y: -50 }}
 		role="alert"
-		class="t-0 absolute z-200 mt-18 flex w-full items-center justify-center"
+		class="absolute z-200 mt-18 flex w-full justify-center"
 		onmouseenter={() => {
 			hoverStart = Date.now();
 			clearTimeout(timeoutId);
 		}}
 		onmouseleave={() => {
-			const now = Date.now();
-			if (now - hoverStart >= 500) {
-				startTimer(500);
-			} else {
-				startTimer(Math.max(expiresAt - now, 500));
+			if (open) {
+				const now = Date.now();
+				if (now - hoverStart >= 500) {
+					startTimer(500);
+				} else {
+					startTimer(Math.max(expiresAt - now, 500));
+				}
 			}
 		}}
 	>
 		<div
 			class:bg-red-300={isError}
 			class:dark:bg-red-500={isError}
-			class="flex max-w-[60%] items-center rounded-md bg-indigo-300 px-3 py-3 dark:bg-indigo-500"
+			class="flex max-w-[60%] rounded-md bg-indigo-300 px-3 py-3 dark:bg-indigo-500"
 		>
-			<span class="text-center">{text}</span>
+			<div class="text-center">{text}</div>
 			<button
 				class="cursor-pointer rounded-full pl-2 outline-offset-2 focus-visible:outline-2"
-				onclick={() => (open = false)}><X /></button
+				onclick={() => (open = false)}
 			>
+				<X />
+			</button>
 		</div>
 	</div>
 {/if}

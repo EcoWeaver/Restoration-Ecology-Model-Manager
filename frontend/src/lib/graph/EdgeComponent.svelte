@@ -189,11 +189,11 @@
 					</optgroup>
 				{/each}
 			</select>
-			<div class="ml-1 h-10 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700">
+			<div
+				class="nopan ml-1 h-10 cursor-default rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
+			>
 				<div
-					class="nopan nodrag inline-block"
-					class:cursor-grab={!drag.dragging}
-					class:cursor-grabbing={drag.dragging}
+					class="inline-block cursor-grab"
 					onpointerdown={() => {
 						drag.dragging = true;
 						drag.offset = undefined;
@@ -202,14 +202,14 @@
 					<Move />
 				</div>
 				<button
-					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+					class="cursor-pointer rounded-full outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 					onclick={() => (position = { r: 0, phi: 0 })}
 					title="reset position"
 				>
 					<RotateCcw />
 				</button>
 				<button
-					class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+					class="cursor-pointer rounded-full outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 					onclick={deleteSelf}
 					title="delete"
 				>

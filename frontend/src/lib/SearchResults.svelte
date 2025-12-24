@@ -123,13 +123,13 @@
 				<div class="table-row border-b border-neutral-300">
 					{#snippet header(column: SortColumn, value?: string)}
 						{@const text = value ?? column}
-						<span class="table-cell px-1 py-3 font-semibold">
+						<div class="table-cell px-1 py-3 font-semibold">
 							<button
 								title={sortState?.column === column ? `${text} (${sortState.type})` : text}
-								class="outline-offset flex cursor-pointer items-center gap-1 rounded-md px-2 text-nowrap outline-indigo-400 focus-visible:outline-2"
+								class="flex cursor-pointer items-center gap-1 rounded-md px-2 text-nowrap outline-indigo-400 focus-visible:outline-2"
 								onclick={() => toggleState(column)}
 							>
-								{text}
+								<div class="select-text">{text}</div>
 
 								{#if sortState?.column === column && sortState.type === "ascending"}
 									<ChevronUp size={20} />
@@ -139,7 +139,7 @@
 									<div class="invisible w-5"></div>
 								{/if}
 							</button>
-						</span>
+						</div>
 					{/snippet}
 
 					{@render header("title")}
@@ -153,21 +153,21 @@
 				{#each sortedItems as { uuid, title, modelType, identifier, uploaded } (uuid)}
 					{@const date = new Date(uploaded)}
 					<a
-						href={resolve(`/${route}/${uuid}`)}
 						class="table-row border-b border-neutral-300 outline-indigo-400 last:border-none hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
+						href={resolve(`/${route}/${uuid}`)}
 						data-sveltekit-preload-data="tap"
 						data-sveltekit-preload-code="hover"
 					>
-						<span class="table-cell p-3">{title}</span>
-						<span class="table-cell p-3">{modelType}</span>
-						<span class="table-cell p-3 text-nowrap">{identifier}</span>
-						<span title={dateFormat(date, false)} class="table-cell p-3">
+						<div class="table-cell p-3">{title}</div>
+						<div class="table-cell p-3">{modelType}</div>
+						<div class="table-cell p-3 text-nowrap">{identifier}</div>
+						<div title={dateFormat(date, false)} class="table-cell p-3">
 							{dateFormat(date, true)}
-						</span>
+						</div>
 						{#if del}
 							<div class="table-cell w-1 p-2">
 								<button
-									class="cursor-pointer rounded-4xl outline-red-500 hover:bg-red-500/25 focus-visible:outline-2"
+									class="cursor-pointer rounded-full outline-red-500 hover:bg-red-500/25 focus-visible:outline-2"
 									title="delete this local model"
 									onclick={(e) => {
 										del(uuid);

@@ -15,32 +15,16 @@
 	let selected = $state(0);
 
 	let focused = $state(false);
-	let inputElement: ReturnType<typeof Input>;
-
-	function onkeydown(event: KeyboardEvent) {
-		if (event.key === "Enter") {
-			if (suggestions[selected]) {
-				event.preventDefault();
-				value = suggestions[selected];
-				selected = 0;
-				focused = false;
-			}
-		} else {
-			if (event.key === "ArrowUp") {
-				event.preventDefault();
-				if (focused) {
-					selected = Math.min(suggestions.length - 1, selected + 1);
-				}
-			} else if (event.key === "ArrowDown") {
-				event.preventDefault();
-				if (focused) {
-					selected = Math.max(0, selected - 1);
-				}
-			}
-			focused = true;
+	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+		const { relatedTarget, currentTarget } = event;
+		if (relatedTarget instanceof HTMLElement && currentTarget.contains(relatedTarget)) {
+			return;
 		}
+
+		focused = false;
 	}
 
+	let inputElement: ReturnType<typeof Input>;
 	function select(event: MouseEvent, idx: number) {
 		inputElement.focus();
 		event.preventDefault();
@@ -52,13 +36,25 @@
 		}
 	}
 
-	function onfocusout(event: FocusEvent & { currentTarget: EventTarget & HTMLDivElement }) {
-		const { relatedTarget, currentTarget } = event;
-		if (relatedTarget instanceof HTMLElement && currentTarget.contains(relatedTarget)) {
-			return;
+	function onkeydown(event: KeyboardEvent) {
+		if (event.key === "Enter") {
+			if (suggestions[selected]) {
+				value = suggestions[selected];
+				selected = 0;
+				focused = false;
+				event.preventDefault();
+			}
+		} else if (focused) {
+			if (event.key === "ArrowUp") {
+				selected = Math.min(suggestions.length - 1, selected + 1);
+				event.preventDefault();
+			} else if (event.key === "ArrowDown") {
+				selected = Math.max(0, selected - 1);
+				event.preventDefault();
+			}
+		} else {
+			focused = true;
 		}
-
-		focused = false;
 	}
 
 	$effect(() => {
@@ -73,11 +69,12 @@
 </script>
 
 <div class="relative" {onfocusout}>
-	{#if suggestions.length > 0 && focused}
+	{#if focused && suggestions.length > 0}
 		<div
-			class="absolute bottom-9 flex max-h-64 min-w-64 flex-col-reverse overflow-y-auto rounded bg-neutral-200 p-4 shadow-xl dark:bg-neutral-700"
+			class="absolute bottom-9.5 -ml-0.75 flex max-h-64 min-w-64 flex-col-reverse overflow-y-scroll rounded-md border border-neutral-600 bg-neutral-200 p-1.75 py-1 shadow-xl dark:bg-neutral-700"
+			tabindex="-1"
 		>
-			{#each suggestions as choice, idx (choice)}
+			{#each suggestions as suggestion, idx (suggestion)}
 				{#if idx === selected}
 					<button
 						tabindex="-1"
@@ -85,7 +82,7 @@
 						class="my-1 block w-full cursor-pointer rounded bg-neutral-300 p-2 text-left ring-2 ring-indigo-400 dark:bg-neutral-600"
 						bind:this={focusedElement}
 					>
-						{choice}
+						{suggestion}
 					</button>
 				{:else}
 					<button
@@ -93,7 +90,7 @@
 						onclick={(event) => select(event, idx)}
 						class="my-1 block w-full cursor-pointer rounded p-2 text-left hover:bg-neutral-300 dark:hover:bg-neutral-600"
 					>
-						{choice}
+						{suggestion}
 					</button>
 				{/if}
 			{/each}

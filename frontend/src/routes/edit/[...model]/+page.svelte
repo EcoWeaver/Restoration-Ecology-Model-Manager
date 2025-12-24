@@ -81,7 +81,7 @@
 			onclick={check}
 		>
 			<CheckLine />
-			<span class="pl-2">check</span>
+			<div class="pl-2">check</div>
 		</button>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
@@ -89,7 +89,7 @@
 			onclick={upload}
 		>
 			<Upload />
-			<span class="pl-2">upload</span>
+			<div class="pl-2">upload</div>
 		</button>
 	</GraphEdit>
 </SvelteFlowProvider>

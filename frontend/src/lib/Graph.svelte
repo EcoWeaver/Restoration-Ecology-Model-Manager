@@ -22,7 +22,7 @@
 		edges = $bindable(),
 		addNode,
 		onmoveend,
-		children: panel,
+		children,
 	}: {
 		nodes: Node[];
 		edges: Edge[];
@@ -90,7 +90,7 @@
 	onconnectend={editable ? onconnectend : undefined}
 >
 	<Panel position="bottom-right">
-		{@render panel()}
+		{@render children()}
 	</Panel>
 
 	<Background variant={BackgroundVariant.Dots} />

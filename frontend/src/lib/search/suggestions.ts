@@ -12,7 +12,7 @@ export function metadataSuggest(
 		const newSuggestions = filterMatches(elements, value);
 
 		let newSelected = value === "" ? -1 : 0;
-		if (selected > 0 && typeof prevSuggestions[selected] === "string") {
+		if (selected > 0) {
 			newSelected = newSuggestions.findIndex((choice) => choice === prevSuggestions[selected]);
 		}
 

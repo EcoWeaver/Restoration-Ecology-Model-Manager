@@ -53,17 +53,23 @@
 		<div
 			class="absolute top-full left-0 mt-1 h-10 w-max cursor-default rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
 		>
-			<div class="drag-handle inline-block cursor-grab"><Move /></div>
+			<div class="drag-handle inline-block cursor-grab">
+				<Move />
+			</div>
 			<button
-				class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+				class="cursor-pointer rounded-full outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 				onclick={changeColor}
-				title="change color"><Palette /></button
+				title="change color"
 			>
+				<Palette />
+			</button>
 			<button
-				class="cursor-pointer rounded-4xl outline-offset-3 outline-indigo-400 focus-visible:outline-2"
+				class="cursor-pointer rounded-full outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 				onclick={deleteSelf}
-				title="delete"><Trash2 /></button
+				title="delete"
 			>
+				<Trash2 />
+			</button>
 		</div>
 	{:else}
 		<div
