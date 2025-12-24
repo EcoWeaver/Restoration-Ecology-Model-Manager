@@ -5,11 +5,11 @@
 	import { metadataSuggest } from "./search/suggestions";
 	import { Search as SearchIcon } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
-	import { useMetadataElements } from "./api";
+	import { useElements } from "./api";
 
 	let { params = [] }: { params?: ChipElement[] } = $props();
 
-	const { getMetadataElements } = useMetadataElements();
+	const { getMetadataElements } = useElements();
 	const suggest = metadataSuggest(getMetadataElements());
 
 	let input = $state("");

@@ -4,7 +4,7 @@
 	import { defaultEdge } from "$lib/model.js";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
-	import { useMetadataElements, type Metadata, type MetadataElement, type Parent } from "./api";
+	import { useElements, type Metadata, type MetadataElement, type Parent } from "./api";
 	import Header from "./Header.svelte";
 	import { type XYPosition, useStore, useSvelteFlow, useUpdateNodeInternals } from "@xyflow/svelte";
 	import { History } from "./graph/history.svelte";
@@ -32,7 +32,7 @@
 		children: Snippet;
 	} = $props();
 
-	const { getMetadataElements } = useMetadataElements();
+	const { getMetadataElements } = useElements();
 	const { getViewport } = useSvelteFlow();
 	const { width, height } = $derived(useStore());
 	const updateNodeInternals = useUpdateNodeInternals();

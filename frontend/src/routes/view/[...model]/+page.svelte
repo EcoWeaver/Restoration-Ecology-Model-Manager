@@ -9,11 +9,11 @@
 	import { resolve } from "$app/paths";
 	import { newLocalModel } from "$lib/local.js";
 	import { goto } from "$app/navigation";
-	import { useMetadataElements, type MetadataType } from "$lib/api.js";
+	import { useElements, type MetadataType } from "$lib/api.js";
 
 	let { data } = $props();
 
-	const { getMetadataElements } = useMetadataElements();
+	const { getMetadataElements } = useElements();
 
 	let { model } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, false));

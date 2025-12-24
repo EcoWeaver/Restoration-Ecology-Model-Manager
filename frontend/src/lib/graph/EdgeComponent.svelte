@@ -9,19 +9,14 @@
 		type InternalNode,
 	} from "@xyflow/svelte";
 	import type { Edge } from "$lib/model";
-	import {
-		cartesianToPolar,
-		useRelationElements,
-		polarToCartesian,
-		type Cartesian,
-	} from "$lib/api";
+	import { cartesianToPolar, useElements, polarToCartesian, type Cartesian } from "$lib/api";
 	import { Move, RotateCcw, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
 	import { untrack } from "svelte";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
 
-	const { getRelationElements } = useRelationElements();
+	const { getRelationElements } = useElements();
 	const { updateEdge, getZoom, deleteElements, screenToFlowPosition } = useSvelteFlow();
 	const sourceNode = $derived(useInternalNode(source));
 	const targetNode = $derived(useInternalNode(target));

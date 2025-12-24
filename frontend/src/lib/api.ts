@@ -19,10 +19,8 @@ export async function req<T>(method: string, path: string, body?: unknown): Prom
 export type MetadataElements = Record<"mandatory" | "optional" | "recommended", MetadataElement[]>;
 export type RelationElements = Record<"causal" | "noncausal", RelationElement[]>;
 
-export const [useMetadataElements, setMetadataElements] = createContext<{
+export const [useElements, setElements] = createContext<{
 	getMetadataElements: () => MetadataElements;
-}>();
-export const [useRelationElements, setRelationElements] = createContext<{
 	getRelationElements: () => RelationElements;
 }>();
 

@@ -2,13 +2,15 @@
 	import "../app.css";
 	import "../svelte-flow.css";
 	import LoadingSpinner from "$lib/LoadingSpinner.svelte";
-	import { setMetadataElements, setRelationElements } from "$lib/api";
+	import { setElements } from "$lib/api";
 
 	let { children, data } = $props();
 
 	let { metadataElements, relationElements } = $derived(data);
-	setMetadataElements({ getMetadataElements: () => metadataElements });
-	setRelationElements({ getRelationElements: () => relationElements });
+	setElements({
+		getMetadataElements: () => metadataElements,
+		getRelationElements: () => relationElements,
+	});
 </script>
 
 <svelte:head>
