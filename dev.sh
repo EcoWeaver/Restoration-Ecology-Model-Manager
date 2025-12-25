@@ -33,6 +33,6 @@ splits() {
 }
 
 splits \
-	"cd backend && make up" \
-	"cd backend && make run" \
+	"docker compose up postgres" \
+	"docker compose up --build backend" \
 	"cd frontend && npm run dev"

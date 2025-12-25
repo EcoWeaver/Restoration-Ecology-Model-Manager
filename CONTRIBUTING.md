@@ -3,7 +3,7 @@
 0. Setup
 
 - To set up the development environment locally, you'll need [`docker`](https://www.docker.com/), [`make`](https://www.gnu.org/software/make/), [`go`](https://go.dev/), [`npm`](https://www.npmjs.com/) and [`nodejs`](https://nodejs.org/) installed.
-- The database and backend use an environment file to manage secrets. You'll need to copy the `backend/.env.example` file to `backend/.env`, and uncomment the second `DATABASE_URL` definition for local development.
+- The database and backend use an environment file to manage secrets. You'll need to copy the `backend/.env.example` file to `backend/.env`.
 - You can uncomment the `REMMA_NO_VERIFY_REQ` definition to bypass the backend verification checks that hit an external API endpoint.
 - You can find example data for the database at `backend/postgresql/1-example-data.sql.disabled`. To make use of it, copy it to `backend/postgresql/1-example-data.sql` and recreate the `postgres` docker volume.
 
@@ -11,16 +11,14 @@
 
 - After running the following commands, the PostgreSQL server will be available on http://localhost:5432.
 ```sh
-cd backend
-make up
+docker compose up postgres
 ```
 
 2. Backend
 
 - The backend is built with Go, using the Echo web framework. After running the following commands, it will be available on http://localhost:8080.
 ```sh
-cd backend
-make run
+docker compose up --build backend
 ```
 
 3. Frontend
