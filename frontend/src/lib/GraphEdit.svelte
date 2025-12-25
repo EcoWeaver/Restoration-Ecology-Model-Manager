@@ -16,7 +16,7 @@
 	import YearInput from "./metadata-panel/YearInput.svelte";
 	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
 	import { suggestOLS4, suggestSpecies } from "./metadata-panel/auto-complete";
-	import type { Snippet } from "svelte";
+	import { untrack, type Snippet } from "svelte";
 
 	let {
 		parent,
@@ -38,13 +38,20 @@
 	const updateNodeInternals = useUpdateNodeInternals();
 
 	const history = new History(nodes, edges, defaultEdge(true), updateNodeInternals);
-	$effect(() =>
-		// FIXME: https://github.com/sveltejs/svelte/issues/17117
-		history.push(
-			$state.snapshot(nodes) as unknown as Node[],
-			$state.snapshot(edges) as unknown as Edge[],
-		),
-	);
+	let timeoutId = $state<number>();
+	$effect(() => {
+		const nodes_ = nodes;
+		const edges_ = edges;
+
+		clearTimeout(untrack(() => timeoutId));
+		timeoutId = setTimeout(() => {
+			// FIXME: https://github.com/sveltejs/svelte/issues/17117
+			history.push(
+				$state.snapshot(nodes_) as unknown as Node[],
+				$state.snapshot(edges_) as unknown as Edge[],
+			);
+		}, 50);
+	});
 
 	let id = nodes.length;
 	let offset = 0;

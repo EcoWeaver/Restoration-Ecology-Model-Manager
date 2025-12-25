@@ -10,6 +10,7 @@
 	import { resolve } from "$app/paths";
 	import { goto } from "$app/navigation";
 	import Alert from "$lib/Alert.svelte";
+	import { untrack } from "svelte";
 
 	let { data } = $props();
 
@@ -19,15 +20,20 @@
 	const parent = $derived(model.parent);
 	const title = $derived(metadata.find(({ kind }) => kind === "title")?.value ?? "");
 
+	let timeoutId = $state<number>();
 	$effect(() => {
 		const nodes_ = nodes;
 		const edges_ = edges;
 		const metadata_ = metadata;
-		setLocalModel(page.params.model!, {
-			graph: flowToApi(nodes_, edges_),
-			metadata: metadata_,
-			parent,
-		});
+
+		clearTimeout(untrack(() => timeoutId));
+		timeoutId = setTimeout(() => {
+			setLocalModel(page.params.model!, {
+				graph: flowToApi(nodes_, edges_),
+				metadata: metadata_,
+				parent,
+			});
+		}, 50);
 	});
 
 	let alert: ReturnType<typeof Alert>;
