@@ -3,7 +3,7 @@
 	import { goto } from "$app/navigation";
 	import Chip, { type ChipElement } from "./search/Chip.svelte";
 	import { metadataSuggest } from "./search/suggestions";
-	import { Search as SearchIcon } from "@lucide/svelte";
+	import { Search } from "@lucide/svelte";
 	import { resolve } from "$app/paths";
 	import { useElements } from "./api";
 
@@ -223,5 +223,5 @@
 	title="search"
 	{onclick}
 >
-	<SearchIcon />
+	<Search />
 </button>

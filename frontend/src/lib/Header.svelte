@@ -30,7 +30,7 @@
 		<House />
 	</a>
 
-	<div class="flex grow">
+	<div class="flex min-w-0 grow">
 		<SearchBar {params} />
 	</div>
 

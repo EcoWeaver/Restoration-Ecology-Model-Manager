@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from "svelte";
 	import type { MouseEventHandler } from "svelte/elements";
-	import { PlusIcon, RedoIcon, SquareChartGantt, UndoIcon } from "@lucide/svelte";
+	import { Plus, Redo, SquareChartGantt, Undo } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
 
 	let {
@@ -41,7 +41,7 @@
 			class:text-neutral-400={!history.undo}
 			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 		>
-			<UndoIcon />
+			<Undo />
 		</button>
 		<button
 			title={history.redo ? "redo" : undefined}
@@ -52,7 +52,7 @@
 			class:text-neutral-400={!history.redo}
 			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 		>
-			<RedoIcon />
+			<Redo />
 		</button>
 	{/if}
 
@@ -63,8 +63,8 @@
 			onclick={onaddmetadata}
 			class="flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 p-2 pr-3 text-nowrap outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:bg-neutral-700 dark:hover:bg-neutral-600"
 		>
-			<PlusIcon />
-			<div>add metadata</div>
+			<Plus />
+			<div class="pl-1">add metadata</div>
 		</button>
 	{/if}
 

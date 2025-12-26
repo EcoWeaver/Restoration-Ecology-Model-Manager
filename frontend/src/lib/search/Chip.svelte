@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-	import { X } from "@lucide/svelte";
+	import { EqualApproximately, X } from "@lucide/svelte";
 
 	let {
 		chip = $bindable(),
@@ -50,8 +50,9 @@
 	<div class="h-8 content-center rounded-l bg-neutral-200 px-2 text-nowrap dark:bg-neutral-600">
 		{chip.kind}
 	</div>
-	<div class="h-8 content-center bg-neutral-200 px-2 dark:bg-neutral-600">≈</div>
-
+	<div class="h-8 content-center bg-neutral-200 px-1 dark:bg-neutral-600">
+		<EqualApproximately size={16} />
+	</div>
 	{#if chip.value}
 		<div
 			class="flex h-8 items-center rounded-r bg-neutral-200 pr-2 text-nowrap outline-indigo-400 focus-within:outline-2 dark:bg-neutral-600"
