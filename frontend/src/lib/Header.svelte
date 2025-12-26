@@ -21,7 +21,7 @@
 	} = $props();
 </script>
 
-<div class="flex items-center gap-4 p-4" role="navigation">
+<div class="flex items-center gap-4 p-4 whitespace-nowrap" role="navigation">
 	<a
 		class="rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 		title="home"
