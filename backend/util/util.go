@@ -24,7 +24,7 @@ func SlicesEqualUnordered[T comparable](a, b []T) bool {
 	return true
 }
 
-func SlicesParMap[T any, U any](s []T, f func(T) U) []U {
+func SlicesParMap[T, U any](s []T, f func(T) U) []U {
 	res := make([]U, len(s))
 
 	var wg sync.WaitGroup
