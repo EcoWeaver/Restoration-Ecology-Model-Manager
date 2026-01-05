@@ -4,9 +4,7 @@ WORKDIR /app
 
 RUN apk add --no-cache make gcc musl-dev
 
-COPY go.mod .
-COPY go.sum .
-COPY Makefile .
+COPY go.mod go.sum Makefile .
 
 RUN make prepare
 

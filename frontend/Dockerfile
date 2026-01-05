@@ -2,28 +2,19 @@ FROM node:alpine AS build
 
 WORKDIR /app
 
-COPY package.json .
-COPY package-lock.json .
+COPY package.json package-lock.json .
 
 RUN npm ci
 
-COPY src src
-COPY static static
-COPY vite.config.ts .
-COPY svelte.config.js .
+COPY . .
 
 RUN npm run build
-
-WORKDIR /app/build
-
-COPY package.json .
-COPY package-lock.json .
-
-RUN npm ci --omit dev
+RUN npm prune --production
 
 FROM node:alpine
 
 COPY --from=build /app/build /build
+COPY --from=build /app/node_modules /node_modules
 
 EXPOSE 3000
 
