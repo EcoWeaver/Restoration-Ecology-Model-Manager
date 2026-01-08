@@ -17,7 +17,7 @@ func species(s string, ctx context.Context) error {
 		return nil
 	}
 
-	api := "https://api.gbif.org/v2/species/match?taxonRank=SPECIES&scientificName=" + url.QueryEscape(s)
+	api := "https://api.gbif.org/v2/species/match?scientificName=" + url.QueryEscape(s)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
 	if err != nil {
 		return err

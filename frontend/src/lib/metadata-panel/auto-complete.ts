@@ -5,9 +5,7 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 		return [];
 	}
 
-	const res = await fetch(
-		`https://api.gbif.org/v1/species/suggest?rank=SPECIES&q=${encodeURIComponent(value)}`,
-	);
+	const res = await fetch(`https://api.gbif.org/v1/species/suggest?q=${encodeURIComponent(value)}`);
 	const suggestions: {
 		status: string;
 		canonicalName: string;
