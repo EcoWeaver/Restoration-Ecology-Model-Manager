@@ -8,7 +8,7 @@
 	import { clearNavigate, startNavigate } from "$lib/LoadingSpinner.svelte";
 	import { req, type BackendError, type PutModelResult } from "$lib/api";
 	import { resolve } from "$app/paths";
-	import { goto } from "$app/navigation";
+	import { beforeNavigate, goto } from "$app/navigation";
 	import Alert from "$lib/Alert.svelte";
 	import { untrack } from "svelte";
 
@@ -34,6 +34,24 @@
 				parent,
 			});
 		}, 50);
+	});
+
+	beforeNavigate((nav) => {
+		if (nav.type !== "goto" || nav.to?.route.id !== "/view/[...model]") {
+			if (localStorage.getItem("editModelConfirmNavigation")) {
+				return;
+			}
+
+			const doNavigate = confirm(
+				"Leave site?\n\nYour local models are saved in your browser's local storage until they're uploaded. They'll be deleted if this page's data is cleared.",
+			);
+
+			if (doNavigate) {
+				localStorage.setItem("editModelConfirmNavigation", "true");
+			} else {
+				nav.cancel();
+			}
+		}
 	});
 
 	let alert: ReturnType<typeof Alert>;
