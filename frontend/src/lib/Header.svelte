@@ -65,7 +65,7 @@
 		title="source code"
 		href="https://github.com/EcoWeaver/Restoration-Ecology-Model-Manager"
 		target="_blank"
-		rel="noopener noreferrer"
+		rel="external noreferrer"
 	>
 		<CodeXml />
 	</a>

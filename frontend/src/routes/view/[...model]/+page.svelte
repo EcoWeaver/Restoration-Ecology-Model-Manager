@@ -111,7 +111,7 @@
 									class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
 									href="https://doi.org/{value}"
 									target="_blank"
-									rel="noopener noreferrer"
+									rel="external noreferrer"
 								>
 									{value}
 								</a>
@@ -120,16 +120,16 @@
 									class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
 									href="https://orcid.org/{value}"
 									target="_blank"
-									rel="noopener noreferrer"
+									rel="external noreferrer"
 								>
 									{value}
 								</a>
 							{:else if type === "url"}
 								<a
 									class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
-									href={/* eslint-disable-line svelte/no-navigation-without-resolve */ value}
+									href={value}
 									target="_blank"
-									rel="noopener noreferrer"
+									rel="external noreferrer"
 								>
 									{value}
 								</a>
