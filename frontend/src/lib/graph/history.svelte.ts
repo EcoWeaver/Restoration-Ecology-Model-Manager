@@ -1,5 +1,5 @@
 import type { Polar } from "$lib/api";
-import type { Edge, Node } from "$lib/model";
+import { defaultEdgeOptions, type Edge, type Node } from "$lib/model";
 import type { XYPosition } from "@xyflow/svelte";
 
 type Change =
@@ -13,7 +13,6 @@ type Change =
 export class History {
 	nodes: Node[];
 	edges: Edge[];
-	defaultEdge: Partial<Edge>;
 	updateNodeInternals: (nodeId?: string | string[]) => void;
 
 	undoHist: Change[] = $state([]);
@@ -22,12 +21,10 @@ export class History {
 	constructor(
 		nodes: Node[],
 		edges: Edge[],
-		defaultEdge: Partial<Edge>,
 		updateNodeInternals: (nodeId?: string | string[]) => void,
 	) {
 		this.nodes = nodes;
 		this.edges = edges;
-		this.defaultEdge = defaultEdge;
 		this.updateNodeInternals = updateNodeInternals;
 	}
 
@@ -146,8 +143,8 @@ export class History {
 
 		for (const edge of edges) {
 			const oldEdge = edgesMap.get(edge.id)!;
-			const oldData = oldEdge.data ?? this.defaultEdge.data!;
-			const newData = edge.data ?? this.defaultEdge.data!;
+			const oldData = oldEdge.data ?? defaultEdgeOptions.data!;
+			const newData = edge.data ?? defaultEdgeOptions.data!;
 			if (
 				oldData.position.r !== newData.position.r ||
 				oldData.position.phi !== newData.position.phi
@@ -219,7 +216,7 @@ export class History {
 			}
 			case "changeEdgePosition": {
 				const edge = this.edges.find((edge) => edge.id === change.id)!;
-				const oldData = edge.data ?? this.defaultEdge.data!;
+				const oldData = edge.data ?? defaultEdgeOptions.data!;
 				const oldPosition = { ...oldData.position };
 				edge.data = { ...oldData, position: change.to };
 				change.to = oldPosition;
@@ -227,7 +224,7 @@ export class History {
 			}
 			case "changeEdgeKind": {
 				const edge = this.edges.find((edge) => edge.id === change.id)!;
-				const oldData = edge.data ?? this.defaultEdge.data!;
+				const oldData = edge.data ?? defaultEdgeOptions.data!;
 				const oldKind = oldData.kind;
 				edge.data = { ...oldData, kind: change.to };
 				change.to = oldKind;

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Plus, X } from "@lucide/svelte";
 	import Graph from "$lib/Graph.svelte";
-	import { defaultEdge } from "$lib/model.js";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import { useElements, type Metadata, type MetadataElement, type Parent } from "./api";
@@ -37,7 +36,7 @@
 	const { width, height } = $derived(useStore());
 	const updateNodeInternals = useUpdateNodeInternals();
 
-	const history = new History(nodes, edges, defaultEdge(true), updateNodeInternals);
+	const history = new History(nodes, edges, updateNodeInternals);
 	let timeoutId = $state<number>();
 	$effect(() => {
 		const nodes_ = nodes;
@@ -71,7 +70,6 @@
 			data: {
 				body: "new node",
 				color: ["#E40303", "#FF8C00", "#FFED00", "#008026", "#004CFF", "#732982"][id % 6],
-				editable: true,
 			},
 		};
 
@@ -121,6 +119,8 @@
 		panelEntries.push({ mandatory: false, kind: "", value: "" });
 	}
 
+	let editable = $state(true);
+
 	$effect(() => {
 		metadata = panelEntries.map(({ kind, value }) => ({ kind, value }));
 	});
@@ -141,12 +141,16 @@
 </div>
 
 <div class="h-dvh w-dvw">
-	<Graph bind:nodes bind:edges {addNode} onmoveend={() => (offset = 0)}>
+	<Graph bind:nodes bind:edges {editable} {addNode} onmoveend={() => (offset = 0)}>
 		<PanelComponent
-			onaddmetadata={() => addMetadata()}
 			history={{
 				undo: history.canUndo() ? () => ([nodes, edges] = history.undo()) : undefined,
 				redo: history.canRedo() ? () => ([nodes, edges] = history.redo()) : undefined,
+			}}
+			addmetadata={() => addMetadata()}
+			edit={{
+				editable,
+				toggleeditable: () => (editable = !editable),
 			}}
 		>
 			<div class="table">

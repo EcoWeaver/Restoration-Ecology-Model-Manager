@@ -14,25 +14,26 @@
 	} from "@xyflow/svelte";
 	import NodeComponent from "./graph/NodeComponent.svelte";
 	import EdgeComponent from "./graph/EdgeComponent.svelte";
-	import { type Node, type Edge, defaultEdge } from "$lib/model";
+	import { type Node, type Edge, defaultEdgeOptions } from "$lib/model";
 	import "@xyflow/svelte/dist/style.css";
 
 	let {
 		nodes = $bindable(),
 		edges = $bindable(),
+		editable = false,
 		addNode,
 		onmoveend,
 		children,
 	}: {
 		nodes: Node[];
 		edges: Edge[];
+		editable?: boolean;
 		addNode?: (pos: XYPosition) => string;
 		onmoveend?: OnMove;
 		children: Snippet;
 	} = $props();
 
 	const { screenToFlowPosition } = useSvelteFlow();
-	const editable = $derived(addNode !== undefined);
 
 	const onconnectend: OnConnectEnd = (event, connectionState) => {
 		if (!addNode || connectionState.isValid) {
@@ -60,7 +61,7 @@
 		const targetId = addNode(targetPos);
 
 		const newEdge = {
-			...defaultEdge,
+			...defaultEdgeOptions,
 			id: `${sourceId}-${targetId}`,
 			source: sourceId,
 			target: targetId,
@@ -82,7 +83,7 @@
 	elementsSelectable={editable}
 	nodesFocusable={editable}
 	edgesFocusable={editable}
-	defaultEdgeOptions={defaultEdge(editable)}
+	{defaultEdgeOptions}
 	connectionLineType={ConnectionLineType.Straight}
 	elevateEdgesOnSelect={false}
 	proOptions={{ hideAttribution: true }}

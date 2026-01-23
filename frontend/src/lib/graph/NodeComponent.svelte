@@ -1,12 +1,21 @@
 <script lang="ts">
-	import { type NodeProps, Handle, Position, useConnection, useSvelteFlow } from "@xyflow/svelte";
+	import {
+		type NodeProps,
+		Handle,
+		Position,
+		useConnection,
+		useStore,
+		useSvelteFlow,
+	} from "@xyflow/svelte";
 	import { Move, Palette, Trash2 } from "@lucide/svelte";
 	import type { Node } from "$lib/model";
+	import { slide } from "svelte/transition";
 
 	const { id, data }: NodeProps<Node> = $props();
 
 	const { updateNodeData, deleteElements } = useSvelteFlow();
 	const connection = useConnection();
+	const { nodesFocusable } = $derived(useStore());
 
 	let { body, color } = $derived(data);
 	$effect(() => updateNodeData(id, { body, color }));
@@ -41,7 +50,8 @@
 		class="absolute! inset-0! size-full! transform-none! rounded-none! border-0! opacity-0
 			{connection.current.inProgress ? 'z-10' : ''}"
 	/>
-	{#if data.editable}
+
+	{#if nodesFocusable}
 		<div
 			class="relative max-w-[30ch] cursor-text rounded px-2 py-1 text-center wrap-break-word outline-indigo-400 focus-visible:outline-2"
 			class:text-black={light}
@@ -50,7 +60,19 @@
 			role="textbox"
 			bind:innerText={body}
 		></div>
+	{:else}
 		<div
+			class="max-w-[30ch] px-2 py-1 text-center wrap-break-word"
+			class:text-black={light}
+			class:text-white={!light}
+		>
+			{body}
+		</div>
+	{/if}
+
+	{#if nodesFocusable}
+		<div
+			transition:slide={{ duration: 100, axis: "y" }}
 			class="absolute top-full left-0 mt-1 h-10 w-max cursor-default rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
 		>
 			<div class="drag-handle inline-block cursor-grab">
@@ -70,14 +92,6 @@
 			>
 				<Trash2 />
 			</button>
-		</div>
-	{:else}
-		<div
-			class="max-w-[30ch] px-2 py-1 text-center wrap-break-word"
-			class:text-black={light}
-			class:text-white={!light}
-		>
-			{body}
 		</div>
 	{/if}
 </div>

@@ -4,6 +4,7 @@
 		EdgeLabel,
 		MarkerType,
 		useInternalNode,
+		useStore,
 		useSvelteFlow,
 		type EdgeProps,
 		type InternalNode,
@@ -13,6 +14,7 @@
 	import { Move, RotateCcw, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
 	import { untrack } from "svelte";
+	import { slide } from "svelte/transition";
 
 	let { id, data, source, target, markerStart, markerEnd }: EdgeProps<Edge> = $props();
 
@@ -20,6 +22,7 @@
 	const { updateEdge, getZoom, deleteElements, screenToFlowPosition } = useSvelteFlow();
 	const sourceNode = $derived(useInternalNode(source));
 	const targetNode = $derived(useInternalNode(target));
+	const { edgesFocusable } = $derived(useStore());
 
 	function nodeIntersection(intersectionNode: InternalNode, target: Cartesian): Cartesian {
 		// https://math.stackexchange.com/questions/1724792/an-algorithm-for-finding-the-intersection-point-between-a-center-of-vision-and-a
@@ -136,7 +139,7 @@
 			markerEnd: getRelationElements().causal.includes(kind)
 				? { type: MarkerType.ArrowClosed, color: null }
 				: `linecap-e-${source}-${target}`,
-			data: { kind: kind_, editable: data!.editable, position: position_ },
+			data: { kind: kind_, position: position_ },
 		}));
 		updateEdge(id, edge, { replace: true });
 	});
@@ -174,8 +177,8 @@
 
 <BaseEdge {id} {path} {markerStart} {markerEnd} />
 <EdgeLabel x={labelX} y={labelY} class="text-base!">
-	{#if data!.editable}
-		<div class="flex">
+	<div class="flex">
+		{#if edgesFocusable}
 			<select
 				bind:value={kind}
 				title={kind}
@@ -189,8 +192,16 @@
 					</optgroup>
 				{/each}
 			</select>
+		{:else}
+			<div class="flex h-10 items-center rounded-full bg-neutral-200 px-2 dark:bg-neutral-700">
+				{data!.kind}
+			</div>
+		{/if}
+
+		{#if edgesFocusable}
 			<div
-				class="nopan ml-1 h-10 cursor-default rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
+				class="nopan ml-1 flex h-10 cursor-default gap-2 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
+				transition:slide={{ duration: 100, axis: "x" }}
 			>
 				<div
 					class="inline-block cursor-grab"
@@ -216,12 +227,8 @@
 					<Trash2 />
 				</button>
 			</div>
-		</div>
-	{:else}
-		<div class="flex h-10 items-center rounded-full bg-neutral-200 px-2 dark:bg-neutral-700">
-			{data!.kind}
-		</div>
-	{/if}
+		{/if}
+	</div>
 </EdgeLabel>
 
 <svelte:window

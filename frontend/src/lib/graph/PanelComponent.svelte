@@ -1,26 +1,31 @@
 <script lang="ts">
 	import type { Snippet } from "svelte";
 	import type { MouseEventHandler } from "svelte/elements";
-	import { Plus, Redo, SquareChartGantt, Undo } from "@lucide/svelte";
+	import { Eye, Pen, Plus, Redo, SquareChartGantt, Undo } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
 
 	let {
-		onaddmetadata,
 		history,
+		addmetadata,
+		edit,
 		children,
 	}: {
-		onaddmetadata?: MouseEventHandler<HTMLButtonElement>;
 		history?: {
 			undo?: MouseEventHandler<HTMLButtonElement>;
 			redo?: MouseEventHandler<HTMLButtonElement>;
 		};
+		addmetadata?: MouseEventHandler<HTMLButtonElement>;
+		edit?: {
+			toggleeditable: MouseEventHandler<HTMLButtonElement>;
+			editable: boolean;
+		};
 		children: Snippet;
 	} = $props();
 
-	let show = $state(true);
+	let open = $state(true);
 </script>
 
-{#if show}
+{#if open}
 	<div
 		transition:slide={{ duration: 100 }}
 		tabindex="-1"
@@ -39,7 +44,7 @@
 			class:hover:bg-neutral-300={history.undo}
 			class:dark:hover:bg-neutral-600={history.undo}
 			class:text-neutral-400={!history.undo}
-			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
+			class="rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 		>
 			<Undo />
 		</button>
@@ -50,17 +55,17 @@
 			class:hover:bg-neutral-300={history.redo}
 			class:dark:hover:bg-neutral-600={history.redo}
 			class:text-neutral-400={!history.redo}
-			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
+			class="rounded-full bg-neutral-200 p-2 outline-indigo-400 focus-visible:outline-2 dark:bg-neutral-700"
 		>
 			<Redo />
 		</button>
 	{/if}
 
-	{#if onaddmetadata && show}
+	{#if addmetadata && open}
 		<button
 			title="add metadata"
 			transition:slide={{ duration: 100, axis: "x" }}
-			onclick={onaddmetadata}
+			onclick={addmetadata}
 			class="flex cursor-pointer items-center gap-1 rounded-full bg-neutral-200 p-2 pr-3 text-nowrap outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:bg-neutral-700 dark:hover:bg-neutral-600"
 		>
 			<Plus />
@@ -68,13 +73,27 @@
 		</button>
 	{/if}
 
+	{#if edit}
+		<button
+			title={edit.editable ? "show preview" : "continue editing"}
+			onclick={edit.toggleeditable}
+			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+		>
+			{#if edit.editable}
+				<Eye />
+			{:else}
+				<Pen />
+			{/if}
+		</button>
+	{/if}
+
 	<button
 		title="toggle metadata"
-		onclick={() => (show = !show)}
-		class:bg-neutral-300={show}
-		class:bg-neutral-200={!show}
-		class:dark:bg-neutral-600={show}
-		class:dark:bg-neutral-700={!show}
+		onclick={() => (open = !open)}
+		class:bg-neutral-300={open}
+		class:bg-neutral-200={!open}
+		class:dark:bg-neutral-600={open}
+		class:dark:bg-neutral-700={!open}
 		class="cursor-pointer rounded-full p-2 outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:hover:bg-neutral-600"
 	>
 		<SquareChartGantt />

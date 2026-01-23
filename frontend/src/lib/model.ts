@@ -1,19 +1,16 @@
 import type { Node as FlowNode, Edge as FlowEdge } from "@xyflow/svelte";
 import type { Node as ApiNode, Relation as ApiRelation, Graph } from "./api";
 
-export type Node = FlowNode<Omit<ApiNode, "position"> & { editable: boolean }, "custom">;
-export type Edge = FlowEdge<Omit<ApiRelation, "from" | "to"> & { editable: boolean }, "custom">;
+export type Node = FlowNode<Omit<ApiNode, "position">, "custom">;
+export type Edge = FlowEdge<Omit<ApiRelation, "from" | "to">, "custom">;
 
-export function defaultEdge(editable: boolean): Partial<Edge> {
-	return {
-		type: "custom",
-		data: {
-			kind: "affects",
-			editable,
-			position: { r: 0, phi: 0 },
-		},
-	};
-}
+export const defaultEdgeOptions: Partial<Edge> = {
+	type: "custom",
+	data: {
+		kind: "affects",
+		position: { r: 0, phi: 0 },
+	},
+};
 
 export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edges: Edge[] } {
 	const nodes: Node[] = Array.from(
@@ -52,7 +49,7 @@ export function flowToApi(nodes: Node[], edges: Edge[]): Graph {
 		const from = nodes.findIndex((n) => n.id === e.source);
 		const to = nodes.findIndex((n) => n.id === e.target);
 
-		const { kind, position } = e.data ?? defaultEdge(true).data!;
+		const { kind, position } = e.data ?? defaultEdgeOptions.data!;
 		if (position.r < 0) {
 			position.r *= -1;
 			position.phi += Math.PI;
