@@ -15,20 +15,21 @@ export const defaultEdgeOptions: Partial<Edge> = {
 export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edges: Edge[] } {
 	const nodes: Node[] = Array.from(
 		graph.nodes?.entries().map(([id, { body, position, color }]) => ({
-			position,
+			id: id.toString(),
 			type: "custom",
 			dragHandle: ".drag-handle",
-			id: id.toString(),
+			position,
+			origin: [0.5, 0.5],
 			data: { body, color, editable },
 		})) ?? [],
 	);
 
 	const edges: Edge[] =
 		graph.relations?.map(({ from, to, kind, position }) => ({
+			id: `${from}-${to}`,
+			type: "custom",
 			source: from.toString(),
 			target: to.toString(),
-			type: "custom",
-			id: `${from}-${to}`,
 			data: { kind, editable, position },
 		})) ?? [];
 
