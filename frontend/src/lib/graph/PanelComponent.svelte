@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from "svelte";
 	import type { MouseEventHandler } from "svelte/elements";
-	import { Eye, Pen, Plus, Redo, SquareChartGantt, Undo } from "@lucide/svelte";
+	import { Eye, PencilLine, Plus, Redo, SquareChartGantt, Undo } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
 
 	let {
@@ -82,7 +82,7 @@
 			{#if edit.editable}
 				<Eye />
 			{:else}
-				<Pen />
+				<PencilLine strokeWidth={1.75} />
 			{/if}
 		</button>
 	{/if}
