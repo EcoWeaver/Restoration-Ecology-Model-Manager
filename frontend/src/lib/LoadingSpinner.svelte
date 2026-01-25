@@ -31,7 +31,7 @@
 
 {#if spinner === "spinning"}
 	<div
-		class="absolute top-0 z-1000 flex h-full w-full items-center justify-center bg-white/50 dark:bg-neutral-800/50"
+		class="absolute top-0 z-1000 flex h-full w-full cursor-wait items-center justify-center bg-white/50 dark:bg-neutral-800/50"
 		in:fade={{ duration: 250 }}
 	>
 		<LoaderCircle class="animate-spin" />
