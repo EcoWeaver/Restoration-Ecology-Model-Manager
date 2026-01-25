@@ -148,10 +148,7 @@
 				redo: history.canRedo() ? () => ([nodes, edges] = history.redo()) : undefined,
 			}}
 			addmetadata={() => addMetadata()}
-			edit={{
-				editable,
-				toggleeditable: () => (editable = !editable),
-			}}
+			bind:editable
 		>
 			<div class="table">
 				<div class="table-row">

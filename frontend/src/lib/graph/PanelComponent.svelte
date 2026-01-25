@@ -7,7 +7,7 @@
 	let {
 		history,
 		addmetadata,
-		edit,
+		editable = $bindable(),
 		children,
 	}: {
 		history?: {
@@ -15,10 +15,7 @@
 			redo?: MouseEventHandler<HTMLButtonElement>;
 		};
 		addmetadata?: MouseEventHandler<HTMLButtonElement>;
-		edit?: {
-			toggleeditable: MouseEventHandler<HTMLButtonElement>;
-			editable: boolean;
-		};
+		editable?: boolean;
 		children: Snippet;
 	} = $props();
 
@@ -73,13 +70,13 @@
 		</button>
 	{/if}
 
-	{#if edit}
+	{#if editable !== undefined}
 		<button
-			title={edit.editable ? "show preview" : "continue editing"}
-			onclick={edit.toggleeditable}
+			title={editable ? "show preview" : "continue editing"}
+			onclick={() => (editable = !editable)}
 			class="cursor-pointer rounded-full bg-neutral-200 p-2 outline-indigo-400 hover:bg-neutral-300 focus-visible:outline-2 dark:bg-neutral-700 dark:hover:bg-neutral-600"
 		>
-			{#if edit.editable}
+			{#if editable}
 				<Eye />
 			{:else}
 				<PencilLine strokeWidth={1.75} />
