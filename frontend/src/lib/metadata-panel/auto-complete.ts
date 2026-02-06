@@ -5,15 +5,14 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 		return [];
 	}
 
-	const res = await fetch(`https://api.gbif.org/v1/species/suggest?q=${encodeURIComponent(value)}`);
+	const res = await fetch(
+		`https://api.gbif.org/v1/species/suggest?q=${encodeURIComponent(value)}&status=ACCEPTED`,
+	);
 	const suggestions: {
-		status: string;
 		canonicalName: string;
 	}[] = await res.json();
 
-	return suggestions
-		.filter((suggestion) => suggestion.status === "ACCEPTED")
-		.map((suggestion) => suggestion.canonicalName);
+	return suggestions.map((suggestion) => suggestion.canonicalName);
 }
 
 export async function suggestOLS4(value: string, ols4: OLS4): Promise<string[]> {
