@@ -44,6 +44,20 @@
 		selected = -1;
 	}
 
+	let query = $derived.by(() => {
+		const query = new URLSearchParams();
+
+		for (const { kind, value } of chips) {
+			query.append(kind, value!);
+		}
+
+		if (chip) {
+			query.append(chip.kind, value);
+		}
+
+		return query;
+	});
+
 	async function onkeydown(event: KeyboardEvent) {
 		if (event.code === "Enter") {
 			if (chip) {
@@ -60,7 +74,8 @@
 					value = "";
 					selected = -1;
 				} else if (selected === -1 && value.length === 0) {
-					await submit();
+					// eslint-disable-next-line svelte/no-navigation-without-resolve
+					await goto(resolve("/search") + `?${query}`);
 				}
 			}
 
@@ -84,33 +99,6 @@
 			selected = Math.max(value === "" ? -1 : 0, selected - 1);
 			event.preventDefault();
 		}
-	}
-
-	async function onclick() {
-		if (chip) {
-			if (value.length > 0) {
-				chip.value = value;
-				chips.push(chip);
-
-				chip = undefined;
-				value = "";
-
-				await submit();
-			}
-		} else if (value.length === 0) {
-			await submit();
-		}
-	}
-
-	async function submit() {
-		const query = new URLSearchParams();
-		for (const { kind, value } of chips) {
-			query.append(kind, value!);
-		}
-
-		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		await goto(resolve("/search") + `?${query}`);
-		focused = false;
 	}
 
 	let containerElement: HTMLDivElement;
@@ -218,10 +206,13 @@
 	{/if}
 </div>
 
-<button
+<a
 	class="flex h-10 cursor-pointer items-center rounded-r-md border border-l-0 border-neutral-600 px-3 outline-indigo-400 focus-visible:outline-2"
 	title="search"
-	{onclick}
+	href={/* eslint-disable-line svelte/no-navigation-without-resolve */ resolve("/search") +
+		`?${query}`}
+	data-sveltekit-preload-data="tap"
+	data-sveltekit-preload-code="hover"
 >
 	<Search />
-</button>
+</a>

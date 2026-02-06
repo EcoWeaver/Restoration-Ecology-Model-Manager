@@ -27,7 +27,7 @@
 
 	let alert: ReturnType<typeof Alert>;
 
-	function edit() {
+	async function edit() {
 		const localUUID = newLocalModel({
 			graph: model.graph,
 			metadata,
@@ -37,7 +37,7 @@
 			},
 		});
 
-		goto(resolve(`/edit/${localUUID}`));
+		await goto(resolve(`/edit/${localUUID}`));
 	}
 
 	async function share() {

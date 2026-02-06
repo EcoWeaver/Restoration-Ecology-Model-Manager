@@ -134,6 +134,7 @@
 	$effect(() => {
 		const kind_ = kind;
 		const position_ = position;
+
 		const edge = untrack(() => ({
 			markerStart: `linecap-s-${source}-${target}`,
 			markerEnd: getRelationElements().causal.includes(kind)
