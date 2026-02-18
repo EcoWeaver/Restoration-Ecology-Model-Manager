@@ -4,6 +4,7 @@ import (
 	"backend/types"
 	"backend/util"
 	"backend/verify"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -109,11 +110,11 @@ func (self *State) GetModel(c echo.Context) error {
 			models.graph,
 			models.parent`
 
-	conn, err := self.DBPool.Begin(ctx)
+	conn, err := self.DBPool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
-	defer conn.Rollback(ctx)
+	defer conn.Release()
 
 	var uploaded time.Time
 	var graph types.Graph
@@ -146,12 +147,8 @@ func (self *State) GetModel(c echo.Context) error {
 		}
 	}
 
-	if err = conn.Commit(ctx); err != nil {
-		return err
-	}
-
 	go func() {
-		if err, ok := verifyModel(types.Model{Graph: graph, Parent: parentUUID, Metadata: metadata}, self, c.Logger(), ctx).(types.Error); ok {
+		if err, ok := verifyModel(types.Model{Graph: graph, Parent: parentUUID, Metadata: metadata}, self, c.Logger(), context.Background()).(types.Error); ok {
 			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with uuid '%s': %w", modelID, err))
 		}
 	}()
@@ -378,11 +375,11 @@ func (self *State) PostSearch(c echo.Context) error {
 			models.model_id,
 			models.uploaded`
 
-	conn, err := self.DBPool.Begin(ctx)
+	conn, err := self.DBPool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
-	defer conn.Rollback(ctx)
+	defer conn.Release()
 
 	rows, err := conn.Query(ctx, query, args...)
 	if err != nil {
@@ -396,10 +393,6 @@ func (self *State) PostSearch(c echo.Context) error {
 		return nil
 	})
 	if err != nil {
-		return err
-	}
-
-	if err = conn.Commit(ctx); err != nil {
 		return err
 	}
 
@@ -448,11 +441,11 @@ func (self *State) PostModelRun(c echo.Context) error {
 		WHERE
 			models.model_id = $1`
 
-	conn, err := self.DBPool.Begin(ctx)
+	conn, err := self.DBPool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
-	defer conn.Rollback(ctx)
+	defer conn.Release()
 
 	var graph types.Graph
 	if err = conn.QueryRow(ctx, query, mr.UUID).Scan(&graph); err != nil {
@@ -463,10 +456,6 @@ func (self *State) PostModelRun(c echo.Context) error {
 		} else {
 			return err
 		}
-	}
-
-	if err := conn.Commit(ctx); err != nil {
-		return err
 	}
 
 	res, err := mr.Run(graph, &r)
@@ -510,12 +499,6 @@ func (self *State) PostModelVerify(c echo.Context) error {
 		}
 	}
 
-	conn, err := self.DBPool.Begin(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Rollback(ctx)
-
 	if m.Parent != nil {
 		query := `
 			SELECT
@@ -528,6 +511,12 @@ func (self *State) PostModelVerify(c echo.Context) error {
 				models.model_id = $1
 			GROUP BY
 				models.graph`
+
+		conn, err := self.DBPool.Acquire(ctx)
+		if err != nil {
+			return err
+		}
+		defer conn.Release()
 
 		var graph types.Graph
 		var metadata []types.Metadata

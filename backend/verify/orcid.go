@@ -22,7 +22,7 @@ func orcid(s string, ctx context.Context) error {
 		return nil
 	}
 
-	api := "https://pub.orcid.org/v3.0/" + url.QueryEscape(s)
+	api := "https://pub.orcid.org/v3.0/" + url.PathEscape(s)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
 	if err != nil {
 		return err

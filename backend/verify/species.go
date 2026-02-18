@@ -34,7 +34,7 @@ func species(s string, ctx context.Context) error {
 		return err
 	}
 
-	type Response struct {
+	var r struct {
 		Usage struct {
 			Status string `json:"status"`
 		} `json:"usage"`
@@ -43,7 +43,6 @@ func species(s string, ctx context.Context) error {
 		} `json:"diagnostics"`
 	}
 
-	var r Response
 	if err = json.Unmarshal(body, &r); err != nil {
 		return err
 	}

@@ -41,13 +41,12 @@ func ols4(self types.OLS4, s string, ctx context.Context) error {
 		Label string `json:"label"`
 	}
 
-	type Response struct {
+	var r struct {
 		Response struct {
 			Docs []Label `json:"docs"`
 		} `json:"response"`
 	}
 
-	var r Response
 	if err = json.Unmarshal(body, &r); err != nil {
 		return err
 	}

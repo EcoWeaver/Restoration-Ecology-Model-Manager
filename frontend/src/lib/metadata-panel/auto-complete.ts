@@ -6,7 +6,7 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 	}
 
 	const res = await fetch(
-		`https://api.gbif.org/v1/species/suggest?q=${encodeURIComponent(value)}&status=ACCEPTED`,
+		`https://api.gbif.org/v1/species/suggest?status=ACCEPTED&q=${encodeURIComponent(value)}`,
 	);
 	const suggestions: {
 		canonicalName: string;
