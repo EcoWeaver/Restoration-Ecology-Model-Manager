@@ -35,11 +35,11 @@
 	}
 
 	let inputElement = $state<HTMLInputElement>();
-	function select(event: MouseEvent, selected: number) {
+	function select(event: MouseEvent, idx: number) {
 		inputElement?.focus();
 		event.preventDefault();
 
-		chip = { kind: suggestions[selected] };
+		chip = { kind: suggestions[idx] };
 		value = "";
 		selected = -1;
 	}

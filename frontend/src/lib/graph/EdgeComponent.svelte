@@ -204,7 +204,7 @@
 				class="nopan ml-1 flex h-10 cursor-default gap-2 rounded-full bg-neutral-200 p-2 dark:bg-neutral-700"
 				transition:slide={{ duration: 100, axis: "x" }}
 			>
-				<div
+				<button
 					class="inline-block cursor-grab"
 					onpointerdown={() => {
 						drag.dragging = true;
@@ -212,7 +212,7 @@
 					}}
 				>
 					<Move />
-				</div>
+				</button>
 				<button
 					class="cursor-pointer rounded-full outline-offset-3 outline-indigo-400 focus-visible:outline-2"
 					onclick={() => (position = { r: 0, phi: 0 })}
