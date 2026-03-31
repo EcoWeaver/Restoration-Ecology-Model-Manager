@@ -149,7 +149,7 @@ func (self *State) GetModel(c echo.Context) error {
 
 	go func() {
 		if err, ok := verifyModel(types.Model{Graph: graph, Parent: parentUUID, Metadata: metadata}, self, c.Logger(), context.Background()).(types.Error); ok {
-			c.Logger().Warn(fmt.Errorf("encountered error while verifying model with uuid '%s': %w", modelID, err))
+			c.Logger().Warnf("encountered error while verifying model with uuid '%s': %w", modelID, err)
 		}
 	}()
 
