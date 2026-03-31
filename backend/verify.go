@@ -7,17 +7,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"math"
 	"net/url"
 	"slices"
 	"strings"
 	"time"
 
-	"github.com/labstack/echo/v4"
 	"golang.org/x/text/language"
 )
 
-func verifyModel(self types.Model, s *State, l echo.Logger, ctx context.Context) error {
+func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context) error {
 	if err := verifyGraph(self.Graph, s, l); err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func verifyModel(self types.Model, s *State, l echo.Logger, ctx context.Context)
 	return nil
 }
 
-func verifyGraph(self types.Graph, s *State, l echo.Logger) error {
+func verifyGraph(self types.Graph, s *State, l *slog.Logger) error {
 	type Relation struct {
 		From int
 		To   int
@@ -102,7 +102,7 @@ const Year = "2006"
 const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
-func verifyMetadata(self types.Metadata, s *State, m MetadataConfig, l echo.Logger, ctx context.Context) error {
+func verifyMetadata(self types.Metadata, s *State, m MetadataConfig, l *slog.Logger, ctx context.Context) error {
 	if self.Kind == "" {
 		if self.Value == "" {
 			return types.Error{E: errors.New("encountered unset metadata kind with unset value")}
@@ -169,7 +169,7 @@ func verifyMetadata(self types.Metadata, s *State, m MetadataConfig, l echo.Logg
 					return nil
 				}
 			default:
-				l.Warnf("encountered unknown metadata type '%s', assuming free text", me.Type)
+				l.Warn(fmt.Sprintf("encountered unknown metadata type '%s', assuming free text", me.Type))
 				return nil
 			}
 

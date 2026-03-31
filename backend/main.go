@@ -8,11 +8,9 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
-	echoSwagger "github.com/swaggo/echo-swagger"
-	"golang.org/x/time/rate"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger/v2"
 )
 
 // main godoc
@@ -21,22 +19,19 @@ import (
 //	@version		1.0
 //	@license.name	AGPL-3.0
 //	@license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
-//	@host			localhost:8080
+//	@host			http://localhost:8080
 func main() {
 	e := echo.New()
 
-	e.Logger.SetLevel(log.WARN)
-	e.Logger.SetHeader("${time_rfc3339}")
-
-	e.Use(middleware.BodyLimit("2M"))
-	e.Use(middleware.CORS())
+	e.Use(middleware.BodyLimit(2_097_152))
+	e.Use(middleware.CORS("http://localhost:3000", "http://localhost:5173"))
 	e.Use(middleware.RequestLogger())
-	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	e.Use(middleware.Recover())
 	e.Use(middleware.Secure())
 
 	if err := godotenv.Load(); err != nil {
-		e.Logger.Warn(err)
+		e.Logger.Warn(err.Error())
 	}
 
 	verify.REQ = os.Getenv("REMMA_NO_VERIFY_REQ") != "yes"
@@ -48,7 +43,7 @@ func main() {
 
 	dbPool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		e.Logger.Fatal(err)
+		panic(err)
 	}
 	defer dbPool.Close()
 
@@ -73,6 +68,6 @@ func main() {
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	if err = e.Start(":8080"); err != nil {
-		e.Logger.Fatal(err)
+		panic(err)
 	}
 }

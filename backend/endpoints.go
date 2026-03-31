@@ -16,7 +16,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type State struct {
@@ -68,7 +68,7 @@ type Parent struct {
 // @Success		200			{object}	MetadataConfig
 // @Failure		500			{object}	echo.HTTPError
 // @Router		/metadata	[get]
-func (self *State) GetMetadata(c echo.Context) error {
+func (self *State) GetMetadata(c *echo.Context) error {
 	m, err := self.Metadata.Get(c.Logger())
 	if err != nil {
 		return err
@@ -85,12 +85,11 @@ func (self *State) GetMetadata(c echo.Context) error {
 // @Failure		404		{object}	echo.HTTPError
 // @Failure		500		{object}	echo.HTTPError
 // @Router		/model	[get]
-func (self *State) GetModel(c echo.Context) error {
+func (self *State) GetModel(c *echo.Context) error {
 	ctx := c.Request().Context()
 
-	modelID := c.QueryParam("uuid")
-	if err := verify.UUID(modelID); err != nil {
-		c.Logger().Warn(err)
+	modelUUID := c.QueryParam("uuid")
+	if err := verify.UUID(modelUUID); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
@@ -120,11 +119,9 @@ func (self *State) GetModel(c echo.Context) error {
 	var graph types.Graph
 	var parentUUID *string
 	var metadata []types.Metadata
-	if err = conn.QueryRow(ctx, query, modelID).Scan(&uploaded, &graph, &parentUUID, &metadata); err != nil {
+	if err = conn.QueryRow(ctx, query, modelUUID).Scan(&uploaded, &graph, &parentUUID, &metadata); err != nil {
 		if err == pgx.ErrNoRows {
-			err = fmt.Errorf("model with uuid '%s' not found", modelID)
-			c.Logger().Warn(err)
-			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
+			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' not found", modelUUID)})
 		} else {
 			return err
 		}
@@ -149,11 +146,11 @@ func (self *State) GetModel(c echo.Context) error {
 
 	go func() {
 		if err, ok := verifyModel(types.Model{Graph: graph, Parent: parentUUID, Metadata: metadata}, self, c.Logger(), context.Background()).(types.Error); ok {
-			c.Logger().Warnf("encountered error while verifying model with uuid '%s': %w", modelID, err)
+			c.Logger().Warn(fmt.Sprintf("encountered error while verifying model with uuid '%s': %s", modelUUID, err.Error()))
 		}
 	}()
 
-	return c.JSON(http.StatusOK, GetModelResult{modelID, uploaded, graph, parent, metadata})
+	return c.JSON(http.StatusOK, GetModelResult{modelUUID, uploaded, graph, parent, metadata})
 }
 
 // @Summary		Save a model
@@ -166,7 +163,7 @@ func (self *State) GetModel(c echo.Context) error {
 // @Failure		409		{object}	echo.HTTPError
 // @Failure		500		{object}	echo.HTTPError
 // @Router		/model	[put]
-func (self *State) PutModel(c echo.Context) error {
+func (self *State) PutModel(c *echo.Context) error {
 	ctx := c.Request().Context()
 
 	body, err := io.ReadAll(c.Request().Body)
@@ -176,13 +173,11 @@ func (self *State) PutModel(c echo.Context) error {
 
 	var m types.Model
 	if err = json.Unmarshal(body, &m); err != nil {
-		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
 	if err = verifyModel(m, self, c.Logger(), ctx); err != nil {
 		if _, ok := err.(types.Error); ok {
-			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
@@ -212,17 +207,14 @@ func (self *State) PutModel(c echo.Context) error {
 		var metadata []types.Metadata
 		if err := conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
 			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", *m.Parent)
-				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
 			} else {
 				return err
 			}
 		}
 
 		if slices.Equal(m.Graph.Nodes, graph.Nodes) && util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) && util.SlicesEqualUnordered(m.Metadata, metadata) {
-			err = fmt.Errorf("model with uuid '%s' wasn't changed", *m.Parent)
-			c.Logger().Warn(err)
-			return c.JSON(http.StatusConflict, echo.HTTPError{Message: err.Error()})
+			return c.JSON(http.StatusConflict, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' wasn't changed", *m.Parent)})
 		}
 	}
 
@@ -234,8 +226,8 @@ func (self *State) PutModel(c echo.Context) error {
 		RETURNING
 			model_id`
 
-	var modelID string
-	if err = conn.QueryRow(ctx, query, m.Graph, m.Parent).Scan(&modelID); err != nil {
+	var modelUUID string
+	if err = conn.QueryRow(ctx, query, m.Graph, m.Parent).Scan(&modelUUID); err != nil {
 		return err
 	}
 
@@ -245,7 +237,7 @@ func (self *State) PutModel(c echo.Context) error {
 		VALUES
 			`
 
-	args := []any{modelID}
+	args := []any{modelUUID}
 	var vals []string
 	for _, me := range m.Metadata {
 		args = append(args, me.Kind, me.Value)
@@ -262,7 +254,7 @@ func (self *State) PutModel(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, PutModelResult{modelID})
+	return c.JSON(http.StatusCreated, PutModelResult{modelUUID})
 }
 
 // @Summary		Get the relations
@@ -271,7 +263,7 @@ func (self *State) PutModel(c echo.Context) error {
 // @Success		200			{object}	RelationsConfig
 // @Failure		500			{object}	echo.HTTPError
 // @Router		/relations	[get]
-func (self *State) GetRelations(c echo.Context) error {
+func (self *State) GetRelations(c *echo.Context) error {
 	r, err := self.Relations.Get(c.Logger())
 	if err != nil {
 		return err
@@ -288,7 +280,7 @@ func (self *State) GetRelations(c echo.Context) error {
 // @Failure		400		{object}	echo.HTTPError
 // @Failure		500		{object}	echo.HTTPError
 // @Router		/search	[post]
-func (self *State) PostSearch(c echo.Context) error {
+func (self *State) PostSearch(c *echo.Context) error {
 	ctx := c.Request().Context()
 
 	body, err := io.ReadAll(c.Request().Body)
@@ -298,7 +290,6 @@ func (self *State) PostSearch(c echo.Context) error {
 
 	var mqs []types.Metadata
 	if err = json.Unmarshal(body, &mqs); err != nil {
-		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
@@ -310,9 +301,7 @@ func (self *State) PostSearch(c echo.Context) error {
 	qs := map[string][]string{}
 	for _, mq := range mqs {
 		if _, ok := qs[mq.Kind]; !ok && !m.IsMetadataKind(mq.Kind) {
-			err = fmt.Errorf("encountered invalid metadata kind '%s'", mq.Kind)
-			c.Logger().Warn(err)
-			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered invalid metadata kind '%s'", mq.Kind)})
 		}
 		qs[mq.Kind] = append(qs[mq.Kind], mq.Value)
 	}
@@ -409,7 +398,7 @@ func (self *State) PostSearch(c echo.Context) error {
 // @Failure		404			{object}	echo.HTTPError
 // @Failure		500			{object}	echo.HTTPError
 // @Router		/model/run	[post]
-func (self *State) PostModelRun(c echo.Context) error {
+func (self *State) PostModelRun(c *echo.Context) error {
 	ctx := c.Request().Context()
 
 	body, err := io.ReadAll(c.Request().Body)
@@ -419,7 +408,6 @@ func (self *State) PostModelRun(c echo.Context) error {
 
 	var mr PostModelRunRequest
 	if err = json.Unmarshal(body, &mr); err != nil {
-		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
@@ -429,7 +417,6 @@ func (self *State) PostModelRun(c echo.Context) error {
 	}
 
 	if err := mr.Verify(&r); err != nil {
-		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
@@ -450,9 +437,7 @@ func (self *State) PostModelRun(c echo.Context) error {
 	var graph types.Graph
 	if err = conn.QueryRow(ctx, query, mr.UUID).Scan(&graph); err != nil {
 		if err == pgx.ErrNoRows {
-			err = fmt.Errorf("model with uuid '%s' not found", mr.UUID)
-			c.Logger().Warn(err)
-			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: err.Error()})
+			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' not found", mr.UUID)})
 		} else {
 			return err
 		}
@@ -460,7 +445,6 @@ func (self *State) PostModelRun(c echo.Context) error {
 
 	res, err := mr.Run(graph, &r)
 	if err != nil {
-		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
@@ -476,7 +460,7 @@ func (self *State) PostModelRun(c echo.Context) error {
 // @Failure		409				{object}	echo.HTTPError
 // @Failure		500				{object}	echo.HTTPError
 // @Router		/model/verify	[post]
-func (self *State) PostModelVerify(c echo.Context) error {
+func (self *State) PostModelVerify(c *echo.Context) error {
 	ctx := c.Request().Context()
 
 	body, err := io.ReadAll(c.Request().Body)
@@ -486,13 +470,11 @@ func (self *State) PostModelVerify(c echo.Context) error {
 
 	var m types.Model
 	if err = json.Unmarshal(body, &m); err != nil {
-		c.Logger().Warn(err)
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
 	if err = verifyModel(m, self, c.Logger(), ctx); err != nil {
 		if _, ok := err.(types.Error); ok {
-			c.Logger().Warn(err)
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
@@ -522,17 +504,14 @@ func (self *State) PostModelVerify(c echo.Context) error {
 		var metadata []types.Metadata
 		if err := conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
 			if err == pgx.ErrNoRows {
-				err = fmt.Errorf("encountered non-existent parent model with uuid '%s'", *m.Parent)
-				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
 			} else {
 				return err
 			}
 		}
 
 		if slices.Equal(m.Graph.Nodes, graph.Nodes) && util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) && util.SlicesEqualUnordered(m.Metadata, metadata) {
-			err = fmt.Errorf("model with uuid '%s' wasn't changed", *m.Parent)
-			c.Logger().Warn(err)
-			return c.JSON(http.StatusConflict, echo.HTTPError{Message: err.Error()})
+			return c.JSON(http.StatusConflict, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' wasn't changed", *m.Parent)})
 		}
 	}
 

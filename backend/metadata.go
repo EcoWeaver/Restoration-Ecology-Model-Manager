@@ -4,13 +4,12 @@ import (
 	"backend/types"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"os"
 	"slices"
 	"sync"
 	"time"
-
-	"github.com/labstack/echo/v4"
 )
 
 type LiveMetadataConfig struct {
@@ -32,7 +31,7 @@ type MetadataElement struct {
 	OLS4    *types.OLS4 `json:"ols4,omitempty"`
 }
 
-func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
+func (self *LiveMetadataConfig) Get(l *slog.Logger) (MetadataConfig, error) {
 	fi, err := os.Stat("metadata.json")
 	if err != nil {
 		return MetadataConfig{}, err
@@ -69,7 +68,7 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 			_, ok := e[me.Name]
 			e[me.Name] = struct{}{}
 			if ok {
-				l.Warnf("ignoring duplicate relation kind '%s'", me)
+				l.Warn(fmt.Sprintf("ignoring duplicate relation kind '%s'", me.Name))
 			}
 			return ok
 		})
@@ -84,7 +83,7 @@ func (self *LiveMetadataConfig) Get(l echo.Logger) (MetadataConfig, error) {
 	return m, nil
 }
 
-func (self *MetadataElement) verify(l echo.Logger) error {
+func (self *MetadataElement) verify(l *slog.Logger) error {
 	if self.Type == "choice" {
 		if len(self.Choices) != 0 {
 			e := map[string]struct{}{}
@@ -92,7 +91,7 @@ func (self *MetadataElement) verify(l echo.Logger) error {
 				_, ok := e[ce]
 				e[ce] = struct{}{}
 				if ok {
-					l.Warnf("ignoring duplicate choice '%s' for metadata kind '%s'", ce, self.Name)
+					l.Warn(fmt.Sprintf("ignoring duplicate choice '%s' for metadata kind '%s'", ce, self.Name))
 				}
 				return ok
 			})
@@ -100,7 +99,7 @@ func (self *MetadataElement) verify(l echo.Logger) error {
 			return fmt.Errorf("missing choices for metadata kind '%s'", self.Name)
 		}
 	} else if len(self.Choices) != 0 {
-		l.Warnf("ignoring unnecessary choices for metadata kind '%s'", self.Name)
+		l.Warn(fmt.Sprintf("ignoring unnecessary choices for metadata kind '%s'", self.Name))
 		self.Choices = []string{}
 	}
 
@@ -111,7 +110,7 @@ func (self *MetadataElement) verify(l echo.Logger) error {
 			return err
 		}
 	} else if self.OLS4 != nil {
-		l.Warnf("ignoring unnecessary ontology for metadata kind '%s'", self.Name)
+		l.Warn(fmt.Sprintf("ignoring unnecessary ontology for metadata kind '%s'", self.Name))
 		self.OLS4 = nil
 	}
 

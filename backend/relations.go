@@ -2,12 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"log/slog"
 	"os"
 	"slices"
 	"sync"
 	"time"
-
-	"github.com/labstack/echo/v4"
 )
 
 type LiveRelationsConfig struct {
@@ -21,7 +21,7 @@ type RelationsConfig struct {
 	Noncausal []string `json:"noncausal"`
 }
 
-func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
+func (self *LiveRelationsConfig) Get(l *slog.Logger) (RelationsConfig, error) {
 	fi, err := os.Stat("relations.json")
 	if err != nil {
 		return RelationsConfig{}, err
@@ -51,7 +51,7 @@ func (self *LiveRelationsConfig) Get(l echo.Logger) (RelationsConfig, error) {
 			_, ok := e[re]
 			e[re] = struct{}{}
 			if ok {
-				l.Warnf("ignoring duplicate relation kind '%s'", re)
+				l.Warn(fmt.Sprintf("ignoring duplicate relation kind '%s'", re))
 			}
 			return ok
 		})
