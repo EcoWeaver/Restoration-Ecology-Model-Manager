@@ -20,7 +20,7 @@
 	const parent = $derived(model.parent);
 	const title = $derived(metadata.find(({ kind }) => kind === "title")?.value ?? "");
 
-	let timeoutId = $state<number>();
+	let timeoutId = $state<NodeJS.Timeout>();
 	$effect(() => {
 		const nodes_ = nodes;
 		const edges_ = edges;

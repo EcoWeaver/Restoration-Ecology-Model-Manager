@@ -5,7 +5,7 @@
 	let open = $state(false);
 	let text = $state("");
 	let isError = $state(false);
-	let timeoutId = $state<number>();
+	let timeoutId = $state<NodeJS.Timeout>();
 	let expiresAt = $state(0);
 	let hoverStart = $state(0);
 

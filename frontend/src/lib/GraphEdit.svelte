@@ -37,7 +37,7 @@
 	const updateNodeInternals = useUpdateNodeInternals();
 
 	const history = new History(nodes, edges, updateNodeInternals);
-	let timeoutId = $state<number>();
+	let timeoutId = $state<NodeJS.Timeout>();
 	$effect(() => {
 		const nodes_ = nodes;
 		const edges_ = edges;
