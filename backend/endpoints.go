@@ -96,18 +96,11 @@ func (self *State) GetModel(c *echo.Context) error {
 	query := `
 		SELECT
 			models.uploaded,
-			models.graph,
-			models.parent,
-			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
+			models.parent
 		FROM
 			models
-			JOIN metadata ON models.model_id = metadata.model_id
 		WHERE
-			models.model_id = $1
-		GROUP BY
-			models.uploaded,
-			models.graph,
-			models.parent`
+			models.model_id = $1`
 
 	conn, err := self.DBPool.Acquire(ctx)
 	if err != nil {
@@ -116,15 +109,23 @@ func (self *State) GetModel(c *echo.Context) error {
 	defer conn.Release()
 
 	var uploaded time.Time
-	var graph types.Graph
 	var parentUUID *string
-	var metadata []types.Metadata
-	if err = conn.QueryRow(ctx, query, modelUUID).Scan(&uploaded, &graph, &parentUUID, &metadata); err != nil {
+	if err = conn.QueryRow(ctx, query, modelUUID).Scan(&uploaded, &parentUUID); err != nil {
 		if err == pgx.ErrNoRows {
 			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' not found", modelUUID)})
 		} else {
 			return err
 		}
+	}
+
+	graph, err := getModelGraph(ctx, conn.Conn(), modelUUID)
+	if err != nil {
+		return err
+	}
+
+	metadata, err := getModelMetadata(ctx, conn.Conn(), modelUUID)
+	if err != nil {
+		return err
 	}
 
 	var parent *Parent
@@ -133,11 +134,11 @@ func (self *State) GetModel(c *echo.Context) error {
 
 		query = `
 		SELECT
-			metadata.value
+			model_metadata.value
 		FROM
-			metadata
+			model_metadata
 		WHERE
-			metadata.model_id = $1 AND metadata.kind = 'title'`
+			model_metadata.model_id = $1 AND model_metadata.kind = 'title'`
 
 		if err := conn.QueryRow(ctx, query, *parentUUID).Scan(&parent.Title); err != nil {
 			return err
@@ -191,26 +192,23 @@ func (self *State) PutModel(c *echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	if m.Parent != nil {
-		query := `
-		SELECT
-			models.graph,
-			jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
-		FROM
-			models
-			JOIN metadata ON models.model_id = metadata.model_id
-		WHERE
-			models.model_id = $1
-		GROUP BY
-			models.graph`
-
-		var graph types.Graph
-		var metadata []types.Metadata
-		if err := conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
+		var one int
+		if err := conn.QueryRow(ctx, "SELECT 1 FROM models WHERE models.model_id = $1", m.Parent).Scan(&one); err != nil {
 			if err == pgx.ErrNoRows {
 				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
 			} else {
 				return err
 			}
+		}
+
+		graph, err := getModelGraph(ctx, conn.Conn(), *m.Parent)
+		if err != nil {
+			return err
+		}
+
+		metadata, err := getModelMetadata(ctx, conn.Conn(), *m.Parent)
+		if err != nil {
+			return err
 		}
 
 		if slices.Equal(m.Graph.Nodes, graph.Nodes) && util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) && util.SlicesEqualUnordered(m.Metadata, metadata) {
@@ -220,33 +218,22 @@ func (self *State) PutModel(c *echo.Context) error {
 
 	query := `
 		INSERT INTO
-			models (graph, parent)
+			models (parent)
 		VALUES
-			($1, $2)
+			($1)
 		RETURNING
 			model_id`
 
-	var modelUUID string
-	if err = conn.QueryRow(ctx, query, m.Graph, m.Parent).Scan(&modelUUID); err != nil {
+	var res PutModelResult
+	if err = conn.QueryRow(ctx, query, m.Parent).Scan(&res.UUID); err != nil {
 		return err
 	}
 
-	query = `
-		INSERT INTO
-			metadata (model_id, kind, value)
-		VALUES
-			`
-
-	args := []any{modelUUID}
-	var vals []string
-	for _, me := range m.Metadata {
-		args = append(args, me.Kind, me.Value)
-		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
+	if err = insertModelGraph(ctx, conn, res.UUID, m.Graph); err != nil {
+		return err
 	}
-	query += strings.Join(vals, `,
-			`)
 
-	if _, err = conn.Exec(ctx, query, args...); err != nil {
+	if err = insertModelMetadata(ctx, conn, res.UUID, m.Metadata); err != nil {
 		return err
 	}
 
@@ -254,7 +241,7 @@ func (self *State) PutModel(c *echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, PutModelResult{modelUUID})
+	return c.JSON(http.StatusCreated, res)
 }
 
 // @Summary		Get the relations
@@ -310,24 +297,24 @@ func (self *State) PostSearch(c *echo.Context) error {
 		SELECT
 			models.model_id,
 			models.uploaded,
-			MAX(CASE WHEN metadata.kind = 'identifier' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'title' THEN metadata.value END),
-			MAX(CASE WHEN metadata.kind = 'model type' THEN metadata.value END)
+			MAX(CASE WHEN model_metadata.kind = 'identifier' THEN model_metadata.value END),
+			MAX(CASE WHEN model_metadata.kind = 'title' THEN model_metadata.value END),
+			MAX(CASE WHEN model_metadata.kind = 'model type' THEN model_metadata.value END)
 		FROM
 			models
-			JOIN metadata ON models.model_id = metadata.model_id`
+			JOIN model_metadata ON models.model_id = model_metadata.model_id`
 
 	var args []any
 	if len(qs) != 0 {
 		var conds []string
 		for k, v := range qs {
 			args = append(args, k)
-			conj := fmt.Sprintf("(metadata.kind = $%d AND (", len(args))
+			conj := fmt.Sprintf("(model_metadata.kind = $%d AND (", len(args))
 
 			var disj []string
 			for _, ve := range v {
 				args = append(args, "%"+ve+"%")
-				disj = append(disj, fmt.Sprintf("metadata.value ILIKE $%d", len(args)))
+				disj = append(disj, fmt.Sprintf("model_metadata.value ILIKE $%d", len(args)))
 			}
 
 			conds = append(conds, conj+strings.Join(disj, " OR ")+"))")
@@ -338,7 +325,7 @@ func (self *State) PostSearch(c *echo.Context) error {
 					models.model_id
 				FROM
 					models
-					JOIN metadata ON models.model_id = metadata.model_id
+					JOIN model_metadata ON models.model_id = model_metadata.model_id
 				WHERE
 					` + strings.Join(conds, `
 					OR `)
@@ -350,7 +337,7 @@ func (self *State) PostSearch(c *echo.Context) error {
 				GROUP BY
 					models.model_id
 				HAVING
-					COUNT(DISTINCT metadata.kind) = $%d`, len(args))
+					COUNT(DISTINCT model_metadata.kind) = $%d`, len(args))
 		}
 
 		query += `
@@ -374,6 +361,7 @@ func (self *State) PostSearch(c *echo.Context) error {
 	if err != nil {
 		return err
 	}
+	defer rows.Close()
 
 	var sr PostSearchResult
 	var res []PostSearchResult
@@ -420,22 +408,14 @@ func (self *State) PostModelRun(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	query := `
-		SELECT
-			models.graph
-		FROM
-			models
-		WHERE
-			models.model_id = $1`
-
 	conn, err := self.DBPool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
 
-	var graph types.Graph
-	if err = conn.QueryRow(ctx, query, mr.UUID).Scan(&graph); err != nil {
+	var one int
+	if err := conn.QueryRow(ctx, "SELECT 1 FROM models WHERE models.model_id = $1", mr.UUID).Scan(&one); err != nil {
 		if err == pgx.ErrNoRows {
 			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' not found", mr.UUID)})
 		} else {
@@ -443,7 +423,17 @@ func (self *State) PostModelRun(c *echo.Context) error {
 		}
 	}
 
-	res, err := mr.Run(graph, &r)
+	graph, err := getModelGraph(ctx, conn.Conn(), mr.UUID)
+	if err != nil {
+		return err
+	}
+
+	s, err := mr.Build(graph, &r)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+	}
+
+	res, err := s.Run()
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
@@ -482,32 +472,29 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 	}
 
 	if m.Parent != nil {
-		query := `
-			SELECT
-				models.graph,
-				jsonb_agg(jsonb_build_object('kind', metadata.kind, 'value', metadata.value))
-			FROM
-				models
-				JOIN metadata ON models.model_id = metadata.model_id
-			WHERE
-				models.model_id = $1
-			GROUP BY
-				models.graph`
-
 		conn, err := self.DBPool.Acquire(ctx)
 		if err != nil {
 			return err
 		}
 		defer conn.Release()
 
-		var graph types.Graph
-		var metadata []types.Metadata
-		if err := conn.QueryRow(ctx, query, m.Parent).Scan(&graph, &metadata); err != nil {
+		var one int
+		if err := conn.QueryRow(ctx, "SELECT 1 FROM models WHERE models.model_id = $1", m.Parent).Scan(&one); err != nil {
 			if err == pgx.ErrNoRows {
 				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
 			} else {
 				return err
 			}
+		}
+
+		graph, err := getModelGraph(ctx, conn.Conn(), *m.Parent)
+		if err != nil {
+			return err
+		}
+
+		metadata, err := getModelMetadata(ctx, conn.Conn(), *m.Parent)
+		if err != nil {
+			return err
 		}
 
 		if slices.Equal(m.Graph.Nodes, graph.Nodes) && util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) && util.SlicesEqualUnordered(m.Metadata, metadata) {
@@ -516,4 +503,195 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, struct{}{})
+}
+
+func getModelGraph(ctx context.Context, conn *pgx.Conn, modelUUID string) (types.Graph, error) {
+	var graph types.Graph
+
+	query := `
+		SELECT
+			nodes.node_id,
+			nodes.body,
+			nodes.color,
+			nodes.x,
+			nodes.y
+		FROM
+			nodes
+		WHERE
+			nodes.model_id = $1
+		ORDER BY
+			nodes.ord`
+
+	rows, err := conn.Query(ctx, query, modelUUID)
+	if err != nil {
+		return types.Graph{}, err
+	}
+	defer rows.Close()
+
+	var id int
+	var n types.Node
+	ids := map[int]int{}
+	_, err = pgx.ForEachRow(rows, []any{&id, &n.Body, &n.Color, &n.Position.X, &n.Position.Y}, func() error {
+		ids[id] = len(graph.Nodes)
+		graph.Nodes = append(graph.Nodes, n)
+		return nil
+	})
+	if err != nil {
+		return types.Graph{}, err
+	}
+
+	query = `
+		SELECT
+			relations.from_id,
+			relations.to_id,
+			relations.kind,
+			relations.r,
+			relations.phi
+		FROM
+			relations
+		WHERE
+			relations.model_id = $1`
+
+	relRows, err := conn.Query(ctx, query, modelUUID)
+	if err != nil {
+		return types.Graph{}, err
+	}
+	defer relRows.Close()
+
+	var r types.Relation
+	_, err = pgx.ForEachRow(relRows, []any{&r.From, &r.To, &r.Kind, &r.Position.R, &r.Position.Phi}, func() error {
+		r.From = ids[r.From]
+		r.To = ids[r.To]
+		graph.Relations = append(graph.Relations, r)
+		return nil
+	})
+	if err != nil {
+		return types.Graph{}, err
+	}
+
+	return graph, nil
+}
+
+func getModelMetadata(ctx context.Context, conn *pgx.Conn, modelUUID string) ([]types.Metadata, error) {
+	query := `
+		SELECT
+			model_metadata.kind,
+			model_metadata.value
+		FROM
+			model_metadata
+		WHERE
+			model_metadata.model_id = $1`
+
+	rows, err := conn.Query(ctx, query, modelUUID)
+	if err != nil {
+		return []types.Metadata{}, err
+	}
+	defer rows.Close()
+
+	var me types.Metadata
+	var metadata []types.Metadata
+	_, err = pgx.ForEachRow(rows, []any{&me.Kind, &me.Value}, func() error {
+		metadata = append(metadata, me)
+		return nil
+	})
+	if err != nil {
+		return []types.Metadata{}, err
+	}
+
+	return metadata, nil
+}
+
+func insertModelGraph(ctx context.Context, conn pgx.Tx, modelUUID string, g types.Graph) error {
+	if len(g.Nodes) == 0 {
+		return nil
+	}
+
+	args := []any{modelUUID}
+	var vals []string
+	for i, n := range g.Nodes {
+		args = append(args, i, n.Body, n.Color, n.Position.X, n.Position.Y)
+		vals = append(vals,
+			fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)",
+				len(args)-4, len(args)-3, len(args)-2, len(args)-1, len(args)),
+		)
+	}
+
+	query := `
+		WITH inserted AS (
+			INSERT INTO
+				nodes (model_id, ord, body, color, x, y)
+			VALUES
+				` + strings.Join(vals, `,
+				`) + `
+			RETURNING
+				nodes.node_id,
+				nodes.ord
+		)
+		SELECT
+			inserted.node_id
+		FROM
+			inserted
+		ORDER BY
+			inserted.ord`
+
+	rows, err := conn.Query(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var id int
+	args = []any{modelUUID}
+	_, err = pgx.ForEachRow(rows, []any{&id}, func() error {
+		args = append(args, id)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(g.Relations) == 0 {
+		return nil
+	}
+
+	vals = nil
+	for _, r := range g.Relations {
+		args = append(args, r.Kind, r.Position.R, r.Position.Phi)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)", r.From+2, r.To+2, len(args)-2, len(args)-1, len(args)))
+	}
+
+	query = `
+		INSERT INTO
+			relations (model_id, from_id, to_id, kind, r, phi)
+		VALUES
+			` + strings.Join(vals, `,
+			`)
+
+	if _, err = conn.Exec(ctx, query, args...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func insertModelMetadata(ctx context.Context, conn pgx.Tx, modelUUID string, metadata []types.Metadata) error {
+	args := []any{modelUUID}
+	var vals []string
+	for _, me := range metadata {
+		args = append(args, me.Kind, me.Value)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
+	}
+
+	query := `
+		INSERT INTO
+			model_metadata (model_id, kind, value)
+		VALUES
+			` + strings.Join(vals, `,
+			`)
+
+	if _, err := conn.Exec(ctx, query, args...); err != nil {
+		return err
+	}
+
+	return nil
 }

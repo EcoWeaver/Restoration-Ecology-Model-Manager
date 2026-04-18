@@ -49,7 +49,7 @@ func (self PostModelRunRequest) Verify(r *RelationsConfig) error {
 	return nil
 }
 
-func (self PostModelRunRequest) Run(g types.Graph, r *RelationsConfig) (PostModelRunResult, error) {
+func (self PostModelRunRequest) Build(g types.Graph, r *RelationsConfig) (ModelRunState, error) {
 	var s ModelRunState
 	for i := range len(g.Nodes) {
 		s = append(s, &NodeState{Value: self.NodeValues[i]})
@@ -63,7 +63,7 @@ outer:
 			}
 
 			if !slices.Contains(r.Causal, re.Kind) {
-				return PostModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-causal relation from %d to %d", w.From, w.To)}
+				return ModelRunState{}, types.Error{E: fmt.Errorf("encountered weight for non-causal relation from %d to %d", w.From, w.To)}
 			}
 
 			s[re.From].Out = append(s[re.From].Out, s[re.To])
@@ -73,17 +73,21 @@ outer:
 			continue outer
 		}
 
-		return PostModelRunResult{}, types.Error{E: fmt.Errorf("encountered weight for non-existent relation from %d to %d", w.From, w.To)}
+		return ModelRunState{}, types.Error{E: fmt.Errorf("encountered weight for non-existent relation from %d to %d", w.From, w.To)}
 	}
 
-	for _, node := range s {
+	return s, nil
+}
+
+func (self ModelRunState) Run() (PostModelRunResult, error) {
+	for _, node := range self {
 		if node.Indegree == 0 {
 			node.recurseKahn()
 		}
 	}
 
 	var res PostModelRunResult
-	for _, node := range s {
+	for _, node := range self {
 		if node.Indegree != -1 {
 			return PostModelRunResult{}, types.Error{E: errors.New("encountered cycle in graph")}
 		}

@@ -23,7 +23,7 @@ import (
 func main() {
 	e := echo.New()
 
-	e.Use(middleware.BodyLimit(2_097_152))
+	e.Use(middleware.BodyLimit(2 * middleware.MB))
 	e.Use(middleware.CORS("http://localhost:3000", "http://localhost:5173"))
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
@@ -52,6 +52,14 @@ func main() {
 		DOICache:     verify.DOICache(),
 		ORCIDCache:   verify.ORCIDCache(),
 		SpeciesCache: verify.SpeciesCache(),
+	}
+
+	if err := state.runMigration(context.Background(), schema, e.Logger); err != nil {
+		panic(err)
+	}
+
+	if err := state.runMigration(context.Background(), migrateModelsGraphJSON, e.Logger); err != nil {
+		panic(err)
 	}
 
 	e.GET("/metadata", state.GetMetadata)
