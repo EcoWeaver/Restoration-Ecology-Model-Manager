@@ -74,8 +74,7 @@
 					value = "";
 					selected = -1;
 				} else if (selected === -1 && value.length === 0) {
-					// eslint-disable-next-line svelte/no-navigation-without-resolve
-					await goto(resolve("/search") + `?${query}`);
+					await goto(resolve(`/search?${query}`));
 				}
 			}
 
@@ -209,8 +208,7 @@
 <a
 	class="flex h-10 cursor-pointer items-center rounded-r-md border border-l-0 border-neutral-600 px-3 outline-indigo-400 focus-visible:outline-2"
 	title="search"
-	href={/* eslint-disable-line svelte/no-navigation-without-resolve */ resolve("/search") +
-		`?${query}`}
+	href={resolve(`/search?${query}`)}
 	data-sveltekit-preload-data="tap"
 	data-sveltekit-preload-code="hover"
 >
