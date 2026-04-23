@@ -17,6 +17,49 @@ import (
 	"golang.org/x/text/language"
 )
 
+func (self PutModelRequest) verify(s *State, l *slog.Logger, ctx context.Context) error {
+	if err := verifyModel(self.Model, s, l, ctx); err != nil {
+		return err
+	}
+
+	if self.Parent != nil {
+		if err := verify.UUID(*self.Parent); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (self PostModelRunRequest) Verify() error {
+	type Relation struct {
+		From int
+		To   int
+	}
+
+	if err := verify.UUID(self.UUID); err != nil {
+		return err
+	}
+
+	e := map[Relation]struct{}{}
+
+	for _, w := range self.RelationWeights {
+		pair := Relation{w.From, w.To}
+
+		if _, ok := e[pair]; ok {
+			return types.Error{E: fmt.Errorf("encountered duplicate weight for relation from %d to %d", w.From, w.To)}
+		}
+
+		e[pair] = struct{}{}
+	}
+
+	return nil
+}
+
+func modelsEqual(l types.Model, r types.Model) bool {
+	return slices.Equal(l.Graph.Nodes, r.Graph.Nodes) && util.SlicesEqualUnordered(l.Graph.Relations, r.Graph.Relations) && util.SlicesEqualUnordered(l.Metadata, r.Metadata)
+}
+
 func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context) error {
 	if err := verifyGraph(self.Graph, s, l); err != nil {
 		return err
@@ -46,12 +89,6 @@ func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context
 		return verifyMetadata(me, s, m, l, ctx)
 	}) {
 		if err != nil {
-			return err
-		}
-	}
-
-	if self.Parent != nil {
-		if err := verify.UUID(*self.Parent); err != nil {
 			return err
 		}
 	}
@@ -102,7 +139,7 @@ const Year = "2006"
 const YearMonth = "2006-01"
 const YearMonthDay = "2006-01-02"
 
-func verifyMetadata(self types.Metadata, s *State, m MetadataConfig, l *slog.Logger, ctx context.Context) error {
+func verifyMetadata(self types.Metadata, s *State, m *MetadataConfig, l *slog.Logger, ctx context.Context) error {
 	if self.Kind == "" {
 		if self.Value == "" {
 			return types.Error{E: errors.New("encountered unset metadata kind with unset value")}
@@ -186,7 +223,7 @@ func verifyMetadata(self types.Metadata, s *State, m MetadataConfig, l *slog.Log
 	return types.Error{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
 }
 
-func verifyRelation(self types.Relation, r RelationsConfig, n int) error {
+func verifyRelation(self types.Relation, r *RelationsConfig, n int) error {
 	if self.From < 0 || self.From >= n || self.To < 0 || self.To >= n || self.From == self.To {
 		return types.Error{E: fmt.Errorf("encountered invalid relation from %d to %d", self.From, self.To)}
 	}

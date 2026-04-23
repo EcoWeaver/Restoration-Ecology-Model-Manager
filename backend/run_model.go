@@ -2,7 +2,6 @@ package main
 
 import (
 	"backend/types"
-	"backend/verify"
 	"errors"
 	"fmt"
 	"math"
@@ -22,31 +21,6 @@ type NodeState struct {
 type Connection struct {
 	From    *NodeState
 	Formula types.Polynomial
-}
-
-func (self PostModelRunRequest) Verify(r *RelationsConfig) error {
-	type Relation struct {
-		From int
-		To   int
-	}
-
-	if err := verify.UUID(self.UUID); err != nil {
-		return err
-	}
-
-	e := map[Relation]struct{}{}
-
-	for _, w := range self.RelationWeights {
-		pair := Relation{w.From, w.To}
-
-		if _, ok := e[pair]; ok {
-			return types.Error{E: fmt.Errorf("encountered duplicate weight for relation from %d to %d", w.From, w.To)}
-		}
-
-		e[pair] = struct{}{}
-	}
-
-	return nil
 }
 
 func (self PostModelRunRequest) Build(g types.Graph, r *RelationsConfig) (ModelRunState, error) {

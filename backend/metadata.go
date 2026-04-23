@@ -2,21 +2,11 @@ package main
 
 import (
 	"backend/types"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/url"
-	"os"
 	"slices"
-	"sync"
-	"time"
 )
-
-type LiveMetadataConfig struct {
-	config    MetadataConfig
-	lock      sync.Mutex
-	lastMtime time.Time
-}
 
 type MetadataConfig struct {
 	Mandatory   []MetadataElement `json:"mandatory"`
@@ -31,40 +21,13 @@ type MetadataElement struct {
 	OLS4    *types.OLS4 `json:"ols4,omitempty"`
 }
 
-func (self *LiveMetadataConfig) Get(l *slog.Logger) (MetadataConfig, error) {
-	fi, err := os.Stat("metadata.json")
-	if err != nil {
-		return MetadataConfig{}, err
-	}
-
-	self.lock.Lock()
-	defer self.lock.Unlock()
-
-	mtime := fi.ModTime()
-	if time.Time.Equal(mtime, self.lastMtime) {
-		return self.config, nil
-	}
-
-	data, err := os.ReadFile("metadata.json")
-	if err != nil {
-		return MetadataConfig{}, err
-	}
-
-	var m MetadataConfig
-	if err = json.Unmarshal(data, &m); err != nil {
-		return MetadataConfig{}, err
-	}
+func (self MetadataConfig) verify(l *slog.Logger) error {
+	var err error
 
 	e := map[string]struct{}{}
-	for _, s := range []*[]MetadataElement{&m.Mandatory, &m.Recommended, &m.Optional} {
+	for _, s := range []*[]MetadataElement{&self.Mandatory, &self.Recommended, &self.Optional} {
 		*s = slices.DeleteFunc(*s, func(me MetadataElement) bool {
-			if err != nil {
-				return false
-			}
 			err = me.verify(l)
-			if err != nil {
-				return false
-			}
 			_, ok := e[me.Name]
 			e[me.Name] = struct{}{}
 			if ok {
@@ -72,15 +35,9 @@ func (self *LiveMetadataConfig) Get(l *slog.Logger) (MetadataConfig, error) {
 			}
 			return ok
 		})
-		if err != nil {
-			return MetadataConfig{}, err
-		}
 	}
 
-	self.config = m
-	self.lastMtime = mtime
-
-	return m, nil
+	return err
 }
 
 func (self *MetadataElement) verify(l *slog.Logger) error {

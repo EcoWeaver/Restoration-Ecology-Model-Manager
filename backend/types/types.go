@@ -2,7 +2,6 @@ package types
 
 type Model struct {
 	Graph    Graph      `json:"graph"`
-	Parent   *string    `json:"parent"`
 	Metadata []Metadata `json:"metadata"`
 }
 

@@ -19,7 +19,7 @@ import (
 //	@version		1.0
 //	@license.name	AGPL-3.0
 //	@license.url	https://www.gnu.org/licenses/agpl-3.0.en.html
-//	@host			http://localhost:8080
+//	@host			localhost:8080
 func main() {
 	e := echo.New()
 
@@ -48,6 +48,8 @@ func main() {
 	defer dbPool.Close()
 
 	state := State{
+		Metadata:     HotReload[MetadataConfig]{path: "metadata.json"},
+		Relations:    HotReload[RelationsConfig]{path: "relations.json"},
 		DBPool:       dbPool,
 		DOICache:     verify.DOICache(),
 		ORCIDCache:   verify.ORCIDCache(),

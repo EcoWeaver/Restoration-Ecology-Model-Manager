@@ -16,8 +16,9 @@
 	const { getMetadataElements } = useElements();
 
 	let { model } = $derived(data);
-	let { nodes, edges } = $derived(apiToFlow(model.graph, false));
-	const { metadata, parent } = $derived(model);
+	const { parent, uuid } = $derived(model);
+	let { graph, metadata } = $derived(model.model);
+	let { nodes, edges } = $derived(apiToFlow(graph, false));
 	const title = $derived(metadata.find(({ kind }) => kind === "title")!.value);
 
 	const flatMetadata = new Map<string, MetadataType | undefined>();
@@ -29,10 +30,10 @@
 
 	async function edit() {
 		const localUUID = newLocalModel({
-			graph: model.graph,
+			graph,
 			metadata,
 			parent: {
-				uuid: model.uuid,
+				uuid,
 				title,
 			},
 		});

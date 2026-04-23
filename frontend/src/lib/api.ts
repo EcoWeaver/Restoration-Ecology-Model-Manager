@@ -31,13 +31,22 @@ export type BackendError = {
 export type GetModelResult = {
 	uuid: string;
 	uploaded: string;
-	graph: Graph;
-	metadata: Metadata[];
+	model: Model;
 	parent?: Parent;
+};
+
+export type PutModelRequest = {
+	model: Model;
+	parent?: string;
 };
 
 export type PutModelResult = {
 	uuid: string;
+};
+
+export type PostSearchrequest = {
+	metadata: Metadata[];
+	nodeBodies: string[];
 };
 
 export type PostSearchResult = {
@@ -56,7 +65,6 @@ export type Parent = {
 export type Model = {
 	graph: Graph;
 	metadata: Metadata[];
-	parent?: string;
 };
 
 export type Graph = {

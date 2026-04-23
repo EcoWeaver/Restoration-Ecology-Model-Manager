@@ -2,14 +2,12 @@ package main
 
 import (
 	"backend/types"
-	"backend/util"
 	"backend/verify"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -21,8 +19,8 @@ import (
 
 type State struct {
 	DBPool       *pgxpool.Pool
-	Metadata     LiveMetadataConfig
-	Relations    LiveRelationsConfig
+	Metadata     HotReload[MetadataConfig]
+	Relations    HotReload[RelationsConfig]
 	DOICache     verify.Cache
 	ORCIDCache   verify.Cache
 	SpeciesCache verify.Cache
@@ -30,11 +28,15 @@ type State struct {
 }
 
 type GetModelResult struct {
-	UUID     string           `json:"uuid"`
-	Uploaded time.Time        `json:"uploaded"`
-	Graph    types.Graph      `json:"graph"`
-	Parent   *Parent          `json:"parent"`
-	Metadata []types.Metadata `json:"metadata"`
+	UUID     string      `json:"uuid"`
+	Uploaded time.Time   `json:"uploaded"`
+	Model    types.Model `json:"model"`
+	Parent   *Parent     `json:"parent"`
+}
+
+type PutModelRequest struct {
+	Model  types.Model `json:"model"`
+	Parent *string     `json:"parent"`
 }
 
 type PutModelResult struct {
@@ -48,6 +50,11 @@ type PostModelRunRequest struct {
 }
 
 type PostModelRunResult []float64
+
+type PostSearchRequest struct {
+	Metadata   []types.Metadata `json:"modelMetadata"`
+	NodeBodies []string         `json:"nodeBodies"`
+}
 
 type PostSearchResult struct {
 	UUID       string    `json:"uuid"`
@@ -118,12 +125,7 @@ func (self *State) GetModel(c *echo.Context) error {
 		}
 	}
 
-	graph, err := getModelGraph(ctx, conn.Conn(), modelUUID)
-	if err != nil {
-		return err
-	}
-
-	metadata, err := getModelMetadata(ctx, conn.Conn(), modelUUID)
+	model, err := getModelFromDB(ctx, conn.Conn(), modelUUID)
 	if err != nil {
 		return err
 	}
@@ -146,19 +148,19 @@ func (self *State) GetModel(c *echo.Context) error {
 	}
 
 	go func() {
-		if err, ok := verifyModel(types.Model{Graph: graph, Parent: parentUUID, Metadata: metadata}, self, c.Logger(), context.Background()).(types.Error); ok {
+		if err, ok := verifyModel(model, self, c.Logger(), context.Background()).(types.Error); ok {
 			c.Logger().Warn(fmt.Sprintf("encountered error while verifying model with uuid '%s': %s", modelUUID, err.Error()))
 		}
 	}()
 
-	return c.JSON(http.StatusOK, GetModelResult{modelUUID, uploaded, graph, parent, metadata})
+	return c.JSON(http.StatusOK, GetModelResult{modelUUID, uploaded, model, parent})
 }
 
 // @Summary		Save a model
 // @Description	Saves a model. Returns the UUID assigned to that model.
 // @Accept		json
 // @Produce		json
-// @Param		model	body		types.Model	true	"model"
+// @Param		model	body		PutModelRequest	true	"model"
 // @Success		201		{object}	PutModelResult
 // @Failure		400		{object}	echo.HTTPError
 // @Failure		409		{object}	echo.HTTPError
@@ -172,12 +174,12 @@ func (self *State) PutModel(c *echo.Context) error {
 		return err
 	}
 
-	var m types.Model
+	var m PutModelRequest
 	if err = json.Unmarshal(body, &m); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = verifyModel(m, self, c.Logger(), ctx); err != nil {
+	if err = m.verify(self, c.Logger(), ctx); err != nil {
 		if _, ok := err.(types.Error); ok {
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
@@ -192,8 +194,7 @@ func (self *State) PutModel(c *echo.Context) error {
 	defer conn.Rollback(ctx)
 
 	if m.Parent != nil {
-		var one int
-		if err := conn.QueryRow(ctx, "SELECT 1 FROM models WHERE models.model_id = $1", m.Parent).Scan(&one); err != nil {
+		if err := checkModelExistsInDB(ctx, conn.Conn(), *m.Parent); err != nil {
 			if err == pgx.ErrNoRows {
 				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
 			} else {
@@ -201,17 +202,12 @@ func (self *State) PutModel(c *echo.Context) error {
 			}
 		}
 
-		graph, err := getModelGraph(ctx, conn.Conn(), *m.Parent)
+		model, err := getModelFromDB(ctx, conn.Conn(), *m.Parent)
 		if err != nil {
 			return err
 		}
 
-		metadata, err := getModelMetadata(ctx, conn.Conn(), *m.Parent)
-		if err != nil {
-			return err
-		}
-
-		if slices.Equal(m.Graph.Nodes, graph.Nodes) && util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) && util.SlicesEqualUnordered(m.Metadata, metadata) {
+		if modelsEqual(m.Model, model) {
 			return c.JSON(http.StatusConflict, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' wasn't changed", *m.Parent)})
 		}
 	}
@@ -229,11 +225,7 @@ func (self *State) PutModel(c *echo.Context) error {
 		return err
 	}
 
-	if err = insertModelGraph(ctx, conn, res.UUID, m.Graph); err != nil {
-		return err
-	}
-
-	if err = insertModelMetadata(ctx, conn, res.UUID, m.Metadata); err != nil {
+	if err = insertModelIntoDB(ctx, conn, res.UUID, m.Model); err != nil {
 		return err
 	}
 
@@ -262,7 +254,7 @@ func (self *State) GetRelations(c *echo.Context) error {
 // @Description	Searches for models that match at least one of the provided queries per metadata kind.
 // @Accept		json
 // @Produce		json
-// @Param		queries	body		[]types.Metadata	true	"queries"
+// @Param		queries	body		PostSearchRequest	true	"queries"
 // @Success		200		{object}	[]PostSearchResult
 // @Failure		400		{object}	echo.HTTPError
 // @Failure		500		{object}	echo.HTTPError
@@ -275,8 +267,8 @@ func (self *State) PostSearch(c *echo.Context) error {
 		return err
 	}
 
-	var mqs []types.Metadata
-	if err = json.Unmarshal(body, &mqs); err != nil {
+	var r PostSearchRequest
+	if err = json.Unmarshal(body, &r); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
@@ -286,7 +278,7 @@ func (self *State) PostSearch(c *echo.Context) error {
 	}
 
 	qs := map[string][]string{}
-	for _, mq := range mqs {
+	for _, mq := range r.Metadata {
 		if _, ok := qs[mq.Kind]; !ok && !m.IsMetadataKind(mq.Kind) {
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered invalid metadata kind '%s'", mq.Kind)})
 		}
@@ -346,6 +338,35 @@ func (self *State) PostSearch(c *echo.Context) error {
 			)`
 	}
 
+	if len(r.NodeBodies) != 0 {
+		var disj []string
+		for _, ve := range r.NodeBodies {
+			args = append(args, "%"+ve+"%")
+			disj = append(disj, fmt.Sprintf("nodes.body ILIKE $%d", len(args)))
+		}
+
+		innerQuery := `
+				SELECT
+					models.model_id
+				FROM
+					models
+					JOIN nodes ON models.model_id = nodes.model_id
+				WHERE
+					` + strings.Join(disj, " OR ")
+
+		if len(qs) != 0 {
+			query += `
+		AND`
+		} else {
+			query += `
+		WHERE`
+		}
+
+		query += `
+			models.model_id IN (` + innerQuery + `
+			)`
+	}
+
 	query += `
 		GROUP BY
 			models.model_id,
@@ -399,12 +420,7 @@ func (self *State) PostModelRun(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	r, err := self.Relations.Get(c.Logger())
-	if err != nil {
-		return err
-	}
-
-	if err := mr.Verify(&r); err != nil {
+	if err := mr.Verify(); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
@@ -423,12 +439,17 @@ func (self *State) PostModelRun(c *echo.Context) error {
 		}
 	}
 
-	graph, err := getModelGraph(ctx, conn.Conn(), mr.UUID)
+	graph, err := getModelGraphFromDB(ctx, conn.Conn(), mr.UUID)
 	if err != nil {
 		return err
 	}
 
-	s, err := mr.Build(graph, &r)
+	r, err := self.Relations.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+
+	s, err := mr.Build(graph, r)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
@@ -445,7 +466,7 @@ func (self *State) PostModelRun(c *echo.Context) error {
 // @Description	Verifies whether a model and its metadata are valid and complete.
 // @Accept		json
 // @Produce		json
-// @Param		model			body		types.Model	true	"model"
+// @Param		model			body		PutModelRequest	true	"model"
 // @Failure		400				{object}	echo.HTTPError
 // @Failure		409				{object}	echo.HTTPError
 // @Failure		500				{object}	echo.HTTPError
@@ -458,12 +479,12 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 		return err
 	}
 
-	var m types.Model
+	var m PutModelRequest
 	if err = json.Unmarshal(body, &m); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = verifyModel(m, self, c.Logger(), ctx); err != nil {
+	if err = m.verify(self, c.Logger(), ctx); err != nil {
 		if _, ok := err.(types.Error); ok {
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
@@ -478,8 +499,7 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 		}
 		defer conn.Release()
 
-		var one int
-		if err := conn.QueryRow(ctx, "SELECT 1 FROM models WHERE models.model_id = $1", m.Parent).Scan(&one); err != nil {
+		if err := checkModelExistsInDB(ctx, conn.Conn(), *m.Parent); err != nil {
 			if err == pgx.ErrNoRows {
 				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
 			} else {
@@ -487,17 +507,12 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 			}
 		}
 
-		graph, err := getModelGraph(ctx, conn.Conn(), *m.Parent)
+		model, err := getModelFromDB(ctx, conn.Conn(), *m.Parent)
 		if err != nil {
 			return err
 		}
 
-		metadata, err := getModelMetadata(ctx, conn.Conn(), *m.Parent)
-		if err != nil {
-			return err
-		}
-
-		if slices.Equal(m.Graph.Nodes, graph.Nodes) && util.SlicesEqualUnordered(m.Graph.Relations, graph.Relations) && util.SlicesEqualUnordered(m.Metadata, metadata) {
+		if modelsEqual(m.Model, model) {
 			return c.JSON(http.StatusConflict, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' wasn't changed", *m.Parent)})
 		}
 	}
@@ -505,7 +520,30 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 	return c.JSON(http.StatusOK, struct{}{})
 }
 
-func getModelGraph(ctx context.Context, conn *pgx.Conn, modelUUID string) (types.Graph, error) {
+func checkModelExistsInDB(ctx context.Context, conn *pgx.Conn, modelUUID string) error {
+	var one int
+	if err := conn.QueryRow(ctx, "SELECT 1 FROM models WHERE models.model_id = $1", modelUUID).Scan(&one); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getModelFromDB(ctx context.Context, conn *pgx.Conn, modelUUID string) (types.Model, error) {
+	graph, err := getModelGraphFromDB(ctx, conn, modelUUID)
+	if err != nil {
+		return types.Model{}, err
+	}
+
+	metadata, err := getModelMetadataFromDB(ctx, conn, modelUUID)
+	if err != nil {
+		return types.Model{}, err
+	}
+
+	return types.Model{Graph: graph, Metadata: metadata}, nil
+}
+
+func getModelGraphFromDB(ctx context.Context, conn *pgx.Conn, modelUUID string) (types.Graph, error) {
 	var graph types.Graph
 
 	query := `
@@ -572,7 +610,7 @@ func getModelGraph(ctx context.Context, conn *pgx.Conn, modelUUID string) (types
 	return graph, nil
 }
 
-func getModelMetadata(ctx context.Context, conn *pgx.Conn, modelUUID string) ([]types.Metadata, error) {
+func getModelMetadataFromDB(ctx context.Context, conn *pgx.Conn, modelUUID string) ([]types.Metadata, error) {
 	query := `
 		SELECT
 			model_metadata.kind,
@@ -601,7 +639,19 @@ func getModelMetadata(ctx context.Context, conn *pgx.Conn, modelUUID string) ([]
 	return metadata, nil
 }
 
-func insertModelGraph(ctx context.Context, conn pgx.Tx, modelUUID string, g types.Graph) error {
+func insertModelIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, g types.Model) error {
+	if err := insertModelGraphIntoDB(ctx, conn, modelUUID, g.Graph); err != nil {
+		return err
+	}
+
+	if err := insertModelMetadataIntoDB(ctx, conn, modelUUID, g.Metadata); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, g types.Graph) error {
 	if len(g.Nodes) == 0 {
 		return nil
 	}
@@ -674,7 +724,7 @@ func insertModelGraph(ctx context.Context, conn pgx.Tx, modelUUID string, g type
 	return nil
 }
 
-func insertModelMetadata(ctx context.Context, conn pgx.Tx, modelUUID string, metadata []types.Metadata) error {
+func insertModelMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, metadata []types.Metadata) error {
 	args := []any{modelUUID}
 	var vals []string
 	for _, me := range metadata {

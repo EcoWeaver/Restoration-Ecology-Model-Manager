@@ -148,7 +148,7 @@ func migrateModelsGraphJSON(ctx context.Context, conn pgx.Tx) error {
 	}
 
 	for _, model := range models {
-		if err = insertModelGraph(ctx, conn, model.modelUUID, model.graph); err != nil {
+		if err = insertModelGraphIntoDB(ctx, conn, model.modelUUID, model.graph); err != nil {
 			return err
 		}
 	}

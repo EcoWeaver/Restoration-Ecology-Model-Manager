@@ -60,8 +60,10 @@
 		try {
 			startNavigate();
 			await req("POST", "model/verify", {
-				graph: flowToApi(nodes, edges),
-				metadata,
+				model: {
+					graph: flowToApi(nodes, edges),
+					metadata,
+				},
 				parent: parent?.uuid,
 			});
 			alert.info("model OK");
@@ -77,8 +79,7 @@
 		try {
 			startNavigate();
 			const res = await req<PutModelResult>("PUT", "model", {
-				graph: flowToApi(nodes, edges),
-				metadata,
+				model: { graph: flowToApi(nodes, edges), metadata },
 				parent: parent?.uuid,
 			});
 			deleteLocalModel(page.params.model!);
