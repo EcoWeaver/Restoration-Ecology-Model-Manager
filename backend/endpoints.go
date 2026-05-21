@@ -31,12 +31,10 @@ type GetModelResult struct {
 	UUID     string      `json:"uuid"`
 	Uploaded time.Time   `json:"uploaded"`
 	Model    types.Model `json:"model"`
-	Parent   *Parent     `json:"parent"`
 }
 
 type PutModelRequest struct {
-	Model  types.Model `json:"model"`
-	Parent *string     `json:"parent"`
+	Model types.Model `json:"model"`
 }
 
 type PutModelResult struct {
@@ -62,11 +60,6 @@ type PostSearchResult struct {
 	Identifier string    `json:"identifier"`
 	Title      string    `json:"title"`
 	ModelType  string    `json:"modelType"`
-}
-
-type Parent struct {
-	UUID  string `json:"uuid"`
-	Title string `json:"title"`
 }
 
 // @Summary		Get the metadata
@@ -102,8 +95,7 @@ func (self *State) GetModel(c *echo.Context) error {
 
 	query := `
 		SELECT
-			models.uploaded,
-			models.parent
+			models.uploaded
 		FROM
 			models
 		WHERE
@@ -116,8 +108,7 @@ func (self *State) GetModel(c *echo.Context) error {
 	defer conn.Release()
 
 	var uploaded time.Time
-	var parentUUID *string
-	if err = conn.QueryRow(ctx, query, modelUUID).Scan(&uploaded, &parentUUID); err != nil {
+	if err = conn.QueryRow(ctx, query, modelUUID).Scan(&uploaded); err != nil {
 		if err == pgx.ErrNoRows {
 			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' not found", modelUUID)})
 		} else {
@@ -130,30 +121,13 @@ func (self *State) GetModel(c *echo.Context) error {
 		return err
 	}
 
-	var parent *Parent
-	if parentUUID != nil {
-		parent = &Parent{UUID: *parentUUID}
-
-		query = `
-		SELECT
-			model_metadata.value
-		FROM
-			model_metadata
-		WHERE
-			model_metadata.model_id = $1 AND model_metadata.kind = 'title'`
-
-		if err := conn.QueryRow(ctx, query, *parentUUID).Scan(&parent.Title); err != nil {
-			return err
-		}
-	}
-
 	go func() {
-		if err, ok := verifyModel(model, self, c.Logger(), context.Background()).(types.Error); ok {
+		if err, ok := verifyModel(model, self, c.Logger(), context.Background(), nil).(types.Error); ok {
 			c.Logger().Warn(fmt.Sprintf("encountered error while verifying model with uuid '%s': %s", modelUUID, err.Error()))
 		}
 	}()
 
-	return c.JSON(http.StatusOK, GetModelResult{modelUUID, uploaded, model, parent})
+	return c.JSON(http.StatusOK, GetModelResult{modelUUID, uploaded, model})
 }
 
 // @Summary		Save a model
@@ -179,7 +153,13 @@ func (self *State) PutModel(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = m.verify(self, c.Logger(), ctx); err != nil {
+	conn, err := self.DBPool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Rollback(ctx)
+
+	if err = verifyModel(m.Model, self, c.Logger(), ctx, conn.Conn()); err != nil {
 		if _, ok := err.(types.Error); ok {
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
@@ -187,41 +167,15 @@ func (self *State) PutModel(c *echo.Context) error {
 		}
 	}
 
-	conn, err := self.DBPool.Begin(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Rollback(ctx)
-
-	if m.Parent != nil {
-		if err := checkModelExistsInDB(ctx, conn.Conn(), *m.Parent); err != nil {
-			if err == pgx.ErrNoRows {
-				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
-			} else {
-				return err
-			}
-		}
-
-		model, err := getModelFromDB(ctx, conn.Conn(), *m.Parent)
-		if err != nil {
-			return err
-		}
-
-		if modelsEqual(m.Model, model) {
-			return c.JSON(http.StatusConflict, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' wasn't changed", *m.Parent)})
-		}
-	}
-
 	query := `
 		INSERT INTO
-			models (parent)
-		VALUES
-			($1)
+			models
+		DEFAULT VALUES
 		RETURNING
 			model_id`
 
 	var res PutModelResult
-	if err = conn.QueryRow(ctx, query, m.Parent).Scan(&res.UUID); err != nil {
+	if err = conn.QueryRow(ctx, query).Scan(&res.UUID); err != nil {
 		return err
 	}
 
@@ -484,36 +438,11 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = m.verify(self, c.Logger(), ctx); err != nil {
+	if err = verifyModel(m.Model, self, c.Logger(), ctx, nil); err != nil {
 		if _, ok := err.(types.Error); ok {
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
 			return err
-		}
-	}
-
-	if m.Parent != nil {
-		conn, err := self.DBPool.Acquire(ctx)
-		if err != nil {
-			return err
-		}
-		defer conn.Release()
-
-		if err := checkModelExistsInDB(ctx, conn.Conn(), *m.Parent); err != nil {
-			if err == pgx.ErrNoRows {
-				return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered non-existent parent model with uuid '%s'", *m.Parent)})
-			} else {
-				return err
-			}
-		}
-
-		model, err := getModelFromDB(ctx, conn.Conn(), *m.Parent)
-		if err != nil {
-			return err
-		}
-
-		if modelsEqual(m.Model, model) {
-			return c.JSON(http.StatusConflict, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' wasn't changed", *m.Parent)})
 		}
 	}
 

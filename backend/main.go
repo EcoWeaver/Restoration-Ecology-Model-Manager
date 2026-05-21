@@ -64,6 +64,10 @@ func main() {
 		panic(err)
 	}
 
+	if err := state.runMigration(context.Background(), migrateModelsParent, e.Logger); err != nil {
+		panic(err)
+	}
+
 	e.GET("/metadata", state.GetMetadata)
 
 	e.GET("/model", state.GetModel)

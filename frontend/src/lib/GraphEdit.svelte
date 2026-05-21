@@ -3,11 +3,10 @@
 	import Graph from "$lib/Graph.svelte";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
-	import { useElements, type Metadata, type MetadataElement, type Parent } from "./api";
+	import { useElements, type Metadata, type MetadataElement } from "./api";
 	import Header from "./Header.svelte";
 	import { type XYPosition, useStore, useSvelteFlow, useUpdateNodeInternals } from "@xyflow/svelte";
 	import { History } from "./graph/history.svelte";
-	import { resolve } from "$app/paths";
 	import DoiInput from "./metadata-panel/DoiInput.svelte";
 	import DateInput from "./metadata-panel/DateInput.svelte";
 	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
@@ -16,15 +15,14 @@
 	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
 	import { suggestOLS4, suggestSpecies } from "./metadata-panel/auto-complete";
 	import { untrack, type Snippet } from "svelte";
+	import UuidInput from "./metadata-panel/UuidInput.svelte";
 
 	let {
-		parent,
 		metadata = $bindable(),
 		nodes = $bindable(),
 		edges = $bindable(),
 		children,
 	}: {
-		parent?: Parent;
 		metadata: Metadata[];
 		nodes: Node[];
 		edges: Edge[];
@@ -153,20 +151,6 @@
 			<div class="table">
 				<div class="table-row">
 					<h2 class="table-cell px-2 pb-2 text-xl font-bold select-text">Metadata</h2>
-					{#if parent}
-						<div
-							class="table-cell max-w-lg overflow-hidden px-2 pb-2 text-ellipsis whitespace-nowrap select-text"
-						>
-							based on
-							<a
-								class="text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-								title={parent.title}
-								href={resolve(`/view/${parent.uuid}`)}
-							>
-								"{parent.title}"
-							</a>
-						</div>
-					{/if}
 				</div>
 				<div class="table-row">
 					<div class="table-cell px-2 py-1 font-bold select-text">kind</div>
@@ -222,6 +206,8 @@
 								<OrcidInput bind:value={m.value} />
 							{:else if type === "url"}
 								<Input placeholder={type} bind:value={m.value} type="url" />
+							{:else if type === "uuid"}
+								<UuidInput bind:value={m.value} />
 							{:else if type === "year"}
 								<YearInput {type} bind:value={m.value} />
 							{:else if type === "species"}

@@ -32,12 +32,10 @@ export type GetModelResult = {
 	uuid: string;
 	uploaded: string;
 	model: Model;
-	parent?: Parent;
 };
 
 export type PutModelRequest = {
 	model: Model;
-	parent?: string;
 };
 
 export type PutModelResult = {
@@ -55,11 +53,6 @@ export type PostSearchResult = {
 	identifier: string;
 	title: string;
 	modelType: string;
-};
-
-export type Parent = {
-	uuid: string;
-	title: string;
 };
 
 export type Model = {
@@ -93,6 +86,7 @@ export type MetadataType =
 	| "orcid"
 	| "species"
 	| "url"
+	| "uuid"
 	| "year";
 
 export type Node = {

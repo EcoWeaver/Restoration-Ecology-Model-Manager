@@ -16,7 +16,7 @@
 	const { getMetadataElements } = useElements();
 
 	let { model } = $derived(data);
-	const { parent, uuid } = $derived(model);
+	const { uuid } = $derived(model);
 	let { graph, metadata } = $derived(model.model);
 	let { nodes, edges } = $derived(apiToFlow(graph, false));
 	const title = $derived(metadata.find(({ kind }) => kind === "title")!.value);
@@ -31,11 +31,10 @@
 	async function edit() {
 		const localUUID = newLocalModel({
 			graph,
-			metadata,
-			parent: {
-				uuid,
-				title,
-			},
+			metadata: [
+				{ kind: "derived from", value: uuid },
+				...metadata.filter((m) => m.kind !== "derived from"),
+			],
 		});
 
 		await goto(resolve(`/edit/${localUUID}`));
@@ -82,20 +81,6 @@
 				<div class="table">
 					<div class="table-row">
 						<h2 class="table-cell pr-2 pb-2 text-xl font-bold select-text">Metadata</h2>
-						{#if parent}
-							<div
-								class="table-cell max-w-lg overflow-hidden pb-2 pl-2 text-ellipsis whitespace-nowrap select-text"
-							>
-								based on
-								<a
-									class="text-blue-700 outline-indigo-400 hover:underline focus-visible:outline-2 dark:text-blue-400"
-									title={parent.title}
-									href={resolve(`/view/${parent.uuid}`)}
-								>
-									"{parent.title}"
-								</a>
-							</div>
-						{/if}
 					</div>
 					<div class="table-row">
 						<div class="table-cell py-1 pr-2 font-bold select-text">kind</div>
@@ -131,6 +116,13 @@
 									href={value}
 									target="_blank"
 									rel="external noreferrer"
+								>
+									{value}
+								</a>
+							{:else if kind === "derived from"}
+								<a
+									class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
+									href={resolve(`/view/${value}`)}
 								>
 									{value}
 								</a>

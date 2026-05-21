@@ -104,6 +104,10 @@
 	],
 	"optional": [
 		{
+			"name": "derived from",
+			"type": "uuid"
+		},
+		{
 			"name": "language",
 			"type": "ietf-bcp-47"
 		},

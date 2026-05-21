@@ -14,22 +14,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"golang.org/x/text/language"
 )
-
-func (self PutModelRequest) verify(s *State, l *slog.Logger, ctx context.Context) error {
-	if err := verifyModel(self.Model, s, l, ctx); err != nil {
-		return err
-	}
-
-	if self.Parent != nil {
-		if err := verify.UUID(*self.Parent); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
 
 func (self PostModelRunRequest) Verify() error {
 	type Relation struct {
@@ -56,11 +43,7 @@ func (self PostModelRunRequest) Verify() error {
 	return nil
 }
 
-func modelsEqual(l types.Model, r types.Model) bool {
-	return slices.Equal(l.Graph.Nodes, r.Graph.Nodes) && util.SlicesEqualUnordered(l.Graph.Relations, r.Graph.Relations) && util.SlicesEqualUnordered(l.Metadata, r.Metadata)
-}
-
-func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context) error {
+func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context, conn *pgx.Conn) error {
 	if err := verifyGraph(self.Graph, s, l); err != nil {
 		return err
 	}
@@ -90,6 +73,30 @@ func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context
 	}) {
 		if err != nil {
 			return err
+		}
+	}
+
+	for _, me := range self.Metadata {
+		if me.Kind != "derived from" {
+			continue
+		}
+
+		if conn == nil {
+			c, err := s.DBPool.Acquire(ctx)
+			if err != nil {
+				return err
+			}
+			defer c.Release()
+
+			conn = c.Conn()
+		}
+
+		if err := checkModelExistsInDB(ctx, conn, me.Value); err != nil {
+			if err == pgx.ErrNoRows {
+				return types.Error{E: fmt.Errorf("encountered non-existent derived-from model with uuid '%s'", me.Value)}
+			} else {
+				return err
+			}
 		}
 	}
 
@@ -185,6 +192,10 @@ func verifyMetadata(self types.Metadata, s *State, m *MetadataConfig, l *slog.Lo
 				}
 			case "ietf-bcp-47":
 				if _, err := language.Parse(self.Value); err == nil {
+					return nil
+				}
+			case "uuid":
+				if err := verify.UUID(self.Value); err == nil {
 					return nil
 				}
 			case "ols4":

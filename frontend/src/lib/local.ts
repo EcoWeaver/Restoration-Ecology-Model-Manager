@@ -1,9 +1,8 @@
-import type { Graph, Metadata, Parent, PostSearchResult } from "./api";
+import type { Graph, Metadata, PostSearchResult } from "./api";
 
 export type LocalModel = {
 	graph: Graph;
 	metadata: Metadata[];
-	parent?: Parent;
 };
 
 export function getLocalModels(): Map<string, Omit<PostSearchResult, "uuid">> {

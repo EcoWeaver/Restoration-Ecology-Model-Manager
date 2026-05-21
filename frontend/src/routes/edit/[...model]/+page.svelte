@@ -17,7 +17,6 @@
 	const { model } = $derived(data);
 	let { nodes, edges } = $derived(apiToFlow(model.graph, true));
 	let metadata = $derived(model.metadata);
-	const parent = $derived(model.parent);
 	const title = $derived(metadata.find(({ kind }) => kind === "title")?.value ?? "");
 
 	let timeoutId = $state<NodeJS.Timeout>();
@@ -31,7 +30,6 @@
 			setLocalModel(page.params.model!, {
 				graph: flowToApi(nodes_, edges_),
 				metadata: metadata_,
-				parent,
 			});
 		}, 50);
 	});
@@ -64,7 +62,6 @@
 					graph: flowToApi(nodes, edges),
 					metadata,
 				},
-				parent: parent?.uuid,
 			});
 			alert.info("model OK");
 			clearNavigate();
@@ -80,7 +77,6 @@
 			startNavigate();
 			const res = await req<PutModelResult>("PUT", "model", {
 				model: { graph: flowToApi(nodes, edges), metadata },
-				parent: parent?.uuid,
 			});
 			deleteLocalModel(page.params.model!);
 			await goto(resolve(`/view/${res.uuid}`));
@@ -99,7 +95,7 @@
 <Alert bind:this={alert} />
 
 <SvelteFlowProvider>
-	<GraphEdit {parent} bind:metadata bind:nodes bind:edges>
+	<GraphEdit bind:metadata bind:nodes bind:edges>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="check"

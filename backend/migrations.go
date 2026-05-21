@@ -159,3 +159,47 @@ func migrateModelsGraphJSON(ctx context.Context, conn pgx.Tx) error {
 
 	return nil
 }
+
+func migrateModelsParent(ctx context.Context, conn pgx.Tx) error {
+	query := `
+		SELECT
+			models.model_id,
+			models.parent
+		FROM
+			models
+		WHERE
+			models.parent IS NOT NULL`
+
+	rows, err := conn.Query(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	type Model struct {
+		modelUUID string
+		parent    string
+	}
+
+	var model Model
+	var models []Model
+	_, err = pgx.ForEachRow(rows, []any{&model.modelUUID, &model.parent}, func() error {
+		models = append(models, model)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, model := range models {
+		if err = insertModelMetadataIntoDB(ctx, conn, model.modelUUID, []types.Metadata{{Kind: "derived from", Value: model.parent}}); err != nil {
+			return err
+		}
+	}
+
+	if _, err := conn.Exec(ctx, "ALTER TABLE models DROP COLUMN parent"); err != nil {
+		return err
+	}
+
+	return nil
+}
