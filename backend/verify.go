@@ -102,18 +102,22 @@ func verifyGraph(self types.Graph, s *State, l *slog.Logger) error {
 		To   int
 	}
 
-	e := map[Relation]struct{}{}
-	r, err := s.Relations.Get(l)
-	if err != nil {
-		return err
-	}
-
 	for _, ne := range self.Nodes {
+		if ne.Body == "" {
+			return types.Error{E: errors.New("encountered node with unset body")}
+		}
+
 		if err := verify.Color(ne.Color); err != nil {
 			return err
 		}
 	}
 
+	r, err := s.Relations.Get(l)
+	if err != nil {
+		return err
+	}
+
+	e := map[Relation]struct{}{}
 	for _, re := range self.Relations {
 		if err := verifyRelation(re, r, len(self.Nodes)); err != nil {
 			return err
