@@ -99,6 +99,7 @@
 			startNavigate();
 			mergeModels.push(await req<GetModelResult>("GET", `model?uuid=${mergeUuid}`));
 			mergeUuid = "";
+			clearNavigate();
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
