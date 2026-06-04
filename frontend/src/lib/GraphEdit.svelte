@@ -113,8 +113,8 @@
 		panelEntries.push({ mandatory: false, kind, value });
 	}
 
-	export function addMetadata() {
-		panelEntries.push({ mandatory: false, kind: "", value: "" });
+	export function addMetadata(metadata: Metadata = { kind: "", value: "" }) {
+		panelEntries.push({ ...metadata, mandatory: false });
 	}
 
 	let editable = $state(true);

@@ -116,11 +116,13 @@
 		}
 	}
 
+	let graphEdit: ReturnType<typeof GraphEdit>;
+
 	let mergedModels = 0;
 	async function merge() {
 		await pushMerge();
 		for (const model of mergeModels) {
-			metadata.push({ kind: "derived from", value: model.uuid });
+			graphEdit.addMetadata({ kind: "derived from", value: model.uuid });
 			const graph = apiToFlow(model.model.graph, true, `${mergedModels++}_`);
 			nodes = [...nodes, ...graph.nodes];
 			edges = [...edges, ...graph.edges];
@@ -137,7 +139,7 @@
 <Alert bind:this={alert} />
 
 <SvelteFlowProvider>
-	<GraphEdit bind:metadata bind:nodes bind:edges>
+	<GraphEdit bind:this={graphEdit} bind:metadata bind:nodes bind:edges>
 		<button
 			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="check"
