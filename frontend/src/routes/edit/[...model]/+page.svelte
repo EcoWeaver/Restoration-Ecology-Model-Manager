@@ -4,13 +4,15 @@
 	import { SvelteFlowProvider } from "@xyflow/svelte";
 	import { page } from "$app/state";
 	import { deleteLocalModel, setLocalModel } from "$lib/local.js";
-	import { CheckLine, Upload } from "@lucide/svelte";
+	import { Check, CheckLine, Merge, Plus, Upload, X } from "@lucide/svelte";
 	import { clearNavigate, startNavigate } from "$lib/LoadingSpinner.svelte";
-	import { req, type BackendError, type PutModelResult } from "$lib/api";
+	import { req, type BackendError, type GetModelResult, type PutModelResult } from "$lib/api";
 	import { resolve } from "$app/paths";
 	import { beforeNavigate, goto } from "$app/navigation";
 	import Alert from "$lib/Alert.svelte";
 	import { untrack } from "svelte";
+	import UuidInput from "$lib/metadata-panel/UuidInput.svelte";
+	import { fade } from "svelte/transition";
 
 	let { data } = $props();
 
@@ -86,6 +88,46 @@
 			clearNavigate();
 		}
 	}
+
+	let mergeOpen = $state(false);
+	let mergeUuid = $state("");
+
+	function mergeClose() {
+		if (mergeOpen) {
+			mergeOpen = false;
+			mergeUuid = "";
+		}
+	}
+
+	let mergeModels = $state<GetModelResult[]>([]);
+
+	async function pushMerge() {
+		try {
+			if (mergeUuid.length !== 36) {
+				return;
+			}
+			startNavigate();
+			mergeModels.push(await req<GetModelResult>("GET", `model?uuid=${mergeUuid}`));
+			mergeUuid = "";
+		} catch (err: unknown) {
+			const error = err as BackendError;
+			alert.error(error.message);
+			clearNavigate();
+		}
+	}
+
+	let mergedModels = 0;
+	async function merge() {
+		await pushMerge();
+		for (const model of mergeModels) {
+			metadata.push({ kind: "derived from", value: model.uuid });
+			const graph = apiToFlow(model.model.graph, true, `${mergedModels++}_`);
+			nodes = [...nodes, ...graph.nodes];
+			edges = [...edges, ...graph.edges];
+		}
+		mergeModels = [];
+		mergeOpen = false;
+	}
 </script>
 
 <svelte:head>
@@ -112,5 +154,75 @@
 			<Upload />
 			<div class="pl-2">upload</div>
 		</button>
+		<button
+			class="cursor-pointer rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
+			title="merge models"
+			onclick={(e) => {
+				mergeOpen = true;
+				e.stopPropagation();
+			}}
+		>
+			<Merge />
+		</button>
 	</GraphEdit>
 </SvelteFlowProvider>
+
+<svelte:window
+	onkeydown={(e) => {
+		if (e.key === "Escape") {
+			mergeClose();
+		}
+	}}
+	onclick={mergeClose}
+/>
+
+{#if mergeOpen}
+	<div
+		class="absolute top-0 z-100 flex h-full w-full items-center justify-center bg-white/50 dark:bg-neutral-800/50"
+		in:fade={{ duration: 50 }}
+		out:fade={{ duration: 50 }}
+	>
+		<div
+			class="rounded-md bg-neutral-200 p-2 outline-2 outline-indigo-400 dark:bg-neutral-700"
+			onclick={(e) => e.stopPropagation()}
+			aria-hidden="true"
+		>
+			<div class="mb-2 flex items-center">
+				Enter the IDs of the to-be-merged models.
+				<button
+					class="ml-1 flex cursor-pointer items-center rounded-full p-1 outline-offset-2 outline-neutral-500 hover:bg-neutral-500/25 focus-visible:outline-2"
+					onclick={merge}
+				>
+					<Check />
+				</button>
+			</div>
+			<div class="flex items-center">
+				<UuidInput bind:value={mergeUuid} />
+				<button
+					class="ml-1 flex cursor-pointer items-center rounded-full p-1 outline-offset-2 outline-neutral-500 hover:bg-neutral-500/25 focus-visible:outline-2"
+					onclick={pushMerge}
+				>
+					<Plus />
+				</button>
+			</div>
+			{#each mergeModels as mergeModel, idx (idx)}
+				<div class="mt-1 flex items-center pr-1 pl-3.25">
+					<a
+						class="w-full text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
+						target="_blank"
+						href={resolve(`/view/${mergeModel.uuid}`)}
+					>
+						{mergeModel.uuid}
+					</a>
+					<button
+						class="float-right h-6 cursor-pointer rounded-full outline-red-500 hover:bg-red-500/25 focus-visible:outline-2"
+						title="delete this metadata entry"
+						onclick={() => mergeModels.splice(idx, 1)}
+					>
+						<X class="stroke-red-500" />
+					</button>
+				</div>
+			{/each}
+		</div>
+	</div>
+{/if}

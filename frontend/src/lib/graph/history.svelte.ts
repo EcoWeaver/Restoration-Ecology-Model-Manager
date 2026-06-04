@@ -3,7 +3,7 @@ import { defaultEdgeOptions, type Edge, type Node } from "$lib/model";
 import type { XYPosition } from "@xyflow/svelte";
 
 type Change =
-	| { tag: "addOrRemove"; node?: Node; edges: Map<string, Edge>; remove: boolean }
+	| { tag: "addOrRemove"; nodes: Map<string, Node>; edges: Map<string, Edge>; remove: boolean }
 	| { tag: "changeNodePosition"; id: string; to: XYPosition }
 	| { tag: "changeNodeBody"; id: string; to: string }
 	| { tag: "changeNodeColor"; id: string; to: string }
@@ -44,7 +44,7 @@ export class History {
 
 	diffAddOrRemove(nodes: Node[], edges: Edge[]): Change | undefined {
 		let remove: boolean | undefined;
-		let changedNode: Node | undefined;
+		const changedNodes = new Map<string, Node>();
 		const changedEdges = new Map<string, Edge>();
 
 		// because only inserts *or* deletions can happen, the length must be unequal for one of them
@@ -55,16 +55,14 @@ export class History {
 			for (const node of nodes) {
 				if (!nodesMap.delete(node.id)) {
 					remove = true;
-					changedNode = node;
-					break;
+					changedNodes.set(node.id, node);
 				}
 			}
 
-			if (!changedNode) {
+			if (changedNodes.size === 0) {
 				for (const node of nodesMap.values()) {
 					remove = false;
-					changedNode = node;
-					break;
+					changedNodes.set(node.id, node);
 				}
 			}
 		}
@@ -90,7 +88,7 @@ export class History {
 		if (remove !== undefined) {
 			return {
 				tag: "addOrRemove",
-				node: structuredClone(changedNode),
+				nodes: structuredClone(changedNodes),
 				edges: structuredClone(changedEdges),
 				remove,
 			};
@@ -175,16 +173,10 @@ export class History {
 		switch (change.tag) {
 			case "addOrRemove": {
 				if (change.remove) {
-					if (change.node) {
-						const id = change.node.id;
-						const idx = this.nodes.findIndex((n) => n.id === id);
-						this.nodes.splice(idx, 1);
-					}
+					this.nodes = this.nodes.filter((node) => !change.nodes.has(node.id));
 					this.edges = this.edges.filter((edge) => !change.edges.has(edge.id));
 				} else {
-					if (change.node) {
-						this.nodes.push(structuredClone(change.node));
-					}
+					this.nodes = [...this.nodes, ...change.nodes.values().map((e) => structuredClone(e))];
 					this.edges = [...this.edges, ...change.edges.values().map((e) => structuredClone(e))];
 				}
 				for (const { source, target } of change.edges.values()) {

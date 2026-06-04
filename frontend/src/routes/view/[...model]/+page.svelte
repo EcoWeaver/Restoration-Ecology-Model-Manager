@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Link, PencilLine } from "@lucide/svelte";
+	import { FingerprintPattern, Link, PencilLine } from "@lucide/svelte";
 	import Graph from "$lib/Graph.svelte";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
 	import Header from "$lib/Header.svelte";
@@ -42,7 +42,12 @@
 
 	async function share() {
 		await navigator.clipboard.writeText(window.location.href);
-		alert.info("link copied to clipboard");
+		alert.info("model link copied to clipboard");
+	}
+
+	async function copyId() {
+		await navigator.clipboard.writeText(model.uuid);
+		alert.info("model id copied to clipboard");
 	}
 </script>
 
@@ -62,12 +67,19 @@
 		</button>
 
 		<button
-			class="flex h-10 cursor-pointer items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
+			class="cursor-pointer rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 			title="copy model link to clipboard"
 			onclick={share}
 		>
 			<Link />
-			<div class="pl-2">share</div>
+		</button>
+
+		<button
+			class="cursor-pointer rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
+			title="copy model id to clipboard"
+			onclick={copyId}
+		>
+			<FingerprintPattern />
 		</button>
 	</Header>
 </div>
@@ -122,6 +134,7 @@
 							{:else if kind === "derived from"}
 								<a
 									class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
+									target="_blank"
 									href={resolve(`/view/${value}`)}
 								>
 									{value}

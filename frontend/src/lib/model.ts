@@ -12,10 +12,14 @@ export const defaultEdgeOptions: Partial<Edge> = {
 	},
 };
 
-export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edges: Edge[] } {
+export function apiToFlow(
+	graph: Graph,
+	editable: boolean,
+	idPrefix: string = "",
+): { nodes: Node[]; edges: Edge[] } {
 	const nodes: Node[] = Array.from(
 		graph.nodes?.entries().map(([id, { body, position, color }]) => ({
-			id: id.toString(),
+			id: `${idPrefix}${id}`,
 			type: "custom",
 			dragHandle: ".drag-handle",
 			position,
@@ -26,10 +30,10 @@ export function apiToFlow(graph: Graph, editable: boolean): { nodes: Node[]; edg
 
 	const edges: Edge[] =
 		graph.relations?.map(({ from, to, kind, position }) => ({
-			id: `${from}-${to}`,
+			id: `${idPrefix}${from}-${idPrefix}${to}`,
 			type: "custom",
-			source: from.toString(),
-			target: to.toString(),
+			source: `${idPrefix}${from}`,
+			target: `${idPrefix}${to}`,
 			data: { kind, editable, position },
 		})) ?? [];
 
