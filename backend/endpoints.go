@@ -18,13 +18,15 @@ import (
 )
 
 type State struct {
-	DBPool       *pgxpool.Pool
-	Metadata     HotReload[MetadataConfig]
-	Relations    HotReload[RelationsConfig]
-	DOICache     verify.Cache
-	ORCIDCache   verify.Cache
-	SpeciesCache verify.Cache
-	OLS4Caches   sync.Map
+	DBPool           *pgxpool.Pool
+	ModelMetadata    HotReload[MetadataConfig]
+	NodeMetadata     HotReload[MetadataConfig]
+	RelationMetadata HotReload[MetadataConfig]
+	Relations        HotReload[RelationsConfig]
+	DOICache         verify.Cache
+	ORCIDCache       verify.Cache
+	SpeciesCache     verify.Cache
+	OLS4Caches       sync.Map
 }
 
 type GetModelResult struct {
@@ -62,14 +64,42 @@ type PostSearchResult struct {
 	ModelType  string    `json:"modelType"`
 }
 
-// @Summary		Get the metadata
-// @Description	Gets the list of currently accepted metadata kinds, types and obligations.
+// @Summary		Get the model metadata
+// @Description	Gets the list of currently accepted model metadata kinds, types and obligations.
 // @Produce		json
-// @Success		200			{object}	MetadataConfig
-// @Failure		500			{object}	echo.HTTPError
-// @Router		/metadata	[get]
-func (self *State) GetMetadata(c *echo.Context) error {
-	m, err := self.Metadata.Get(c.Logger())
+// @Success		200				{object}	MetadataConfig
+// @Failure		500				{object}	echo.HTTPError
+// @Router		/metadata/model	[get]
+func (self *State) GetMetadataModel(c *echo.Context) error {
+	m, err := self.ModelMetadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, m)
+}
+
+// @Summary		Get the node metadata
+// @Description	Gets the list of currently accepted node metadata kinds, types and obligations.
+// @Produce		json
+// @Success		200				{object}	MetadataConfig
+// @Failure		500				{object}	echo.HTTPError
+// @Router		/metadata/node	[get]
+func (self *State) GetMetadataNode(c *echo.Context) error {
+	m, err := self.NodeMetadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, m)
+}
+
+// @Summary		Get the relation metadata
+// @Description	Gets the list of currently accepted relation metadata kinds, types and obligations.
+// @Produce		json
+// @Success		200					{object}	MetadataConfig
+// @Failure		500					{object}	echo.HTTPError
+// @Router		/metadata/relation	[get]
+func (self *State) GetMetadataRelation(c *echo.Context) error {
+	m, err := self.RelationMetadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}
@@ -226,7 +256,7 @@ func (self *State) PostSearch(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	m, err := self.Metadata.Get(c.Logger())
+	m, err := self.ModelMetadata.Get(c.Logger())
 	if err != nil {
 		return err
 	}
@@ -590,8 +620,7 @@ func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, 
 	for i, n := range g.Nodes {
 		args = append(args, i, n.Body, n.Color, n.Position.X, n.Position.Y)
 		vals = append(vals,
-			fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)",
-				len(args)-4, len(args)-3, len(args)-2, len(args)-1, len(args)),
+			fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)", len(args)-4, len(args)-3, len(args)-2, len(args)-1, len(args)),
 		)
 	}
 
@@ -620,8 +649,10 @@ func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, 
 	defer rows.Close()
 
 	var id int
+	var ids []int
 	args = []any{modelUUID}
 	_, err = pgx.ForEachRow(rows, []any{&id}, func() error {
+		ids = append(ids, id)
 		args = append(args, id)
 		return nil
 	})
@@ -629,31 +660,69 @@ func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, 
 		return err
 	}
 
+	for i, id := range ids {
+		if err = insertNodeMetadataIntoDB(ctx, conn, modelUUID, id, g.Nodes[i].Metadata); err != nil {
+			return err
+		}
+	}
+
 	if len(g.Relations) == 0 {
 		return nil
 	}
 
 	vals = nil
-	for _, r := range g.Relations {
-		args = append(args, r.Kind, r.Position.R, r.Position.Phi)
-		vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)", r.From+2, r.To+2, len(args)-2, len(args)-1, len(args)))
+	for i, r := range g.Relations {
+		args = append(args, i, r.Kind, r.Position.R, r.Position.Phi)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d, $%d)", r.From+2, r.To+2, len(args)-3, len(args)-2, len(args)-1, len(args)))
 	}
 
 	query = `
-		INSERT INTO
-			relations (model_id, from_id, to_id, kind, r, phi)
-		VALUES
-			` + strings.Join(vals, `,
-			`)
+		WITH inserted AS (
+			INSERT INTO
+				relations (model_id, from_id, to_id, ord, kind, r, phi)
+			VALUES
+				` + strings.Join(vals, `,
+				`) + `
+			RETURNING
+				relations.relation_id,
+				relations.ord
+		)
+		SELECT
+			inserted.relation_id
+		FROM
+			inserted
+		ORDER BY
+			inserted.ord`
 
-	if _, err = conn.Exec(ctx, query, args...); err != nil {
+	rows, err = conn.Query(ctx, query, args...)
+	if err != nil {
 		return err
+	}
+	defer rows.Close()
+
+	ids = []int{}
+	_, err = pgx.ForEachRow(rows, []any{&id}, func() error {
+		ids = append(ids, id)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	for i, id := range ids {
+		if err = insertRelationMetadataIntoDB(ctx, conn, modelUUID, id, g.Relations[i].Metadata); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
 func insertModelMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, metadata []types.Metadata) error {
+	if len(metadata) == 0 {
+		return nil
+	}
+
 	args := []any{modelUUID}
 	var vals []string
 	for _, me := range metadata {
@@ -664,6 +733,58 @@ func insertModelMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID strin
 	query := `
 		INSERT INTO
 			model_metadata (model_id, kind, value)
+		VALUES
+			` + strings.Join(vals, `,
+			`)
+
+	if _, err := conn.Exec(ctx, query, args...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func insertNodeMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, nodeID int, metadata []types.Metadata) error {
+	if len(metadata) == 0 {
+		return nil
+	}
+
+	args := []any{modelUUID, nodeID}
+	var vals []string
+	for _, me := range metadata {
+		args = append(args, me.Kind, me.Value)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
+	}
+
+	query := `
+		INSERT INTO
+			node_metadata (model_id, node_id, kind, value)
+		VALUES
+			` + strings.Join(vals, `,
+			`)
+
+	if _, err := conn.Exec(ctx, query, args...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func insertRelationMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, relationID int, metadata []types.Metadata) error {
+	if len(metadata) == 0 {
+		return nil
+	}
+
+	args := []any{modelUUID, relationID}
+	var vals []string
+	for _, me := range metadata {
+		args = append(args, me.Kind, me.Value)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
+	}
+
+	query := `
+		INSERT INTO
+			relation_metadata (model_id, relation_id, kind, value)
 		VALUES
 			` + strings.Join(vals, `,
 			`)

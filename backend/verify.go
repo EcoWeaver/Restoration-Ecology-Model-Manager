@@ -44,36 +44,17 @@ func (self PostModelRunRequest) Verify() error {
 }
 
 func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context, conn *pgx.Conn) error {
-	if err := verifyGraph(self.Graph, s, l); err != nil {
+	if err := verifyGraph(self.Graph, s, l, ctx, &conn); err != nil {
 		return err
 	}
 
-	m, err := s.Metadata.Get(l)
+	m, err := s.ModelMetadata.Get(l)
 	if err != nil {
 		return err
 	}
 
-	e := map[string]struct{}{}
-	for _, me := range m.Mandatory {
-		e[me.Name] = struct{}{}
-	}
-	for _, me := range self.Metadata {
-		delete(e, me.Kind)
-	}
-	if len(e) != 0 {
-		var k []string
-		for me := range e {
-			k = append(k, me)
-		}
-		return types.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", strings.Join(k, "', '"))}
-	}
-
-	for _, err := range util.SlicesParMap(self.Metadata, func(me types.Metadata) error {
-		return verifyMetadata(me, s, m, l, ctx)
-	}) {
-		if err != nil {
-			return err
-		}
+	if err := verifyMetadataList(self.Metadata, s, m, l, ctx, &conn); err != nil {
+		return err
 	}
 
 	for _, me := range self.Metadata {
@@ -103,20 +84,28 @@ func verifyModel(self types.Model, s *State, l *slog.Logger, ctx context.Context
 	return nil
 }
 
-func verifyGraph(self types.Graph, s *State, l *slog.Logger) error {
+func verifyGraph(self types.Graph, s *State, l *slog.Logger, ctx context.Context, conn **pgx.Conn) error {
 	type Relation struct {
 		From int
 		To   int
 	}
 
-	for _, ne := range self.Nodes {
-		if ne.Body == "" {
-			return types.Error{E: errors.New("encountered node with unset body")}
-		}
+	m, err := s.NodeMetadata.Get(l)
+	if err != nil {
+		return err
+	}
 
-		if err := verify.Color(ne.Color); err != nil {
+	for _, err := range util.SlicesParMap(self.Nodes, func(ne types.Node) error {
+		return verifyNode(ne, s, m, l, ctx, conn)
+	}) {
+		if err != nil {
 			return err
 		}
+	}
+
+	m, err = s.RelationMetadata.Get(l)
+	if err != nil {
+		return err
 	}
 
 	r, err := s.Relations.Get(l)
@@ -124,11 +113,16 @@ func verifyGraph(self types.Graph, s *State, l *slog.Logger) error {
 		return err
 	}
 
-	e := map[Relation]struct{}{}
-	for _, re := range self.Relations {
-		if err := verifyRelation(re, r, len(self.Nodes)); err != nil {
+	for _, err := range util.SlicesParMap(self.Relations, func(re types.Relation) error {
+		return verifyRelation(re, r, len(self.Nodes), s, m, l, ctx, conn)
+	}) {
+		if err != nil {
 			return err
 		}
+	}
+
+	e := map[Relation]struct{}{}
+	for _, re := range self.Relations {
 		pair := Relation{re.From, re.To}
 		if _, ok := e[pair]; ok {
 			return types.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
@@ -140,6 +134,89 @@ func verifyGraph(self types.Graph, s *State, l *slog.Logger) error {
 				return types.Error{E: fmt.Errorf("encountered duplicate relation from %d to %d", re.From, re.To)}
 			}
 			e[pair] = struct{}{}
+		}
+	}
+
+	return nil
+}
+
+func verifyNode(self types.Node, s *State, m *MetadataConfig, l *slog.Logger, ctx context.Context, conn **pgx.Conn) error {
+	if self.Body == "" {
+		return types.Error{E: errors.New("encountered node with unset body")}
+	}
+
+	if err := verify.Color(self.Color); err != nil {
+		return err
+	}
+
+	if err := verifyMetadataList(self.Metadata, s, m, l, ctx, conn); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func verifyRelation(self types.Relation, r *RelationsConfig, n int, s *State, m *MetadataConfig, l *slog.Logger, ctx context.Context, conn **pgx.Conn) error {
+	if self.From < 0 || self.From >= n || self.To < 0 || self.To >= n || self.From == self.To {
+		return types.Error{E: fmt.Errorf("encountered invalid relation from %d to %d", self.From, self.To)}
+	}
+
+	if !slices.Contains(r.Causal, self.Kind) && !slices.Contains(r.Noncausal, self.Kind) {
+		return types.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
+	}
+
+	if err := verifyMetadataList(self.Metadata, s, m, l, ctx, conn); err != nil {
+		return err
+	}
+
+	return verifyPolar(self.Position)
+}
+
+func verifyMetadataList(metadata []types.Metadata, s *State, m *MetadataConfig, l *slog.Logger, ctx context.Context, conn **pgx.Conn) error {
+	e := map[string]struct{}{}
+	for _, me := range m.Mandatory {
+		e[me.Name] = struct{}{}
+	}
+	for _, me := range metadata {
+		delete(e, me.Kind)
+	}
+	if len(e) != 0 {
+		var k []string
+		for me := range e {
+			k = append(k, me)
+		}
+		return types.Error{E: fmt.Errorf("missing mandatory metadata elements '%s'", strings.Join(k, "', '"))}
+	}
+
+	for _, err := range util.SlicesParMap(metadata, func(me types.Metadata) error {
+		return verifyMetadata(me, s, m, l, ctx)
+	}) {
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, me := range metadata {
+		if me.Kind != "derived from" {
+			continue
+		}
+
+		if *conn == nil {
+			c, err := s.DBPool.Acquire(ctx)
+			if err != nil {
+				return err
+			}
+			defer c.Release()
+
+			*conn = c.Conn()
+		}
+
+		if err := checkModelExistsInDB(ctx, *conn, me.Value); err != nil {
+			if err == pgx.ErrNoRows {
+				return types.Error{E: fmt.Errorf("encountered non-existent derived-from model with uuid '%s'", me.Value)}
+			} else {
+				return err
+			}
 		}
 	}
 
@@ -236,18 +313,6 @@ func verifyMetadata(self types.Metadata, s *State, m *MetadataConfig, l *slog.Lo
 	}
 
 	return types.Error{E: fmt.Errorf("encountered invalid metadata kind '%s'", self.Kind)}
-}
-
-func verifyRelation(self types.Relation, r *RelationsConfig, n int) error {
-	if self.From < 0 || self.From >= n || self.To < 0 || self.To >= n || self.From == self.To {
-		return types.Error{E: fmt.Errorf("encountered invalid relation from %d to %d", self.From, self.To)}
-	}
-
-	if !slices.Contains(r.Causal, self.Kind) && !slices.Contains(r.Noncausal, self.Kind) {
-		return types.Error{E: fmt.Errorf("encountered invalid relation kind '%s'", self.Kind)}
-	}
-
-	return verifyPolar(self.Position)
 }
 
 func verifyPolar(self types.Polar) error {

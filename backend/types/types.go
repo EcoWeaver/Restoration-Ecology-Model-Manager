@@ -16,16 +16,18 @@ type Metadata struct {
 }
 
 type Node struct {
-	Body     string    `json:"body"`
-	Color    string    `json:"color"`
-	Position Cartesian `json:"position"`
+	Body     string     `json:"body"`
+	Color    string     `json:"color"`
+	Position Cartesian  `json:"position"`
+	Metadata []Metadata `json:"metadata"`
 }
 
 type Relation struct {
-	Kind     string `json:"kind"`
-	From     int    `json:"from"`
-	To       int    `json:"to"`
-	Position Polar  `json:"position"`
+	Kind     string     `json:"kind"`
+	From     int        `json:"from"`
+	To       int        `json:"to"`
+	Position Polar      `json:"position"`
+	Metadata []Metadata `json:"metadata"`
 }
 
 type Cartesian struct {

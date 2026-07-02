@@ -3,7 +3,7 @@ import { error } from "@sveltejs/kit";
 import type { LayoutLoad } from "./$types";
 
 export const load: LayoutLoad = async ({ fetch }) => {
-	const metadata = await fetch(`${apiBase}/metadata`);
+	const metadata = await fetch(`${apiBase}/metadata/model`);
 	if (!metadata.ok) {
 		return error(metadata.status, await metadata.json());
 	}

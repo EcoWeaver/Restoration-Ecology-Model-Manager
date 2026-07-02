@@ -31,7 +31,7 @@ func (self MetadataConfig) verify(l *slog.Logger) error {
 			_, ok := e[me.Name]
 			e[me.Name] = struct{}{}
 			if ok {
-				l.Warn(fmt.Sprintf("ignoring duplicate relation kind '%s'", me.Name))
+				l.Warn(fmt.Sprintf("ignoring duplicate metadata kind '%s'", me.Name))
 			}
 			return ok
 		})

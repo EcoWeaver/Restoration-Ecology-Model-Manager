@@ -96,6 +96,7 @@ func migrateModelsGraphJSON(ctx context.Context, conn pgx.Tx) error {
 			model_id UUID NOT NULL REFERENCES models (model_id),
 			from_id INT NOT NULL REFERENCES nodes (node_id),
 			to_id INT NOT NULL REFERENCES nodes (node_id),
+			ord INT NOT NULL,
 			kind TEXT NOT NULL,
 			r FLOAT NOT NULL,
 			phi FLOAT NOT NULL
@@ -198,6 +199,14 @@ func migrateModelsParent(ctx context.Context, conn pgx.Tx) error {
 	}
 
 	if _, err := conn.Exec(ctx, "ALTER TABLE models DROP COLUMN parent"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func migrateRelationMetadataAddOrd(ctx context.Context, conn pgx.Tx) error {
+	if _, err := conn.Exec(ctx, "ALTER TABLE relations ADD COLUMN IF NOT EXISTS ord INT NOT NULL"); err != nil {
 		return err
 	}
 

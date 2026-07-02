@@ -24,7 +24,7 @@ func main() {
 	e := echo.New()
 
 	e.Use(middleware.BodyLimit(2 * middleware.MB))
-	e.Use(middleware.CORS("http://localhost:3000", "http://localhost:5173"))
+	e.Use(middleware.CORS("*"))
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 	e.Use(middleware.Recover())
@@ -48,12 +48,14 @@ func main() {
 	defer dbPool.Close()
 
 	state := State{
-		Metadata:     HotReload[MetadataConfig]{path: "metadata.json"},
-		Relations:    HotReload[RelationsConfig]{path: "relations.json"},
-		DBPool:       dbPool,
-		DOICache:     verify.DOICache(),
-		ORCIDCache:   verify.ORCIDCache(),
-		SpeciesCache: verify.SpeciesCache(),
+		ModelMetadata:    HotReload[MetadataConfig]{path: "model_metadata.json"},
+		NodeMetadata:     HotReload[MetadataConfig]{path: "node_metadata.json"},
+		RelationMetadata: HotReload[MetadataConfig]{path: "relation_metadata.json"},
+		Relations:        HotReload[RelationsConfig]{path: "relations.json"},
+		DBPool:           dbPool,
+		DOICache:         verify.DOICache(),
+		ORCIDCache:       verify.ORCIDCache(),
+		SpeciesCache:     verify.SpeciesCache(),
 	}
 
 	if err := state.runMigration(context.Background(), schema, e.Logger); err != nil {
@@ -68,7 +70,13 @@ func main() {
 		panic(err)
 	}
 
-	e.GET("/metadata", state.GetMetadata)
+	if err := state.runMigration(context.Background(), migrateRelationMetadataAddOrd, e.Logger); err != nil {
+		panic(err)
+	}
+
+	e.GET("/metadata/model", state.GetMetadataModel)
+	e.GET("/metadata/node", state.GetMetadataNode)
+	e.GET("/metadata/relation", state.GetMetadataRelation)
 
 	e.GET("/model", state.GetModel)
 	e.PUT("/model", state.PutModel)

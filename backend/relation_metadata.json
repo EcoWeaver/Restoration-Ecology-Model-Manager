@@ -1,0 +1,57 @@
+{
+	"mandatory": [],
+	"recommended": [
+		{
+			"name": "identifier",
+			"type": "doi"
+		},
+		{
+			"name": "creator",
+			"type": "orcid"
+		},
+		{
+			"name": "title"
+		},
+		{
+			"name": "publisher"
+		},
+		{
+			"name": "publication year",
+			"type": "year"
+		},
+		{
+			"name": "resource type",
+			"type": "choice",
+			"choices": [
+				"Computational Notebook",
+				"Conference Paper",
+				"Data Paper",
+				"Dataset",
+				"Model",
+				"Research Paper",
+				"Software",
+				"Text",
+				"Service",
+				"Other"
+			]
+		}
+	],
+	"optional": [
+		{
+			"name": "description"
+		},
+		{
+			"name": "derived from",
+			"type": "uuid"
+		},
+		{
+			"name": "performance metric",
+			"type": "ols4",
+			"ols4": {
+				"onto": "stato",
+				"iri": "http://purl.obolibrary.org/obo/STATO_0000039",
+				"label": "statistic"
+			}
+		}
+	]
+}

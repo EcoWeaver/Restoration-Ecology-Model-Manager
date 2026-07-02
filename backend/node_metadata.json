@@ -1,0 +1,41 @@
+{
+	"mandatory": [],
+	"recommended": [
+		{
+			"name": "ecological domain",
+			"type": "ols4",
+			"ols4": {
+				"onto": "envo",
+				"iri": "http://purl.obolibrary.org/obo/ENVO_00000428",
+				"label": "biome"
+			}
+		},
+		{
+			"name": "target species",
+			"type": "species"
+		},
+		{
+			"name": "process",
+			"type": "ols4",
+			"ols4": {
+				"onto": "envo",
+				"iri": "http://purl.obolibrary.org/obo/BFO_0000015",
+				"label": "process"
+			}
+		},
+		{
+			"name": "characteristic",
+			"type": "ols4",
+			"ols4": {
+				"onto": "oba",
+				"iri": "http://purl.obolibrary.org/obo/BFO_0000020",
+				"label": "characteristic"
+			}
+		}
+	],
+	"optional": [
+		{
+			"name": "description"
+		}
+	]
+}
