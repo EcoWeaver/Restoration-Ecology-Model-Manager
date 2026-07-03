@@ -222,8 +222,7 @@
 								<textarea
 									class="field-sizing-content min-h-8 w-full max-w-lg rounded border border-neutral-600 py-1 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
 									rows="1"
-									bind:value={m.value}
-								></textarea>
+									bind:value={m.value}></textarea>
 							{/if}
 						</div>
 
