@@ -249,6 +249,12 @@ func verifyMetadata(self types.Metadata, s *State, m *MetadataConfig, l *slog.Lo
 			switch me.Type {
 			case "":
 				return nil
+			case "bioportal":
+				ca := verify.BioPortalCache(*me.Onto, s.BioPortalAPIKey, s.NoVerifyReq)
+				c, _ := s.OntoCaches.LoadOrStore(*me.Onto, &ca)
+				if err = c.(*verify.Cache).Verify(self.Value, ctx); err == nil {
+					return nil
+				}
 			case "choice":
 				if slices.Contains(me.Choices, self.Value) {
 					return nil

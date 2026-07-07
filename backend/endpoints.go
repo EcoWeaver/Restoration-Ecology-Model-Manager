@@ -2,12 +2,14 @@ package main
 
 import (
 	"backend/types"
+	"backend/util"
 	"backend/verify"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -28,6 +30,7 @@ type State struct {
 	SpeciesCache     verify.Cache
 	OntoCaches       sync.Map
 	NoVerifyReq      bool
+	BioPortalAPIKey  string
 }
 
 type GetModelResult struct {
@@ -63,6 +66,97 @@ type PostSearchResult struct {
 	Identifier string    `json:"identifier"`
 	Title      string    `json:"title"`
 	ModelType  string    `json:"modelType"`
+}
+
+// @Summary		Get metadata suggestions
+// @Description	Gets a list of completion suggestions for the given query and metadata kind. This currently supports any metadata kind of type "bioportal", "ols4" or "species".
+// @Produce		json
+// @Param		kind				query		string	true	"kind"
+// @Param		q					query		string	true	"q"
+// @Success		200					{object}	[]string
+// @Failure		400					{object}	echo.HTTPError
+// @Failure		500					{object}	echo.HTTPError
+// @Router		/metadata/suggest	[get]
+func (self *State) GetMetadataSuggest(c *echo.Context) error {
+	ctx := c.Request().Context()
+
+	m, err := self.ModelMetadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+
+	kind := c.QueryParam("kind")
+	q := c.QueryParam("q")
+
+	for _, ml := range [][]MetadataElement{m.Mandatory, m.Recommended, m.Optional} {
+		for _, me := range ml {
+			if me.Name != kind {
+				continue
+			}
+
+			switch me.Type {
+			case "bioportal":
+				{
+					api := "https://data.bioontology.org/search?suggest=true&apikey=" + self.BioPortalAPIKey + "&ontology=" + me.Onto.Onto + "&subtree_root_id=" + me.Onto.IRI + "&q=" + url.QueryEscape(q)
+					res, err := util.GetAndUnmarshal[struct {
+						Collection []struct {
+							PrefLabel string `json:"prefLabel"`
+						} `json:"collection"`
+					}](api, ctx)
+					if err != nil {
+						return err
+					}
+
+					ret := []string{}
+					for _, ri := range res.Collection {
+						ret = append(ret, ri.PrefLabel)
+					}
+
+					return c.JSON(http.StatusOK, ret)
+				}
+			case "ols4":
+				{
+					api := "https://www.ebi.ac.uk/ols4/api/suggest?ontology=" + me.Onto.Onto + "&childrenOf=" + me.Onto.IRI + "&q=" + url.QueryEscape(q)
+					res, err := util.GetAndUnmarshal[struct {
+						Response struct {
+							Docs []struct {
+								Autosuggest string `json:"autosuggest"`
+							} `json:"docs"`
+						} `json:"response"`
+					}](api, ctx)
+					if err != nil {
+						return err
+					}
+
+					ret := []string{}
+					for _, ri := range res.Response.Docs {
+						ret = append(ret, ri.Autosuggest)
+					}
+
+					return c.JSON(http.StatusOK, ret)
+				}
+			case "species":
+				{
+					api := "https://api.gbif.org/v1/species/suggest?status=ACCEPTED&q=" + url.QueryEscape(q)
+					res, err := util.GetAndUnmarshal[[]struct {
+						CanonicalName string `json:"canonicalName"`
+					}](api, ctx)
+					if err != nil {
+						return err
+					}
+
+					ret := []string{}
+					for _, ri := range res {
+						ret = append(ret, ri.CanonicalName)
+					}
+
+					return c.JSON(http.StatusOK, ret)
+				}
+			}
+		}
+	}
+
+	return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered invalid or non-completable metadata kind '%s'", kind)})
 }
 
 // @Summary		Get the model metadata

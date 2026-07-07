@@ -1,14 +1,13 @@
 <script lang="ts">
+	import { apiBase, type Metadata } from "$lib/api";
 	import Input from "./Input.svelte";
 
 	let {
 		placeholder,
-		suggest,
-		value = $bindable(),
+		meta = $bindable(),
 	}: {
 		placeholder: string;
-		suggest: (value: string) => Promise<string[]>;
-		value: string;
+		meta: Metadata;
 	} = $props();
 
 	let suggestions = $state<string[]>([]);
@@ -30,7 +29,7 @@
 		event.preventDefault();
 
 		if (suggestions[idx]) {
-			value = suggestions[idx];
+			meta.value = suggestions[idx];
 			selected = 0;
 			focused = false;
 		}
@@ -39,7 +38,7 @@
 	function onkeydown(event: KeyboardEvent) {
 		if (event.key === "Enter") {
 			if (suggestions[selected]) {
-				value = suggestions[selected];
+				meta.value = suggestions[selected];
 				selected = 0;
 				focused = false;
 				event.preventDefault();
@@ -57,11 +56,24 @@
 		}
 	}
 
+	async function suggest() {
+		if (meta.value === "") {
+			suggestions = [];
+			selected = 0;
+		} else {
+			const res = await fetch(
+				`${apiBase}/metadata/suggest?kind=${meta.kind}&q=${encodeURIComponent(meta.value)}`,
+			);
+			const newSuggestions: string[] = await res.json();
+			const unique = new Set(newSuggestions);
+			suggestions = newSuggestions.filter((suggestion) => unique.delete(suggestion));
+			selected = Math.min(selected, Math.max(0, suggestions.length - 1));
+		}
+	}
+
 	$effect(() => {
-		suggest(value).then((newSuggestions) => {
-			suggestions = newSuggestions;
-			selected = Math.min(selected, Math.max(0, newSuggestions.length - 1));
-		});
+		$state.snapshot(meta.value);
+		suggest();
 	});
 
 	let focusedElement = $state<HTMLButtonElement>();
@@ -102,6 +114,6 @@
 		onfocus={() => (focused = true)}
 		{onkeydown}
 		{placeholder}
-		bind:value
+		bind:value={meta.value}
 	/>
 </div>

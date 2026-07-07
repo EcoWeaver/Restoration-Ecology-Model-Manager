@@ -16,6 +16,7 @@ Make sure you have [`docker`](https://www.docker.com/) installed. If you don't, 
 	- Your file explorer may not show 'hidden files' by default. If this is the case, refer to the following articles to make them appear:
 		- Windows: https://www.computerhope.com/issues/ch000516.htm
 		- MacOS: https://www.wikihow.com/Show-Hidden-Files-and-Folders-on-a-Mac
+3. Open the `.env` file, and enter a valid [BioPortal API key](https://www.bioontology.org/wiki/BioPortal_Help#Getting_an_API_key) in the `BIOPORTAL_API_KEY` field.
 
 You should repeat these steps anytime you'd like to update to a newer version of the app. The uploaded models will persist locally between versions.
 

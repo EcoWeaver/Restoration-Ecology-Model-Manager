@@ -41,6 +41,12 @@ func SpeciesCache(noVerifyReq bool) Cache {
 	}}
 }
 
+func BioPortalCache(o types.Onto, bioPortalAPIKey string, noVerifyReq bool) Cache {
+	return Cache{get: func(s string, ctx context.Context) error {
+		return bioPortal(o, s, ctx, bioPortalAPIKey, noVerifyReq)
+	}}
+}
+
 func OLS4Cache(o types.Onto, noVerifyReq bool) Cache {
 	return Cache{get: func(s string, ctx context.Context) error {
 		return ols4(o, s, ctx, noVerifyReq)

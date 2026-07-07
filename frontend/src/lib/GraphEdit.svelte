@@ -13,7 +13,6 @@
 	import Input from "./metadata-panel/Input.svelte";
 	import YearInput from "./metadata-panel/YearInput.svelte";
 	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
-	import { suggestOLS4, suggestSpecies } from "./metadata-panel/auto-complete";
 	import { untrack, type Snippet } from "svelte";
 	import UuidInput from "./metadata-panel/UuidInput.svelte";
 
@@ -184,6 +183,11 @@
 						<div class="table-cell py-0.75 pl-2">
 							{#if m.kind === ""}
 								<Input value="" disabled placeholder="-- select a kind --" />
+							{:else if type === "bioportal"}
+								<AutoComplete
+									placeholder={`subclass of '${onto!.label}' in ontology '${onto!.onto}'`}
+									bind:meta={panelEntries[idx]}
+								/>
 							{:else if type === "choice"}
 								<select
 									bind:value={m.value}
@@ -198,26 +202,25 @@
 										</option>
 									{/each}
 								</select>
-							{:else if type === "doi"}
-								<DoiInput bind:value={m.value} />
 							{:else if type === "date"}
 								<DateInput bind:value={m.value} />
+							{:else if type === "doi"}
+								<DoiInput bind:value={m.value} />
+							{:else if type === "ols4"}
+								<AutoComplete
+									placeholder={`subclass of '${onto!.label}' in ontology '${onto!.onto}'`}
+									bind:meta={panelEntries[idx]}
+								/>
 							{:else if type === "orcid"}
 								<OrcidInput bind:value={m.value} />
+							{:else if type === "species"}
+								<AutoComplete placeholder={type} bind:meta={panelEntries[idx]} />
 							{:else if type === "url"}
 								<Input placeholder={type} bind:value={m.value} type="url" />
 							{:else if type === "uuid"}
 								<UuidInput bind:value={m.value} />
 							{:else if type === "year"}
 								<YearInput {type} bind:value={m.value} />
-							{:else if type === "species"}
-								<AutoComplete placeholder={type} suggest={suggestSpecies} bind:value={m.value} />
-							{:else if type === "ols4"}
-								<AutoComplete
-									placeholder={`subclass of '${onto!.label}' in ontology '${onto!.onto}'`}
-									suggest={(value) => suggestOLS4(value, onto!)}
-									bind:value={m.value}
-								/>
 							{:else}
 								<textarea
 									class="field-sizing-content min-h-8 w-full max-w-lg rounded border border-neutral-600 py-1 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"

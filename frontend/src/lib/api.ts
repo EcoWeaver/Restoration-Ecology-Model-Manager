@@ -78,6 +78,7 @@ export type MetadataElement = {
 };
 
 export type MetadataType =
+	| "bioportal"
 	| "choice"
 	| "date"
 	| "doi"

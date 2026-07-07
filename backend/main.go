@@ -35,11 +35,15 @@ func main() {
 	}
 
 	noVerifyReq := os.Getenv("REMMA_NO_VERIFY_REQ") == "yes"
-
 	if noVerifyReq {
 		e.Logger.Warn("'REMMA_NO_VERIFY_REQ' is set!")
 		e.Logger.Warn("This means that metadata verification will not hit external API endpoints!")
 		e.Logger.Warn("This must be disabled in a production environment!")
+	}
+
+	bioPortalAPIKey := os.Getenv("BIOPORTAL_API_KEY")
+	if err := verify.UUID(bioPortalAPIKey); err != nil {
+		panic(err)
 	}
 
 	dbPool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
@@ -57,6 +61,7 @@ func main() {
 		DOICache:         verify.DOICache(noVerifyReq),
 		ORCIDCache:       verify.ORCIDCache(noVerifyReq),
 		SpeciesCache:     verify.SpeciesCache(noVerifyReq),
+		BioPortalAPIKey:  bioPortalAPIKey,
 		NoVerifyReq:      noVerifyReq,
 	}
 
@@ -76,6 +81,7 @@ func main() {
 		panic(err)
 	}
 
+	e.GET("/metadata/suggest", state.GetMetadataSuggest)
 	e.GET("/metadata/model", state.GetMetadataModel)
 	e.GET("/metadata/node", state.GetMetadataNode)
 	e.GET("/metadata/relation", state.GetMetadataRelation)

@@ -3,18 +3,18 @@
 	import { navigating } from "$app/state";
 	import { fade } from "svelte/transition";
 
-	let timer = $state<NodeJS.Timeout>();
+	let timeoutId = $state<NodeJS.Timeout>();
 	let spinner: "idle" | "waiting" | "spinning" = $state("idle");
 
 	export function startNavigate() {
 		if (spinner === "idle") {
 			spinner = "waiting";
-			timer = setTimeout(() => (spinner = "spinning"), 500);
+			timeoutId = setTimeout(() => (spinner = "spinning"), 500);
 		}
 	}
 
 	export function clearNavigate() {
-		clearTimeout(timer);
+		clearTimeout(timeoutId);
 		spinner = "idle";
 	}
 </script>
