@@ -4,6 +4,8 @@
 		"related",
 		"not related",
 		"positively correlated",
-		"negatively correlated"
+		"negatively correlated",
+		"positively associated",
+		"negatively associated"
 	]
 }
