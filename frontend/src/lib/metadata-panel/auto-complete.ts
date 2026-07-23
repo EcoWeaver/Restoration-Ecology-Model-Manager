@@ -1,4 +1,4 @@
-import type { OLS4 } from "$lib/api";
+import type { Onto } from "$lib/api";
 
 export async function suggestSpecies(value: string): Promise<string[]> {
 	if (value === "") {
@@ -15,13 +15,13 @@ export async function suggestSpecies(value: string): Promise<string[]> {
 	return suggestions.map((suggestion) => suggestion.canonicalName);
 }
 
-export async function suggestOLS4(value: string, ols4: OLS4): Promise<string[]> {
+export async function suggestOLS4(value: string, onto: Onto): Promise<string[]> {
 	if (value === "") {
 		return [];
 	}
 
 	const res = await fetch(
-		`https://www.ebi.ac.uk/ols4/api/suggest?ontology=${ols4.onto}&childrenOf=${ols4.iri}&q=${encodeURIComponent(value)}`,
+		`https://www.ebi.ac.uk/ols4/api/suggest?ontology=${onto.onto}&childrenOf=${onto.iri}&q=${encodeURIComponent(value)}`,
 	);
 	const suggestions: {
 		response: {

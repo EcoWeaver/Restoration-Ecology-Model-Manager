@@ -74,7 +74,7 @@ export type MetadataElement = {
 	name: string;
 	type?: MetadataType;
 	choices?: string[];
-	ols4?: OLS4;
+	onto?: Onto;
 };
 
 export type MetadataType =
@@ -114,7 +114,7 @@ export type Polar = {
 	phi: number;
 };
 
-export type OLS4 = {
+export type Onto = {
 	onto: string;
 	iri: string;
 	label: string;

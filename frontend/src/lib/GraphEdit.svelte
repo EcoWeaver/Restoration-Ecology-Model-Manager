@@ -92,8 +92,8 @@
 	}
 
 	const flatMetadata = new Map<string, Omit<MetadataElement, "name">>();
-	for (const { name, type, choices, ols4 } of Object.values(getMetadataElements()).flat()) {
-		flatMetadata.set(name, { type, choices, ols4 });
+	for (const { name, type, choices, onto } of Object.values(getMetadataElements()).flat()) {
+		flatMetadata.set(name, { type, choices, onto });
 	}
 
 	const panelEntries: (Metadata & { mandatory: boolean })[] = $state([]);
@@ -157,7 +157,7 @@
 					<div class="table-cell px-2 py-1 font-bold select-text">value</div>
 				</div>
 				{#each panelEntries as m, idx (idx)}
-					{@const { type, choices, ols4 } = flatMetadata.get(m.kind) || {}}
+					{@const { type, choices, onto } = flatMetadata.get(m.kind) || {}}
 
 					<div class="table-row">
 						<div class="table-cell align-middle">
@@ -214,8 +214,8 @@
 								<AutoComplete placeholder={type} suggest={suggestSpecies} bind:value={m.value} />
 							{:else if type === "ols4"}
 								<AutoComplete
-									placeholder={`subclass of '${ols4!.label}' in ontology '${ols4!.onto}'`}
-									suggest={(value) => suggestOLS4(value, ols4!)}
+									placeholder={`subclass of '${onto!.label}' in ontology '${onto!.onto}'`}
+									suggest={(value) => suggestOLS4(value, onto!)}
 									bind:value={m.value}
 								/>
 							{:else}

@@ -18,3 +18,7 @@ func errInvalid(t string) types.Error {
 func errUnregistered(t string) types.Error {
 	return types.Error{E: fmt.Errorf("unregistered %s", t)}
 }
+
+func formatOnto(self types.Onto) string {
+	return fmt.Sprintf("subclass of '%s' in ontology '%s'", self.Label, self.Onto)
+}

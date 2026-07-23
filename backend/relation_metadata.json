@@ -36,9 +36,9 @@
 			]
 		},
 		{
-			"name": "knowledge type",
+			"name": "knowledge level",
 			"type": "choice",
-			"choices": ["statistical", "observational", "mechanistic"]
+			"choices": ["statistical", "observational"]
 		}
 	],
 	"optional": [
@@ -52,7 +52,7 @@
 		{
 			"name": "performance metric",
 			"type": "ols4",
-			"ols4": {
+			"onto": {
 				"onto": "stato",
 				"iri": "http://purl.obolibrary.org/obo/STATO_0000039",
 				"label": "statistic"

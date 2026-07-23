@@ -4,16 +4,15 @@ import (
 	"backend/types"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"slices"
 )
 
-func ols4(self types.OLS4, s string, ctx context.Context) error {
+func ols4(self types.Onto, s string, ctx context.Context) error {
 	if s == "" {
-		return errNotProvided(formatOLS4(self))
+		return errNotProvided(formatOnto(self))
 	}
 
 	if !REQ {
@@ -52,12 +51,8 @@ func ols4(self types.OLS4, s string, ctx context.Context) error {
 	}
 
 	if !slices.ContainsFunc(r.Response.Docs, func(l Label) bool { return l.Label == s }) {
-		return errInvalid(formatOLS4(self))
+		return errInvalid(formatOnto(self))
 	}
 
 	return nil
-}
-
-func formatOLS4(self types.OLS4) string {
-	return fmt.Sprintf("subclass of '%s' in ontology '%s'", self.Label, self.Onto)
 }

@@ -18,7 +18,7 @@ type MetadataElement struct {
 	Name    string      `json:"name"`
 	Type    string      `json:"type,omitempty"`
 	Choices []string    `json:"choices,omitempty"`
-	OLS4    *types.OLS4 `json:"ols4,omitempty"`
+	Onto    *types.Onto `json:"onto,omitempty"`
 }
 
 func (self MetadataConfig) verify(l *slog.Logger) error {
@@ -61,14 +61,14 @@ func (self *MetadataElement) verify(l *slog.Logger) error {
 	}
 
 	if self.Type == "ols4" {
-		if self.OLS4 == nil {
+		if self.Onto == nil {
 			return fmt.Errorf("missing ontology for metadata kind '%s'", self.Name)
-		} else if _, err := url.ParseRequestURI(self.OLS4.IRI); err != nil {
+		} else if _, err := url.ParseRequestURI(self.Onto.IRI); err != nil {
 			return err
 		}
-	} else if self.OLS4 != nil {
+	} else if self.Onto != nil {
 		l.Warn(fmt.Sprintf("ignoring unnecessary ontology for metadata kind '%s'", self.Name))
-		self.OLS4 = nil
+		self.Onto = nil
 	}
 
 	return nil

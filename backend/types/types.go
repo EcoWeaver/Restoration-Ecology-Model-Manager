@@ -40,7 +40,7 @@ type Polar struct {
 	Phi float64 `json:"phi"`
 }
 
-type OLS4 struct {
+type Onto struct {
 	Onto  string `json:"onto"`
 	IRI   string `json:"iri"`
 	Label string `json:"label"`

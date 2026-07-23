@@ -26,7 +26,7 @@ type State struct {
 	DOICache         verify.Cache
 	ORCIDCache       verify.Cache
 	SpeciesCache     verify.Cache
-	OLS4Caches       sync.Map
+	OntoCaches       sync.Map
 }
 
 type GetModelResult struct {

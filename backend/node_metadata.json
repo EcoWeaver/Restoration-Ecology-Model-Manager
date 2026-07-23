@@ -4,7 +4,7 @@
 		{
 			"name": "ecological domain",
 			"type": "ols4",
-			"ols4": {
+			"onto": {
 				"onto": "envo",
 				"iri": "http://purl.obolibrary.org/obo/ENVO_00000428",
 				"label": "biome"
@@ -17,7 +17,7 @@
 		{
 			"name": "process",
 			"type": "ols4",
-			"ols4": {
+			"onto": {
 				"onto": "envo",
 				"iri": "http://purl.obolibrary.org/obo/BFO_0000015",
 				"label": "process"
@@ -26,7 +26,7 @@
 		{
 			"name": "characteristic",
 			"type": "ols4",
-			"ols4": {
+			"onto": {
 				"onto": "oba",
 				"iri": "http://purl.obolibrary.org/obo/BFO_0000020",
 				"label": "characteristic"
