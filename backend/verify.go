@@ -276,7 +276,7 @@ func verifyMetadata(self types.Metadata, s *State, m *MetadataConfig, l *slog.Lo
 					return nil
 				}
 			case "ols4":
-				ca := verify.OLS4Cache(*me.Onto)
+				ca := verify.OLS4Cache(*me.Onto, s.NoVerifyReq)
 				c, _ := s.OntoCaches.LoadOrStore(*me.Onto, &ca)
 				if err = c.(*verify.Cache).Verify(self.Value, ctx); err == nil {
 					return nil

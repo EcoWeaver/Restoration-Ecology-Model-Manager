@@ -8,12 +8,12 @@ import (
 	"net/url"
 )
 
-func species(s string, ctx context.Context) error {
+func species(s string, ctx context.Context, noVerifyReq bool) error {
 	if s == "" {
 		return errNotProvided("species")
 	}
 
-	if !REQ {
+	if noVerifyReq {
 		return nil
 	}
 

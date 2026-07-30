@@ -27,6 +27,7 @@ type State struct {
 	ORCIDCache       verify.Cache
 	SpeciesCache     verify.Cache
 	OntoCaches       sync.Map
+	NoVerifyReq      bool
 }
 
 type GetModelResult struct {

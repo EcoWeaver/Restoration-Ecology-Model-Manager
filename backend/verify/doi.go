@@ -9,7 +9,7 @@ import (
 
 var doiRegexp = regexp.MustCompile(`(?i)^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
 
-func doi(s string, ctx context.Context) error {
+func doi(s string, ctx context.Context, noVerifyReq bool) error {
 	if s == "" {
 		return errNotProvided("doi")
 	}
@@ -18,7 +18,7 @@ func doi(s string, ctx context.Context) error {
 		return errInvalid("doi")
 	}
 
-	if !REQ {
+	if noVerifyReq {
 		return nil
 	}
 

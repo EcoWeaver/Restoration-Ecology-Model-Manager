@@ -10,12 +10,12 @@ import (
 	"slices"
 )
 
-func ols4(self types.Onto, s string, ctx context.Context) error {
+func ols4(self types.Onto, s string, ctx context.Context, noVerifyReq bool) error {
 	if s == "" {
 		return errNotProvided(formatOnto(self))
 	}
 
-	if !REQ {
+	if noVerifyReq {
 		return nil
 	}
 

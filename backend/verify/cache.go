@@ -23,20 +23,26 @@ func (self *Cache) Verify(s string, ctx context.Context) error {
 	return err
 }
 
-func DOICache() Cache {
-	return Cache{get: doi}
-}
-
-func ORCIDCache() Cache {
-	return Cache{get: orcid}
-}
-
-func SpeciesCache() Cache {
-	return Cache{get: species}
-}
-
-func OLS4Cache(o types.Onto) Cache {
+func DOICache(noVerifyReq bool) Cache {
 	return Cache{get: func(s string, ctx context.Context) error {
-		return ols4(o, s, ctx)
+		return doi(s, ctx, noVerifyReq)
+	}}
+}
+
+func ORCIDCache(noVerifyReq bool) Cache {
+	return Cache{get: func(s string, ctx context.Context) error {
+		return orcid(s, ctx, noVerifyReq)
+	}}
+}
+
+func SpeciesCache(noVerifyReq bool) Cache {
+	return Cache{get: func(s string, ctx context.Context) error {
+		return species(s, ctx, noVerifyReq)
+	}}
+}
+
+func OLS4Cache(o types.Onto, noVerifyReq bool) Cache {
+	return Cache{get: func(s string, ctx context.Context) error {
+		return ols4(o, s, ctx, noVerifyReq)
 	}}
 }

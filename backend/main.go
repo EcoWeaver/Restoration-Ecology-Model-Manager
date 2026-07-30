@@ -34,10 +34,11 @@ func main() {
 		e.Logger.Warn(err.Error())
 	}
 
-	verify.REQ = os.Getenv("REMMA_NO_VERIFY_REQ") != "yes"
-	if !verify.REQ {
+	noVerifyReq := os.Getenv("REMMA_NO_VERIFY_REQ") == "yes"
+
+	if noVerifyReq {
 		e.Logger.Warn("'REMMA_NO_VERIFY_REQ' is set!")
-		e.Logger.Warn("This means metadata verification will not hit verification APIs!")
+		e.Logger.Warn("This means that metadata verification will not hit external API endpoints!")
 		e.Logger.Warn("This must be disabled in a production environment!")
 	}
 
@@ -53,9 +54,10 @@ func main() {
 		RelationMetadata: HotReload[MetadataConfig]{path: "relation_metadata.json"},
 		Relations:        HotReload[RelationsConfig]{path: "relations.json"},
 		DBPool:           dbPool,
-		DOICache:         verify.DOICache(),
-		ORCIDCache:       verify.ORCIDCache(),
-		SpeciesCache:     verify.SpeciesCache(),
+		DOICache:         verify.DOICache(noVerifyReq),
+		ORCIDCache:       verify.ORCIDCache(noVerifyReq),
+		SpeciesCache:     verify.SpeciesCache(noVerifyReq),
+		NoVerifyReq:      noVerifyReq,
 	}
 
 	if err := state.runMigration(context.Background(), schema, e.Logger); err != nil {

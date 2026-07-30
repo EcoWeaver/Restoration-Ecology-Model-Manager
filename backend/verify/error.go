@@ -5,8 +5,6 @@ import (
 	"fmt"
 )
 
-var REQ = true
-
 func errNotProvided(t string) types.Error {
 	return types.Error{E: fmt.Errorf("%s not provided", t)}
 }

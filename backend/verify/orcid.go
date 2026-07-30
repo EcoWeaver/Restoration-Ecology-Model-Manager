@@ -9,7 +9,7 @@ import (
 
 var orcidRegexp = regexp.MustCompile(`^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$`)
 
-func orcid(s string, ctx context.Context) error {
+func orcid(s string, ctx context.Context, noVerifyReq bool) error {
 	if s == "" {
 		return errNotProvided("orcid")
 	}
@@ -18,7 +18,7 @@ func orcid(s string, ctx context.Context) error {
 		return errInvalid("orcid")
 	}
 
-	if !REQ {
+	if noVerifyReq {
 		return nil
 	}
 
