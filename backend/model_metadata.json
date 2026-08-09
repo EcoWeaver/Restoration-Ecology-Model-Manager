@@ -102,6 +102,15 @@
 			"type": "species"
 		},
 		{
+			"name": "ecological community",
+			"type": "bioportal",
+			"onto": {
+				"onto": "BIODIVTHES",
+				"iri": "http://data.loterre.fr/ark:/67375/BLH-JKLNMSMC-G",
+				"label": "biocenosis"
+			}
+		},
+		{
 			"name": "knowledge type",
 			"type": "choice",
 			"choices": ["statistical", "observational", "mechanistic"]
