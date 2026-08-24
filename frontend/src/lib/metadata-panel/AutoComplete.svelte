@@ -56,18 +56,32 @@
 		}
 	}
 
+	let controller: AbortController | undefined = undefined;
 	async function suggest() {
+		controller?.abort();
 		if (meta.value === "") {
 			suggestions = [];
 			selected = 0;
 		} else {
-			const res = await fetch(
-				`${apiBase}/metadata/suggest?kind=${meta.kind}&q=${encodeURIComponent(meta.value)}`,
-			);
-			const newSuggestions: string[] = await res.json();
-			const unique = new Set(newSuggestions);
-			suggestions = newSuggestions.filter((suggestion) => unique.delete(suggestion));
-			selected = Math.min(selected, Math.max(0, suggestions.length - 1));
+			const c = new AbortController();
+			controller = c;
+			try {
+				const res = await fetch(
+					`${apiBase}/metadata/suggest?kind=${meta.kind}&q=${encodeURIComponent(meta.value)}`,
+					{
+						signal: c.signal,
+					},
+				);
+				const newSuggestions: string[] = await res.json();
+				const unique = new Set(newSuggestions);
+				suggestions = newSuggestions.filter((suggestion) => unique.delete(suggestion));
+				selected = Math.min(selected, Math.max(0, suggestions.length - 1));
+			} catch (e) {
+				if (!c.signal.aborted) {
+					/* eslint-disable-next-line no-console */
+					console.error(e);
+				}
+			}
 		}
 	}
 
