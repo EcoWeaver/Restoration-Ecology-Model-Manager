@@ -610,9 +610,7 @@ func getModelGraphFromDB(ctx context.Context, conn *pgx.Conn, modelUUID string) 
 		FROM
 			nodes
 		WHERE
-			nodes.model_id = $1
-		ORDER BY
-			nodes.ord`
+			nodes.model_id = $1`
 
 	rows, err := conn.Query(ctx, query, modelUUID)
 	if err != nil {
