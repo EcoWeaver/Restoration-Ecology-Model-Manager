@@ -75,9 +75,6 @@
 			"type": "date"
 		},
 		{
-			"name": "related identifier"
-		},
-		{
 			"name": "description"
 		},
 		{
@@ -98,6 +95,11 @@
 			"choices": ["Local", "Regional", "Global"]
 		},
 		{
+			"name": "temporal scale",
+			"type": "choice",
+			"choices": ["Short-Term", "Long-Term", "Seasonal", "Event-based"]
+		},
+		{
 			"name": "target species",
 			"type": "species"
 		},
@@ -111,9 +113,27 @@
 			}
 		},
 		{
-			"name": "knowledge type",
+			"name": "process",
+			"type": "ols4",
+			"onto": {
+				"onto": "envo",
+				"iri": "http://purl.obolibrary.org/obo/BFO_0000015",
+				"label": "process"
+			}
+		},
+		{
+			"name": "characteristic",
+			"type": "ols4",
+			"onto": {
+				"onto": "oba",
+				"iri": "http://purl.obolibrary.org/obo/BFO_0000020",
+				"label": "characteristic"
+			}
+		},
+		{
+			"name": "knowledge level",
 			"type": "choice",
-			"choices": ["statistical", "observational", "mechanistic"]
+			"choices": ["statistical", "observational"]
 		}
 	],
 	"optional": [
@@ -124,9 +144,6 @@
 		{
 			"name": "language",
 			"type": "ietf-bcp-47"
-		},
-		{
-			"name": "alternate identifier"
 		},
 		{
 			"name": "size"
@@ -155,14 +172,6 @@
 		{
 			"name": "funding reference",
 			"type": "url"
-		},
-		{
-			"name": "related item"
-		},
-		{
-			"name": "temporal scale",
-			"type": "choice",
-			"choices": ["Short-Term", "Long-Term", "Seasonal", "Event-based"]
 		},
 		{
 			"name": "programming language",

@@ -2,6 +2,9 @@
 	"mandatory": [],
 	"recommended": [
 		{
+			"name": "geolocation"
+		},
+		{
 			"name": "ecological domain",
 			"type": "ols4",
 			"onto": {
@@ -9,6 +12,16 @@
 				"iri": "http://purl.obolibrary.org/obo/ENVO_00000428",
 				"label": "biome"
 			}
+		},
+		{
+			"name": "spatial scale",
+			"type": "choice",
+			"choices": ["Local", "Regional", "Global"]
+		},
+		{
+			"name": "temporal scale",
+			"type": "choice",
+			"choices": ["Short-Term", "Long-Term", "Seasonal", "Event-based"]
 		},
 		{
 			"name": "target species",
