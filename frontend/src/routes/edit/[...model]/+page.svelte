@@ -11,7 +11,7 @@
 	import { beforeNavigate, goto } from "$app/navigation";
 	import Alert from "$lib/Alert.svelte";
 	import { untrack } from "svelte";
-	import UuidInput from "$lib/metadata-panel/UuidInput.svelte";
+	import UuidInput from "$lib/metadata/UuidInput.svelte";
 
 	let { data } = $props();
 

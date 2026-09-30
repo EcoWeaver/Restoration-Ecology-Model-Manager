@@ -3,18 +3,12 @@
 	import Graph from "$lib/Graph.svelte";
 	import type { Edge, Node } from "$lib/model";
 	import PanelComponent from "$lib/graph/PanelComponent.svelte";
-	import { useElements, type Metadata, type MetadataElement } from "./api";
+	import { useElements, type Metadata } from "./api";
 	import Header from "./Header.svelte";
 	import { type XYPosition, useStore, useSvelteFlow, useUpdateNodeInternals } from "@xyflow/svelte";
 	import { History } from "./graph/history.svelte";
-	import DoiInput from "./metadata-panel/DoiInput.svelte";
-	import DateInput from "./metadata-panel/DateInput.svelte";
-	import OrcidInput from "./metadata-panel/OrcidInput.svelte";
-	import Input from "./metadata-panel/Input.svelte";
-	import YearInput from "./metadata-panel/YearInput.svelte";
-	import AutoComplete from "./metadata-panel/AutoComplete.svelte";
 	import { untrack, type Snippet } from "svelte";
-	import UuidInput from "./metadata-panel/UuidInput.svelte";
+	import MetadataInput from "./metadata/MetadataInput.svelte";
 
 	let {
 		metadata = $bindable(),
@@ -90,11 +84,6 @@
 		}
 	}
 
-	const flatMetadata = new Map<string, Omit<MetadataElement, "name">>();
-	for (const { name, type, choices, onto } of Object.values(getMetadataElements()).flat()) {
-		flatMetadata.set(name, { type, choices, onto });
-	}
-
 	const panelEntries: (Metadata & { mandatory: boolean })[] = $state([]);
 
 	const initialMetadata = $state.snapshot(metadata);
@@ -156,8 +145,6 @@
 					<div class="table-cell px-2 py-1 font-bold select-text">value</div>
 				</div>
 				{#each panelEntries as m, idx (idx)}
-					{@const { type, choices, onto } = flatMetadata.get(m.kind) || {}}
-
 					<div class="table-row">
 						<div class="table-cell align-middle">
 							{#if m.mandatory}
@@ -181,52 +168,7 @@
 						</div>
 
 						<div class="table-cell py-0.75 pl-2">
-							{#if m.kind === ""}
-								<Input value="" disabled placeholder="-- select a kind --" />
-							{:else if type === "bioportal"}
-								<AutoComplete
-									placeholder={`subclass of '${onto!.label}' in ontology '${onto!.onto}'`}
-									bind:meta={panelEntries[idx]}
-								/>
-							{:else if type === "choice"}
-								<select
-									bind:value={m.value}
-									title={m.value}
-									class="field-sizing-content h-8 w-full cursor-pointer rounded border border-neutral-600 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
-									required
-								>
-									<option class="hidden" value="" disabled selected>-- select an option --</option>
-									{#each choices! as choice (choice)}
-										<option class="cursor-pointer dark:bg-neutral-700" value={choice}>
-											{choice}
-										</option>
-									{/each}
-								</select>
-							{:else if type === "date"}
-								<DateInput bind:value={m.value} />
-							{:else if type === "doi"}
-								<DoiInput bind:value={m.value} />
-							{:else if type === "ols4"}
-								<AutoComplete
-									placeholder={`subclass of '${onto!.label}' in ontology '${onto!.onto}'`}
-									bind:meta={panelEntries[idx]}
-								/>
-							{:else if type === "orcid"}
-								<OrcidInput bind:value={m.value} />
-							{:else if type === "species"}
-								<AutoComplete placeholder={type} bind:meta={panelEntries[idx]} />
-							{:else if type === "url"}
-								<Input placeholder={type} bind:value={m.value} type="url" />
-							{:else if type === "uuid"}
-								<UuidInput bind:value={m.value} />
-							{:else if type === "year"}
-								<YearInput {type} bind:value={m.value} />
-							{:else}
-								<textarea
-									class="field-sizing-content min-h-8 w-full max-w-lg rounded border border-neutral-600 py-1 pr-2 pl-3 outline-indigo-400 focus-visible:outline-2"
-									rows="1"
-									bind:value={m.value}></textarea>
-							{/if}
+							<MetadataInput bind:meta={panelEntries[idx]} />
 						</div>
 
 						{#if !m.mandatory}
