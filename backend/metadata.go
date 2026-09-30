@@ -60,7 +60,7 @@ func (self *MetadataElement) verify(l *slog.Logger) error {
 		self.Choices = []string{}
 	}
 
-	if self.Type == "ols4" {
+	if self.Type == "ols4" || self.Type == "bioportal" {
 		if self.Onto == nil {
 			return fmt.Errorf("missing ontology for metadata kind '%s'", self.Name)
 		} else if _, err := url.ParseRequestURI(self.Onto.IRI); err != nil {
