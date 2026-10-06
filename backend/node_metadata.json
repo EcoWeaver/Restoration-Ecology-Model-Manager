@@ -58,6 +58,10 @@
 	"optional": [
 		{
 			"name": "description"
+		},
+		{
+			"name": "derived from",
+			"type": "uuid"
 		}
 	]
 }
