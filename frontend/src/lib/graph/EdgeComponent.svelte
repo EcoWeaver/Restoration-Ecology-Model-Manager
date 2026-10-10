@@ -96,10 +96,13 @@
 		const source = sourceNode.current!;
 		const target = targetNode.current!;
 
-		const sourceX = source.internals.positionAbsolute.x + source.measured.width! / 2;
-		const sourceY = source.internals.positionAbsolute.y + source.measured.height! / 2;
-		const targetX = target.internals.positionAbsolute.x + target.measured.width! / 2;
-		const targetY = target.internals.positionAbsolute.y + target.measured.height! / 2;
+		const sourceNodeX = source.internals.positionAbsolute.x + source.measured.width! / 2;
+		const sourceNodeY = source.internals.positionAbsolute.y + source.measured.height! / 2;
+		const targetNodeX = target.internals.positionAbsolute.x + target.measured.width! / 2;
+		const targetNodeY = target.internals.positionAbsolute.y + target.measured.height! / 2;
+
+		const { x: sourceX, y: sourceY } = nodeIntersection(source, { x: targetNodeX, y: targetNodeY });
+		const { x: targetX, y: targetY } = nodeIntersection(target, { x: sourceNodeX, y: sourceNodeY });
 
 		const middleX = (sourceX + targetX) / 2;
 		const middleY = (sourceY + targetY) / 2;
