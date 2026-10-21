@@ -20,13 +20,17 @@ type HotReload[T Verify] struct {
 }
 
 func (self *HotReload[T]) Get(l *slog.Logger) (*T, error) {
+	self.lock.Lock()
+	defer self.lock.Unlock()
+
+	if time.Since(self.lastMtime) < time.Second {
+		return &self.cached, nil
+	}
+
 	fi, err := os.Stat(self.path)
 	if err != nil {
 		return nil, err
 	}
-
-	self.lock.Lock()
-	defer self.lock.Unlock()
 
 	mtime := fi.ModTime()
 	if time.Time.Equal(mtime, self.lastMtime) {
