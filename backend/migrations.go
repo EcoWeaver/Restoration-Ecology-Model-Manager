@@ -10,6 +10,20 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+func (self *State) runMigrations(ctx context.Context, l *slog.Logger) error {
+	migrations := []func(context.Context, pgx.Tx) error{
+		schema, migrateModelsGraphJSON, migrateModelsParent, migrateRelationMetadataAddOrd,
+	}
+
+	for _, migration := range migrations {
+		if err := self.runMigration(ctx, migration, l); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (self *State) runMigration(ctx context.Context, f func(context.Context, pgx.Tx) error, l *slog.Logger) error {
 	id := runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 

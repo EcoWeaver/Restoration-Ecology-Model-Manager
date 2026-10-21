@@ -1,4 +1,4 @@
-import { apiBase, type GetModelResult } from "$lib/api";
+import { apiBase, type Model } from "$lib/api";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
@@ -8,6 +8,6 @@ export const load: PageLoad = async ({ fetch, params }) => {
 		return error(res.status, await res.json());
 	}
 
-	const model: GetModelResult = await res.json();
-	return { model };
+	const model: Model = await res.json();
+	return { uuid: params.model, model };
 };

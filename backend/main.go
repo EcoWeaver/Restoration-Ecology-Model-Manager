@@ -65,26 +65,14 @@ func main() {
 		NoVerifyReq:      noVerifyReq,
 	}
 
-	if err := state.runMigration(context.Background(), schema, e.Logger); err != nil {
+	if err := state.runMigrations(context.Background(), e.Logger); err != nil {
 		panic(err)
 	}
 
-	if err := state.runMigration(context.Background(), migrateModelsGraphJSON, e.Logger); err != nil {
-		panic(err)
-	}
-
-	if err := state.runMigration(context.Background(), migrateModelsParent, e.Logger); err != nil {
-		panic(err)
-	}
-
-	if err := state.runMigration(context.Background(), migrateRelationMetadataAddOrd, e.Logger); err != nil {
-		panic(err)
-	}
-
-	e.GET("/metadata/suggest", state.GetMetadataSuggest)
 	e.GET("/metadata/model", state.GetMetadataModel)
 	e.GET("/metadata/node", state.GetMetadataNode)
 	e.GET("/metadata/relation", state.GetMetadataRelation)
+	e.GET("/metadata/suggest", state.GetMetadataSuggest)
 
 	e.GET("/model", state.GetModel)
 	e.PUT("/model", state.PutModel)

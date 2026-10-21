@@ -15,9 +15,8 @@
 
 	const { getMetadataElements } = useElements();
 
-	let { model } = $derived(data);
-	const { uuid } = $derived(model);
-	let { graph, metadata } = $derived(model.model);
+	let { uuid, model } = $derived(data);
+	let { graph, metadata } = $derived(model);
 	let { nodes, edges } = $derived(apiToFlow(graph, false));
 	const title = $derived(metadata.find(({ kind }) => kind === "title")!.value);
 
@@ -46,7 +45,7 @@
 	}
 
 	async function copyId() {
-		await navigator.clipboard.writeText(model.uuid);
+		await navigator.clipboard.writeText(uuid);
 		alert.info("model id copied to clipboard");
 	}
 </script>

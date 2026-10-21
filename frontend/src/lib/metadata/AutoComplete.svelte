@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { apiBase, type Metadata } from "$lib/api";
+	import { req, type Metadata } from "$lib/api";
 	import Input from "./Input.svelte";
 
 	let {
@@ -66,13 +66,12 @@
 			const c = new AbortController();
 			controller = c;
 			try {
-				const res = await fetch(
-					`${apiBase}/metadata/suggest?kind=${meta.kind}&q=${encodeURIComponent(meta.value)}`,
-					{
-						signal: c.signal,
-					},
+				const newSuggestions = await req<string[]>(
+					"GET",
+					`metadata/suggest?kind=${meta.kind}&q=${encodeURIComponent(meta.value)}`,
+					undefined,
+					c.signal,
 				);
-				const newSuggestions: string[] = await res.json();
 				const unique = new Set(newSuggestions);
 				suggestions = newSuggestions.filter((suggestion) => unique.delete(suggestion));
 				selected = Math.min(selected, Math.max(0, suggestions.length - 1));

@@ -3,10 +3,16 @@ import { createContext } from "svelte";
 
 export const apiBase = env.PUBLIC_API_URL || "http://localhost:8080";
 
-export async function req<T>(method: string, path: string, body?: unknown): Promise<T> {
+export async function req<T>(
+	method: string,
+	path: string,
+	body?: unknown,
+	signal?: AbortSignal,
+): Promise<T> {
 	const res = await fetch(`${apiBase}/${path}`, {
 		method,
 		body: body === undefined ? undefined : JSON.stringify(body),
+		signal,
 	});
 
 	if (res.ok) {
@@ -26,25 +32,6 @@ export const [useElements, setElements] = createContext<{
 
 export type BackendError = {
 	message: string;
-};
-
-export type GetModelResult = {
-	uuid: string;
-	uploaded: string;
-	model: Model;
-};
-
-export type PutModelRequest = {
-	model: Model;
-};
-
-export type PutModelResult = {
-	uuid: string;
-};
-
-export type PostSearchrequest = {
-	metadata: Metadata[];
-	nodeBodies: string[];
 };
 
 export type PostSearchResult = {

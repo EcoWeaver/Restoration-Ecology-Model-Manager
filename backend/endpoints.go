@@ -33,31 +33,10 @@ type State struct {
 	BioPortalAPIKey  string
 }
 
-type GetModelResult struct {
-	UUID     string      `json:"uuid"`
-	Uploaded time.Time   `json:"uploaded"`
-	Model    types.Model `json:"model"`
-}
-
-type PutModelRequest struct {
-	Model types.Model `json:"model"`
-}
-
-type PutModelResult struct {
-	UUID string `json:"uuid"`
-}
-
 type PostModelRunRequest struct {
 	UUID            string                 `json:"uuid"`
 	NodeValues      map[int]float64        `json:"nodeValues"`
 	RelationWeights []types.RelationWeight `json:"relationWeights"`
-}
-
-type PostModelRunResult []float64
-
-type PostSearchRequest struct {
-	Metadata   []types.Metadata `json:"modelMetadata"`
-	NodeBodies []string         `json:"nodeBodies"`
 }
 
 type PostSearchResult struct {
@@ -66,6 +45,48 @@ type PostSearchResult struct {
 	Identifier string    `json:"identifier"`
 	Title      string    `json:"title"`
 	ModelType  string    `json:"modelType"`
+}
+
+// @Summary		Get the model metadata
+// @Description	Gets the list of currently accepted model metadata kinds, types and obligations.
+// @Produce		json
+// @Success		200				{object}	MetadataConfig
+// @Failure		500				{object}	echo.HTTPError
+// @Router		/metadata/model	[get]
+func (self *State) GetMetadataModel(c *echo.Context) error {
+	m, err := self.ModelMetadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, m)
+}
+
+// @Summary		Get the node metadata
+// @Description	Gets the list of currently accepted node metadata kinds, types and obligations.
+// @Produce		json
+// @Success		200				{object}	MetadataConfig
+// @Failure		500				{object}	echo.HTTPError
+// @Router		/metadata/node	[get]
+func (self *State) GetMetadataNode(c *echo.Context) error {
+	m, err := self.NodeMetadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, m)
+}
+
+// @Summary		Get the relation metadata
+// @Description	Gets the list of currently accepted relation metadata kinds, types and obligations.
+// @Produce		json
+// @Success		200					{object}	MetadataConfig
+// @Failure		500					{object}	echo.HTTPError
+// @Router		/metadata/relation	[get]
+func (self *State) GetMetadataRelation(c *echo.Context) error {
+	m, err := self.RelationMetadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, m)
 }
 
 // @Summary		Get metadata suggestions
@@ -159,53 +180,11 @@ func (self *State) GetMetadataSuggest(c *echo.Context) error {
 	return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered invalid or non-completable metadata kind '%s'", kind)})
 }
 
-// @Summary		Get the model metadata
-// @Description	Gets the list of currently accepted model metadata kinds, types and obligations.
-// @Produce		json
-// @Success		200				{object}	MetadataConfig
-// @Failure		500				{object}	echo.HTTPError
-// @Router		/metadata/model	[get]
-func (self *State) GetMetadataModel(c *echo.Context) error {
-	m, err := self.ModelMetadata.Get(c.Logger())
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, m)
-}
-
-// @Summary		Get the node metadata
-// @Description	Gets the list of currently accepted node metadata kinds, types and obligations.
-// @Produce		json
-// @Success		200				{object}	MetadataConfig
-// @Failure		500				{object}	echo.HTTPError
-// @Router		/metadata/node	[get]
-func (self *State) GetMetadataNode(c *echo.Context) error {
-	m, err := self.NodeMetadata.Get(c.Logger())
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, m)
-}
-
-// @Summary		Get the relation metadata
-// @Description	Gets the list of currently accepted relation metadata kinds, types and obligations.
-// @Produce		json
-// @Success		200					{object}	MetadataConfig
-// @Failure		500					{object}	echo.HTTPError
-// @Router		/metadata/relation	[get]
-func (self *State) GetMetadataRelation(c *echo.Context) error {
-	m, err := self.RelationMetadata.Get(c.Logger())
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, m)
-}
-
 // @Summary		Get a model
 // @Description	Gets a model by its UUID.
 // @Produce		json
 // @Param		uuid	query		string	true	"uuid"
-// @Success		200		{object}	GetModelResult
+// @Success		200		{object}	types.Model
 // @Failure		400		{object}	echo.HTTPError
 // @Failure		404		{object}	echo.HTTPError
 // @Failure		500		{object}	echo.HTTPError
@@ -218,22 +197,13 @@ func (self *State) GetModel(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	query := `
-		SELECT
-			models.uploaded
-		FROM
-			models
-		WHERE
-			models.model_id = $1`
-
 	conn, err := self.DBPool.Acquire(ctx)
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
 
-	var uploaded time.Time
-	if err = conn.QueryRow(ctx, query, modelUUID).Scan(&uploaded); err != nil {
+	if err := checkModelExistsInDB(ctx, conn.Conn(), modelUUID); err != nil {
 		if err == pgx.ErrNoRows {
 			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' not found", modelUUID)})
 		} else {
@@ -252,15 +222,15 @@ func (self *State) GetModel(c *echo.Context) error {
 		}
 	}()
 
-	return c.JSON(http.StatusOK, GetModelResult{modelUUID, uploaded, model})
+	return c.JSON(http.StatusOK, model)
 }
 
 // @Summary		Save a model
-// @Description	Saves a model. Returns the UUID assigned to that model.
+// @Description	Saves a model, returning the UUID assigned to that model.
 // @Accept		json
 // @Produce		json
-// @Param		model	body		PutModelRequest	true	"model"
-// @Success		201		{object}	PutModelResult
+// @Param		model	body		types.Model		true	"model"
+// @Success		201		{object}	string
 // @Failure		400		{object}	echo.HTTPError
 // @Failure		409		{object}	echo.HTTPError
 // @Failure		500		{object}	echo.HTTPError
@@ -273,7 +243,7 @@ func (self *State) PutModel(c *echo.Context) error {
 		return err
 	}
 
-	var m PutModelRequest
+	var m types.Model
 	if err = json.Unmarshal(body, &m); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
@@ -284,7 +254,7 @@ func (self *State) PutModel(c *echo.Context) error {
 	}
 	defer conn.Rollback(ctx)
 
-	if err = verifyModel(m.Model, self, c.Logger(), ctx, conn.Conn()); err != nil {
+	if err = verifyModel(m, self, c.Logger(), ctx, conn.Conn()); err != nil {
 		if _, ok := err.(types.Error); ok {
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
@@ -294,17 +264,16 @@ func (self *State) PutModel(c *echo.Context) error {
 
 	query := `
 		INSERT INTO
-			models
-		DEFAULT VALUES
+			models DEFAULT VALUES
 		RETURNING
-			model_id`
+			models.model_id`
 
-	var res PutModelResult
-	if err = conn.QueryRow(ctx, query).Scan(&res.UUID); err != nil {
+	var modelUUID string
+	if err = conn.QueryRow(ctx, query).Scan(&modelUUID); err != nil {
 		return err
 	}
 
-	if err = insertModelIntoDB(ctx, conn, res.UUID, m.Model); err != nil {
+	if err = insertModelIntoDB(ctx, conn, modelUUID, m); err != nil {
 		return err
 	}
 
@@ -312,176 +281,15 @@ func (self *State) PutModel(c *echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, res)
-}
-
-// @Summary		Get the relations
-// @Description	Gets the list of currently accepted relation kinds and types.
-// @Produce		json
-// @Success		200			{object}	RelationsConfig
-// @Failure		500			{object}	echo.HTTPError
-// @Router		/relations	[get]
-func (self *State) GetRelations(c *echo.Context) error {
-	r, err := self.Relations.Get(c.Logger())
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, r)
-}
-
-// @Summary		Search for models
-// @Description	Searches for models that match at least one of the provided queries per metadata kind.
-// @Accept		json
-// @Produce		json
-// @Param		queries	body		PostSearchRequest	true	"queries"
-// @Success		200		{object}	[]PostSearchResult
-// @Failure		400		{object}	echo.HTTPError
-// @Failure		500		{object}	echo.HTTPError
-// @Router		/search	[post]
-func (self *State) PostSearch(c *echo.Context) error {
-	ctx := c.Request().Context()
-
-	body, err := io.ReadAll(c.Request().Body)
-	if err != nil {
-		return err
-	}
-
-	var r PostSearchRequest
-	if err = json.Unmarshal(body, &r); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
-	}
-
-	m, err := self.ModelMetadata.Get(c.Logger())
-	if err != nil {
-		return err
-	}
-
-	qs := map[string][]string{}
-	for _, mq := range r.Metadata {
-		if _, ok := qs[mq.Kind]; !ok && !m.IsMetadataKind(mq.Kind) {
-			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered invalid metadata kind '%s'", mq.Kind)})
-		}
-		qs[mq.Kind] = append(qs[mq.Kind], mq.Value)
-	}
-
-	query := `
-		SELECT
-			models.model_id,
-			models.uploaded,
-			MAX(CASE WHEN model_metadata.kind = 'identifier' THEN model_metadata.value END),
-			MAX(CASE WHEN model_metadata.kind = 'title' THEN model_metadata.value END),
-			MAX(CASE WHEN model_metadata.kind = 'model type' THEN model_metadata.value END)
-		FROM
-			models
-			JOIN model_metadata ON models.model_id = model_metadata.model_id`
-
-	var args []any
-	if len(qs) != 0 {
-		var conds []string
-		for k, v := range qs {
-			args = append(args, k)
-			conj := fmt.Sprintf("(model_metadata.kind = $%d AND (", len(args))
-
-			var disj []string
-			for _, ve := range v {
-				args = append(args, "%"+ve+"%")
-				disj = append(disj, fmt.Sprintf("model_metadata.value ILIKE $%d", len(args)))
-			}
-
-			conds = append(conds, conj+strings.Join(disj, " OR ")+"))")
-		}
-
-		innerQuery := `
-				SELECT
-					models.model_id
-				FROM
-					models
-					JOIN model_metadata ON models.model_id = model_metadata.model_id
-				WHERE
-					` + strings.Join(conds, `
-					OR `)
-
-		if len(qs) != 1 {
-			args = append(args, len(qs))
-
-			innerQuery += fmt.Sprintf(`
-				GROUP BY
-					models.model_id
-				HAVING
-					COUNT(DISTINCT model_metadata.kind) = $%d`, len(args))
-		}
-
-		query += `
-		WHERE
-			models.model_id IN (` + innerQuery + `
-			)`
-	}
-
-	if len(r.NodeBodies) != 0 {
-		var disj []string
-		for _, ve := range r.NodeBodies {
-			args = append(args, "%"+ve+"%")
-			disj = append(disj, fmt.Sprintf("nodes.body ILIKE $%d", len(args)))
-		}
-
-		innerQuery := `
-				SELECT
-					models.model_id
-				FROM
-					models
-					JOIN nodes ON models.model_id = nodes.model_id
-				WHERE
-					` + strings.Join(disj, " OR ")
-
-		if len(qs) != 0 {
-			query += `
-		AND`
-		} else {
-			query += `
-		WHERE`
-		}
-
-		query += `
-			models.model_id IN (` + innerQuery + `
-			)`
-	}
-
-	query += `
-		GROUP BY
-			models.model_id,
-			models.uploaded`
-
-	conn, err := self.DBPool.Acquire(ctx)
-	if err != nil {
-		return err
-	}
-	defer conn.Release()
-
-	rows, err := conn.Query(ctx, query, args...)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	var sr PostSearchResult
-	var res []PostSearchResult
-	_, err = pgx.ForEachRow(rows, []any{&sr.UUID, &sr.Uploaded, &sr.Identifier, &sr.Title, &sr.ModelType}, func() error {
-		res = append(res, sr)
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusCreated, modelUUID)
 }
 
 // @Summary		Run a model
-// @Description	Runs a model with provided initial states and edge transfer functions.
+// @Description	Runs a model with provided initial states and edge transfer functions, returning the resulting states.
 // @Accept		json
 // @Produce		json
 // @Param		state		body		PostModelRunRequest	true	"state"
-// @Success		200			{object}	PostModelRunResult
+// @Success		200			{object}	[]float64
 // @Failure		400			{object}	echo.HTTPError
 // @Failure		404			{object}	echo.HTTPError
 // @Failure		500			{object}	echo.HTTPError
@@ -509,8 +317,7 @@ func (self *State) PostModelRun(c *echo.Context) error {
 	}
 	defer conn.Release()
 
-	var one int
-	if err := conn.QueryRow(ctx, "SELECT 1 FROM models WHERE models.model_id = $1", mr.UUID).Scan(&one); err != nil {
+	if err := checkModelExistsInDB(ctx, conn.Conn(), mr.UUID); err != nil {
 		if err == pgx.ErrNoRows {
 			return c.JSON(http.StatusNotFound, echo.HTTPError{Message: fmt.Sprintf("model with uuid '%s' not found", mr.UUID)})
 		} else {
@@ -545,7 +352,7 @@ func (self *State) PostModelRun(c *echo.Context) error {
 // @Description	Verifies whether a model and its metadata are valid and complete.
 // @Accept		json
 // @Produce		json
-// @Param		model			body		PutModelRequest	true	"model"
+// @Param		model			body		types.Model		true	"model"
 // @Failure		400				{object}	echo.HTTPError
 // @Failure		409				{object}	echo.HTTPError
 // @Failure		500				{object}	echo.HTTPError
@@ -558,12 +365,12 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 		return err
 	}
 
-	var m PutModelRequest
+	var m types.Model
 	if err = json.Unmarshal(body, &m); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 	}
 
-	if err = verifyModel(m.Model, self, c.Logger(), ctx, nil); err != nil {
+	if err = verifyModel(m, self, c.Logger(), ctx, nil); err != nil {
 		if _, ok := err.(types.Error); ok {
 			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
 		} else {
@@ -572,6 +379,136 @@ func (self *State) PostModelVerify(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, struct{}{})
+}
+
+// @Summary		Get the relations
+// @Description	Gets the list of currently accepted relation kinds and types.
+// @Produce		json
+// @Success		200			{object}	RelationsConfig
+// @Failure		500			{object}	echo.HTTPError
+// @Router		/relations	[get]
+func (self *State) GetRelations(c *echo.Context) error {
+	r, err := self.Relations.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, r)
+}
+
+// @Summary		Search for models
+// @Description	Searches for models that match at least one of the provided queries per metadata kind.
+// @Accept		json
+// @Produce		json
+// @Param		queries	body		[]types.Metadata	true	"queries"
+// @Success		200		{object}	[]PostSearchResult
+// @Failure		400		{object}	echo.HTTPError
+// @Failure		500		{object}	echo.HTTPError
+// @Router		/search	[post]
+func (self *State) PostSearch(c *echo.Context) error {
+	ctx := c.Request().Context()
+
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		return err
+	}
+
+	var mqs []types.Metadata
+	if err = json.Unmarshal(body, &mqs); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: err.Error()})
+	}
+
+	m, err := self.ModelMetadata.Get(c.Logger())
+	if err != nil {
+		return err
+	}
+
+	qs := map[string][]string{}
+	for _, mq := range mqs {
+		if _, ok := qs[mq.Kind]; !ok && !m.IsMetadataKind(mq.Kind) {
+			return c.JSON(http.StatusBadRequest, echo.HTTPError{Message: fmt.Sprintf("encountered invalid metadata kind '%s'", mq.Kind)})
+		}
+		qs[mq.Kind] = append(qs[mq.Kind], mq.Value)
+	}
+
+	query := `
+		SELECT
+			models.model_id,
+			models.uploaded,
+			MAX(CASE WHEN model_metadata.kind = 'identifier' THEN model_metadata.value END),
+			MAX(CASE WHEN model_metadata.kind = 'title' THEN model_metadata.value END),
+			MAX(CASE WHEN model_metadata.kind = 'model type' THEN model_metadata.value END)
+		FROM
+			models JOIN model_metadata ON models.model_id = model_metadata.model_id`
+
+	var args []any
+	if len(qs) != 0 {
+		var conds []string
+		for k, v := range qs {
+			args = append(args, k)
+			conj := fmt.Sprintf("(model_metadata.kind = $%d AND (", len(args))
+
+			var disj []string
+			for _, ve := range v {
+				args = append(args, "%"+ve+"%")
+				disj = append(disj, fmt.Sprintf("model_metadata.value ILIKE $%d", len(args)))
+			}
+
+			conds = append(conds, conj+strings.Join(disj, " OR ")+"))")
+		}
+
+		innerQuery := `
+				SELECT
+					models.model_id
+				FROM
+					models JOIN model_metadata ON models.model_id = model_metadata.model_id
+				WHERE
+					` + strings.Join(conds, `
+					OR `)
+
+		if len(qs) != 1 {
+			args = append(args, len(qs))
+
+			innerQuery += fmt.Sprintf(`
+				GROUP BY
+					models.model_id
+				HAVING
+					COUNT(DISTINCT model_metadata.kind) = $%d`, len(args))
+		}
+
+		query += `
+		WHERE
+			models.model_id IN (` + innerQuery + `
+			)`
+	}
+
+	query += `
+		GROUP BY
+			models.model_id,
+			models.uploaded`
+
+	conn, err := self.DBPool.Acquire(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var sr PostSearchResult
+	var res []PostSearchResult
+	_, err = pgx.ForEachRow(rows, []any{&sr.UUID, &sr.Uploaded, &sr.Identifier, &sr.Title, &sr.ModelType}, func() error {
+		res = append(res, sr)
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 func checkModelExistsInDB(ctx context.Context, conn *pgx.Conn, modelUUID string) error {

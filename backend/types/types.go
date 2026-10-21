@@ -61,6 +61,8 @@ type Coefficient struct {
 
 type Error struct{ E error }
 
+var _ error = *new(Error)
+
 func (self Error) Error() string {
 	return self.E.Error()
 }

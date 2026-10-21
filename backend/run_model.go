@@ -53,17 +53,17 @@ outer:
 	return s, nil
 }
 
-func (self ModelRunState) Run() (PostModelRunResult, error) {
+func (self ModelRunState) Run() ([]float64, error) {
 	for _, node := range self {
 		if node.Indegree == 0 {
 			node.recurseKahn()
 		}
 	}
 
-	var res PostModelRunResult
+	var res []float64
 	for _, node := range self {
 		if node.Indegree != -1 {
-			return PostModelRunResult{}, types.Error{E: errors.New("encountered cycle in graph")}
+			return []float64{}, types.Error{E: errors.New("encountered cycle in graph")}
 		}
 		res = append(res, node.Value+node.Change)
 	}

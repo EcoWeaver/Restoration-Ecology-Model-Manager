@@ -6,7 +6,7 @@
 	import { deleteLocalModel, setLocalModel } from "$lib/local.js";
 	import { Check, CheckLine, Merge, Plus, Upload, X } from "@lucide/svelte";
 	import { clearNavigate, startNavigate } from "$lib/LoadingSpinner.svelte";
-	import { req, type BackendError, type GetModelResult, type PutModelResult } from "$lib/api";
+	import { req, type BackendError, type Model } from "$lib/api";
 	import { resolve } from "$app/paths";
 	import { beforeNavigate, goto } from "$app/navigation";
 	import Alert from "$lib/Alert.svelte";
@@ -59,10 +59,8 @@
 		try {
 			startNavigate();
 			await req("POST", "model/verify", {
-				model: {
-					graph: flowToApi(nodes, edges),
-					metadata,
-				},
+				graph: flowToApi(nodes, edges),
+				metadata,
 			});
 			alert.info("model OK");
 			clearNavigate();
@@ -76,11 +74,12 @@
 	async function upload() {
 		try {
 			startNavigate();
-			const res = await req<PutModelResult>("PUT", "model", {
-				model: { graph: flowToApi(nodes, edges), metadata },
+			const res = await req<string>("PUT", "model", {
+				graph: flowToApi(nodes, edges),
+				metadata,
 			});
 			deleteLocalModel(page.params.model!);
-			await goto(resolve(`/view/${res.uuid}`));
+			await goto(resolve(`/view/${res}`));
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
@@ -89,7 +88,12 @@
 	}
 
 	let mergeUuid = $state("");
-	let mergeModels = $state<GetModelResult[]>([]);
+	let mergeModels = $state<
+		{
+			uuid: string;
+			model: Model;
+		}[]
+	>([]);
 
 	async function pushMerge() {
 		try {
@@ -97,7 +101,10 @@
 				return;
 			}
 			startNavigate();
-			mergeModels.push(await req<GetModelResult>("GET", `model?uuid=${mergeUuid}`));
+			mergeModels.push({
+				uuid: mergeUuid,
+				model: await req<Model>("GET", `model?uuid=${mergeUuid}`),
+			});
 			mergeUuid = "";
 			clearNavigate();
 		} catch (err: unknown) {
