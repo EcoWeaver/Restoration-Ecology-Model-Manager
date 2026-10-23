@@ -19,20 +19,7 @@
 			"type": "year"
 		},
 		{
-			"name": "resource type",
-			"type": "choice",
-			"choices": [
-				"Computational Notebook",
-				"Conference Paper",
-				"Data Paper",
-				"Dataset",
-				"Model",
-				"Research Paper",
-				"Software",
-				"Text",
-				"Service",
-				"Other"
-			]
+			"name": "resource type"
 		},
 		{
 			"name": "model type",
