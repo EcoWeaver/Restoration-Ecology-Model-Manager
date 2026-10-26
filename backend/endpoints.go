@@ -649,9 +649,7 @@ func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, 
 	var vals []string
 	for i, n := range g.Nodes {
 		args = append(args, i, n.Body, n.Color, n.Position.X, n.Position.Y)
-		vals = append(vals,
-			fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)", len(args)-4, len(args)-3, len(args)-2, len(args)-1, len(args)),
-		)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)", len(args)-4, len(args)-3, len(args)-2, len(args)-1, len(args)))
 	}
 
 	query := `
