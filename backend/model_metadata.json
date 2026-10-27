@@ -72,8 +72,8 @@
 			"type": "ols4",
 			"onto": {
 				"onto": "envo",
-				"iri": "http://purl.obolibrary.org/obo/ENVO_00000428",
-				"label": "biome"
+				"iri": "http://purl.obolibrary.org/obo/ENVO_01001110",
+				"label": "ecosystem"
 			}
 		},
 		{
