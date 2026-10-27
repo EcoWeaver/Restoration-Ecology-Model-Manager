@@ -50,8 +50,8 @@
 			"type": "ols4",
 			"onto": {
 				"onto": "oba",
-				"iri": "http://purl.obolibrary.org/obo/BFO_0000020",
-				"label": "characteristic"
+				"iri": "http://purl.obolibrary.org/obo/OBA_0000001",
+				"label": "biological attribute"
 			}
 		}
 	],
