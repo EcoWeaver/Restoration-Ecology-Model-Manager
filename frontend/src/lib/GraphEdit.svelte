@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Plus, X } from "@lucide/svelte";
-	import Graph from "$lib/Graph.svelte";
-	import type { Edge, Node } from "$lib/model";
-	import PanelComponent from "$lib/graph/PanelComponent.svelte";
+	import Graph from "#lib/Graph.svelte";
+	import type { Edge, Node } from "#lib/model.js";
+	import PanelComponent from "#lib/graph/PanelComponent.svelte";
 	import { useElements, type Metadata } from "./api";
 	import Header from "./Header.svelte";
 	import { type XYPosition, useStore, useSvelteFlow, useUpdateNodeInternals } from "@xyflow/svelte";

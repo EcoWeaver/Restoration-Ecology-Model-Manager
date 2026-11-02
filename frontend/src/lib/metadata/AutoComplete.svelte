@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { req, type Metadata } from "$lib/api";
+	import { req, type Metadata } from "#lib/api.js";
 	import Input from "./Input.svelte";
 
 	let {

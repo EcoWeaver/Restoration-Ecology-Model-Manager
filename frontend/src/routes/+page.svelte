@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Header from "$lib/Header.svelte";
-	import otto from "$lib/assets/otto.webp";
+	import Header from "#lib/Header.svelte";
+	import otto from "#lib/assets/otto.webp";
 </script>
 
 <svelte:head>

@@ -1,4 +1,4 @@
-import type { MetadataElements } from "$lib/api";
+import type { MetadataElements } from "#lib/api.js";
 
 export function metadataSuggest(
 	metadataElements: MetadataElements,

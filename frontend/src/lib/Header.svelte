@@ -25,7 +25,7 @@
 	<a
 		class="rounded-full outline-offset-4 outline-indigo-400 focus-visible:outline-2"
 		title="home"
-		href={resolve("/")}
+		href={resolve("")}
 	>
 		<House />
 	</a>
@@ -38,7 +38,7 @@
 		<a
 			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="view your local models"
-			href={resolve("/edit")}
+			href={resolve("edit")}
 		>
 			<List />
 			<div class="pl-2 select-none">your models</div>
@@ -49,7 +49,7 @@
 		<button
 			class="flex h-10 items-center rounded-md bg-indigo-300 px-3 outline-offset-2 outline-indigo-400 hover:bg-indigo-400 focus-visible:outline-2 dark:bg-indigo-500"
 			title="create new model"
-			onclick={() => goto(resolve(`/edit/${newLocalModel()}`))}
+			onclick={() => goto(resolve(`edit/${newLocalModel()}`))}
 		>
 			<Plus />
 			<div class="pl-2">model</div>

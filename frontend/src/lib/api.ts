@@ -1,7 +1,7 @@
-import { env } from "$env/dynamic/public";
+import { API_BASE } from "$app/env/public";
 import { createContext } from "svelte";
 
-export const apiBase = env.PUBLIC_API_URL || "http://localhost:8080";
+export const apiBase: string = API_BASE;
 
 export async function req<T>(
 	method: string,

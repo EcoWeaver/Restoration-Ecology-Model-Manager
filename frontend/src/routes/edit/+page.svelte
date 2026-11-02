@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Header from "$lib/Header.svelte";
-	import { deleteLocalModel, getLocalModels } from "$lib/local.js";
-	import SearchResults from "$lib/SearchResults.svelte";
+	import Header from "#lib/Header.svelte";
+	import { deleteLocalModel, getLocalModels } from "#lib/local.js";
+	import SearchResults from "#lib/SearchResults.svelte";
 
 	function placeholder<T extends Record<string, string>>(obj: T): T {
 		return Object.fromEntries(

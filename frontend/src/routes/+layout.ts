@@ -1,4 +1,4 @@
-import { apiBase, type MetadataElements, type RelationElements } from "$lib/api";
+import { apiBase, type MetadataElements, type RelationElements } from "#lib/api.js";
 import { error } from "@sveltejs/kit";
 import type { LayoutLoad } from "./$types";
 

@@ -9,8 +9,8 @@
 		type EdgeProps,
 		type InternalNode,
 	} from "@xyflow/svelte";
-	import type { Edge } from "$lib/model";
-	import { cartesianToPolar, useElements, polarToCartesian, type Cartesian } from "$lib/api";
+	import type { Edge } from "#lib/model.js";
+	import { cartesianToPolar, useElements, polarToCartesian, type Cartesian } from "#lib/api.js";
 	import { Move, RotateCcw, Trash2 } from "@lucide/svelte";
 	import LineCap from "./LineCap.svelte";
 	import { untrack } from "svelte";

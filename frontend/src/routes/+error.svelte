@@ -23,7 +23,7 @@
 		<a
 			class="rounded-md bg-red-300 px-5 py-2.5 text-lg font-semibold outline-offset-2 outline-red-400 hover:bg-red-400 focus-visible:outline-2 dark:bg-red-500"
 			title="home"
-			href={resolve("/")}
+			href={resolve("")}
 		>
 			go home
 		</a>

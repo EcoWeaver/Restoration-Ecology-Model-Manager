@@ -1,8 +1,8 @@
 <script lang="ts">
 	import "../app.css";
 	import "../svelte-flow.css";
-	import LoadingSpinner from "$lib/LoadingSpinner.svelte";
-	import { setElements } from "$lib/api";
+	import LoadingSpinner from "#lib/LoadingSpinner.svelte";
+	import { setElements } from "#lib/api.js";
 
 	let { children, data } = $props();
 

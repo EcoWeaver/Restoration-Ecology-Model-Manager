@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { FingerprintPattern, Link, PencilLine } from "@lucide/svelte";
-	import Graph from "$lib/Graph.svelte";
-	import PanelComponent from "$lib/graph/PanelComponent.svelte";
-	import Header from "$lib/Header.svelte";
-	import Alert from "$lib/Alert.svelte";
-	import { apiToFlow } from "$lib/model";
+	import Graph from "#lib/Graph.svelte";
+	import PanelComponent from "#lib/graph/PanelComponent.svelte";
+	import Header from "#lib/Header.svelte";
+	import Alert from "#lib/Alert.svelte";
+	import { apiToFlow } from "#lib/model.js";
 	import { SvelteFlowProvider } from "@xyflow/svelte";
 	import { resolve } from "$app/paths";
-	import { newLocalModel } from "$lib/local.js";
+	import { newLocalModel } from "#lib/local.js";
 	import { goto } from "$app/navigation";
-	import { useElements, type MetadataType } from "$lib/api.js";
+	import { useElements, type MetadataType } from "#lib/api.js";
 
 	let { data } = $props();
 
@@ -36,7 +36,7 @@
 			],
 		});
 
-		await goto(resolve(`/edit/${localUUID}`));
+		await goto(resolve(`edit/${localUUID}`));
 	}
 
 	async function share() {
@@ -134,7 +134,7 @@
 								<a
 									class="table-cell max-w-lg py-1 pl-2 text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
 									target="_blank"
-									href={resolve(`/view/${value}`)}
+									href={resolve(`view/${value}`)}
 								>
 									{value}
 								</a>

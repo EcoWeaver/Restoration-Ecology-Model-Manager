@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from "$app/environment";
+	import { browser } from "$app/env";
 	import { resolve } from "$app/paths";
 	import { ChevronDown, ChevronUp, X } from "@lucide/svelte";
 	import type { PostSearchResult } from "./api";
@@ -154,7 +154,7 @@
 					{@const date = new Date(uploaded)}
 					<a
 						class="table-row border-b border-neutral-300 outline-indigo-400 last:border-none hover:bg-neutral-200 focus-visible:outline-2 dark:hover:bg-neutral-700"
-						href={resolve(`/${route}/${uuid}`)}
+						href={resolve(`${route}/${uuid}`)}
 						data-sveltekit-preload-data="tap"
 						data-sveltekit-preload-code="hover"
 					>

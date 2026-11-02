@@ -1,5 +1,5 @@
-import type { Polar } from "$lib/api";
-import { defaultEdgeOptions, type Edge, type Node } from "$lib/model";
+import type { Polar } from "#lib/api.js";
+import { defaultEdgeOptions, type Edge, type Node } from "#lib/model.js";
 import type { XYPosition } from "@xyflow/svelte";
 
 type Change =

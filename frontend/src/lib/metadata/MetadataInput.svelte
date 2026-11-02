@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useElements, type Metadata, type MetadataElement } from "$lib/api";
+	import { useElements, type Metadata, type MetadataElement } from "#lib/api.js";
 	import AutoComplete from "./AutoComplete.svelte";
 	import DateInput from "./DateInput.svelte";
 	import DoiInput from "./DoiInput.svelte";

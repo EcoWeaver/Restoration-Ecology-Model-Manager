@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { apiToFlow, flowToApi } from "$lib/model.js";
-	import GraphEdit from "$lib/GraphEdit.svelte";
+	import { apiToFlow, flowToApi } from "#lib/model.js";
+	import GraphEdit from "#lib/GraphEdit.svelte";
 	import { SvelteFlowProvider } from "@xyflow/svelte";
 	import { page } from "$app/state";
-	import { deleteLocalModel, setLocalModel } from "$lib/local.js";
+	import { deleteLocalModel, setLocalModel } from "#lib/local.js";
 	import { Check, CheckLine, Merge, Plus, Upload, X } from "@lucide/svelte";
-	import { clearNavigate, startNavigate } from "$lib/LoadingSpinner.svelte";
-	import { req, type BackendError, type Model } from "$lib/api";
+	import { clearNavigate, startNavigate } from "#lib/LoadingSpinner.svelte";
+	import { req, type BackendError, type Model } from "#lib/api.js";
 	import { resolve } from "$app/paths";
 	import { beforeNavigate, goto } from "$app/navigation";
-	import Alert from "$lib/Alert.svelte";
+	import Alert from "#lib/Alert.svelte";
 	import { untrack } from "svelte";
-	import UuidInput from "$lib/metadata/UuidInput.svelte";
+	import UuidInput from "#lib/metadata/UuidInput.svelte";
 
 	let { data } = $props();
 
@@ -79,7 +79,7 @@
 				metadata,
 			});
 			deleteLocalModel(page.params.model!);
-			await goto(resolve(`/view/${res}`));
+			await goto(resolve(`view/${res}`));
 		} catch (err: unknown) {
 			const error = err as BackendError;
 			alert.error(error.message);
@@ -194,7 +194,7 @@
 			<a
 				class="w-full text-blue-700 outline-indigo-400 select-text hover:underline focus-visible:outline-2 dark:text-blue-400"
 				target="_blank"
-				href={resolve(`/view/${mergeModel.uuid}`)}
+				href={resolve(`view/${mergeModel.uuid}`)}
 			>
 				{mergeModel.uuid}
 			</a>

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Header from "$lib/Header.svelte";
-	import type { ChipElement } from "$lib/search/Chip.svelte";
-	import SearchResults from "$lib/SearchResults.svelte";
+	import Header from "#lib/Header.svelte";
+	import type { ChipElement } from "#lib/search/Chip.svelte";
+	import SearchResults from "#lib/SearchResults.svelte";
 
 	let { data } = $props();
 

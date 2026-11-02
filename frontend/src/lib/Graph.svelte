@@ -14,7 +14,7 @@
 	} from "@xyflow/svelte";
 	import NodeComponent from "./graph/NodeComponent.svelte";
 	import EdgeComponent from "./graph/EdgeComponent.svelte";
-	import { type Node, type Edge, defaultEdgeOptions } from "$lib/model";
+	import { type Node, type Edge, defaultEdgeOptions } from "#lib/model.js";
 	import "@xyflow/svelte/dist/style.css";
 
 	let {

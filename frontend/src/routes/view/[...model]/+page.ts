@@ -1,4 +1,4 @@
-import { apiBase, type Model } from "$lib/api";
+import { apiBase, type Model } from "#lib/api.js";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 

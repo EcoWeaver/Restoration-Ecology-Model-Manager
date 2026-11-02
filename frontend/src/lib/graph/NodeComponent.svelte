@@ -8,7 +8,7 @@
 		useSvelteFlow,
 	} from "@xyflow/svelte";
 	import { Move, Palette, Trash2 } from "@lucide/svelte";
-	import type { Node } from "$lib/model";
+	import type { Node } from "#lib/model.js";
 	import { slide } from "svelte/transition";
 
 	const { id, data }: NodeProps<Node> = $props();

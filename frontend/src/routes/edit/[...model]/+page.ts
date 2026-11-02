@@ -1,4 +1,4 @@
-import { getLocalModel } from "$lib/local";
+import { getLocalModel } from "#lib/local.js";
 import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
