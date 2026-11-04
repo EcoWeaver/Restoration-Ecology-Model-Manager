@@ -57,7 +57,7 @@ func (self *MetadataElement) verify(l *slog.Logger) error {
 		}
 	} else if len(self.Choices) != 0 {
 		l.Warn(fmt.Sprintf("ignoring unnecessary choices for metadata kind '%s'", self.Name))
-		self.Choices = []string{}
+		self.Choices = nil
 	}
 
 	if self.Type == "ols4" || self.Type == "bioportal" {

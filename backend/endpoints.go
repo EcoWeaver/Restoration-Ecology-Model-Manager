@@ -629,30 +629,34 @@ func getModelMetadataFromDB(ctx context.Context, conn *pgx.Conn, modelUUID strin
 }
 
 func insertModelIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, g types.Model) error {
-	if err := insertModelGraphIntoDB(ctx, conn, modelUUID, g.Graph); err != nil {
-		return err
-	}
-
-	if err := insertModelMetadataIntoDB(ctx, conn, modelUUID, g.Metadata); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, g types.Graph) error {
-	if len(g.Nodes) == 0 {
-		return nil
-	}
-
 	args := []any{modelUUID}
 	var vals []string
-	for i, n := range g.Nodes {
-		args = append(args, i, n.Body, n.Color, n.Position.X, n.Position.Y)
-		vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d)", len(args)-4, len(args)-3, len(args)-2, len(args)-1, len(args)))
+	for _, me := range g.Metadata {
+		args = append(args, me.Kind, me.Value)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
 	}
 
 	query := `
+		INSERT INTO
+			model_metadata (model_id, kind, value)
+		VALUES
+			` + strings.Join(vals, `,
+			`)
+
+	if len(vals) != 0 {
+		if _, err := conn.Exec(ctx, query, args...); err != nil {
+			return err
+		}
+	}
+
+	args = []any{modelUUID}
+	vals = nil
+	for i, n := range g.Graph.Nodes {
+		args = append(args, n.Body, n.Color, n.Position.X, n.Position.Y)
+		vals = append(vals, fmt.Sprintf("($1, %d, $%d, $%d, $%d, $%d)", i, len(args)-3, len(args)-2, len(args)-1, len(args)))
+	}
+
+	query = `
 		WITH inserted AS (
 			INSERT INTO
 				nodes (model_id, ord, body, color, x, y)
@@ -670,38 +674,57 @@ func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, 
 		ORDER BY
 			inserted.ord`
 
-	rows, err := conn.Query(ctx, query, args...)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	var id int
 	var ids []int
-	args = []any{modelUUID}
-	_, err = pgx.ForEachRow(rows, []any{&id}, func() error {
-		ids = append(ids, id)
-		args = append(args, id)
-		return nil
-	})
-	if err != nil {
-		return err
-	}
+	if len(vals) != 0 {
+		rows, err := conn.Query(ctx, query, args...)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
 
-	for i, id := range ids {
-		if err = insertNodeMetadataIntoDB(ctx, conn, modelUUID, id, g.Nodes[i].Metadata); err != nil {
+		var id int
+		_, err = pgx.ForEachRow(rows, []any{&id}, func() error {
+			ids = append(ids, id)
+			return nil
+		})
+		if err != nil {
 			return err
 		}
 	}
 
-	if len(g.Relations) == 0 {
-		return nil
+	args = []any{modelUUID}
+	vals = nil
+	for _, id := range ids {
+		args = append(args, id)
+	}
+	for i, n := range g.Graph.Nodes {
+		for _, me := range n.Metadata {
+			args = append(args, me.Kind, me.Value)
+			vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d)", i+2, len(args)-1, len(args)))
+		}
 	}
 
+	query = `
+		INSERT INTO
+			node_metadata (model_id, node_id, kind, value)
+		VALUES
+			` + strings.Join(vals, `,
+			`)
+
+	if len(vals) != 0 {
+		if _, err := conn.Exec(ctx, query, args...); err != nil {
+			return err
+		}
+	}
+
+	args = []any{modelUUID}
 	vals = nil
-	for i, r := range g.Relations {
-		args = append(args, i, r.Kind, r.Position.R, r.Position.Phi)
-		vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d, $%d)", r.From+2, r.To+2, len(args)-3, len(args)-2, len(args)-1, len(args)))
+	for _, id := range ids {
+		args = append(args, id)
+	}
+	for i, r := range g.Graph.Relations {
+		args = append(args, r.Kind, r.Position.R, r.Position.Phi)
+		vals = append(vals, fmt.Sprintf("($1, $%d, $%d, %d, $%d, $%d, $%d)", r.From+2, r.To+2, i, len(args)-2, len(args)-1, len(args)))
 	}
 
 	query = `
@@ -722,103 +745,48 @@ func insertModelGraphIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, 
 		ORDER BY
 			inserted.ord`
 
-	rows, err = conn.Query(ctx, query, args...)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	ids = []int{}
-	_, err = pgx.ForEachRow(rows, []any{&id}, func() error {
-		ids = append(ids, id)
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	for i, id := range ids {
-		if err = insertRelationMetadataIntoDB(ctx, conn, modelUUID, id, g.Relations[i].Metadata); err != nil {
+	ids = nil
+	if len(vals) != 0 {
+		rows, err := conn.Query(ctx, query, args...)
+		if err != nil {
 			return err
+		}
+		defer rows.Close()
+
+		var id int
+		_, err = pgx.ForEachRow(rows, []any{&id}, func() error {
+			ids = append(ids, id)
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+
+	}
+
+	args = []any{modelUUID}
+	vals = nil
+	for _, id := range ids {
+		args = append(args, id)
+	}
+	for i, r := range g.Graph.Relations {
+		for _, me := range r.Metadata {
+			args = append(args, me.Kind, me.Value)
+			vals = append(vals, fmt.Sprintf("($1, $%d, $%d, $%d)", i, len(args)-1, len(args)))
 		}
 	}
 
-	return nil
-}
-
-func insertModelMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, metadata []types.Metadata) error {
-	if len(metadata) == 0 {
-		return nil
-	}
-
-	args := []any{modelUUID}
-	var vals []string
-	for _, me := range metadata {
-		args = append(args, me.Kind, me.Value)
-		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
-	}
-
-	query := `
-		INSERT INTO
-			model_metadata (model_id, kind, value)
-		VALUES
-			` + strings.Join(vals, `,
-			`)
-
-	if _, err := conn.Exec(ctx, query, args...); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func insertNodeMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, nodeID int, metadata []types.Metadata) error {
-	if len(metadata) == 0 {
-		return nil
-	}
-
-	args := []any{modelUUID, nodeID}
-	var vals []string
-	for _, me := range metadata {
-		args = append(args, me.Kind, me.Value)
-		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
-	}
-
-	query := `
-		INSERT INTO
-			node_metadata (model_id, node_id, kind, value)
-		VALUES
-			` + strings.Join(vals, `,
-			`)
-
-	if _, err := conn.Exec(ctx, query, args...); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func insertRelationMetadataIntoDB(ctx context.Context, conn pgx.Tx, modelUUID string, relationID int, metadata []types.Metadata) error {
-	if len(metadata) == 0 {
-		return nil
-	}
-
-	args := []any{modelUUID, relationID}
-	var vals []string
-	for _, me := range metadata {
-		args = append(args, me.Kind, me.Value)
-		vals = append(vals, fmt.Sprintf("($1, $%d, $%d)", len(args)-1, len(args)))
-	}
-
-	query := `
+	query = `
 		INSERT INTO
 			relation_metadata (model_id, relation_id, kind, value)
 		VALUES
 			` + strings.Join(vals, `,
 			`)
 
-	if _, err := conn.Exec(ctx, query, args...); err != nil {
-		return err
+	if len(vals) != 0 {
+		if _, err := conn.Exec(ctx, query, args...); err != nil {
+			return err
+		}
 	}
 
 	return nil

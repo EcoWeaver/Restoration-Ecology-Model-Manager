@@ -163,7 +163,7 @@ func migrateModelsGraphJSON(ctx context.Context, conn pgx.Tx) error {
 	}
 
 	for _, model := range models {
-		if err = insertModelGraphIntoDB(ctx, conn, model.modelUUID, model.graph); err != nil {
+		if err = insertModelIntoDB(ctx, conn, model.modelUUID, types.Model{Graph: model.graph, Metadata: []types.Metadata{}}); err != nil {
 			return err
 		}
 	}
@@ -177,42 +177,20 @@ func migrateModelsGraphJSON(ctx context.Context, conn pgx.Tx) error {
 
 func migrateModelsParent(ctx context.Context, conn pgx.Tx) error {
 	query := `
+		INSERT INTO
+			model_metadata (model_id, kind, value)
 		SELECT
 			models.model_id,
+			'derived from',
 			models.parent
 		FROM
 			models
 		WHERE
-			models.parent IS NOT NULL`
+			models.parent IS NOT NULL;
 
-	rows, err := conn.Query(ctx, query)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
+		ALTER TABLE models DROP COLUMN parent;`
 
-	type Model struct {
-		modelUUID string
-		parent    string
-	}
-
-	var model Model
-	var models []Model
-	_, err = pgx.ForEachRow(rows, []any{&model.modelUUID, &model.parent}, func() error {
-		models = append(models, model)
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	for _, model := range models {
-		if err = insertModelMetadataIntoDB(ctx, conn, model.modelUUID, []types.Metadata{{Kind: "derived from", Value: model.parent}}); err != nil {
-			return err
-		}
-	}
-
-	if _, err := conn.Exec(ctx, "ALTER TABLE models DROP COLUMN parent"); err != nil {
+	if _, err := conn.Exec(ctx, query); err != nil {
 		return err
 	}
 

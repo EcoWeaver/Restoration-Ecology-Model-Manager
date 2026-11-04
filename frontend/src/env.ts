@@ -1,5 +1,6 @@
 import { defineEnvVars } from "@sveltejs/kit/env";
 
 export const variables = defineEnvVars({
-	API_BASE: { public: true, schema: (input) => input ?? "http://localhost:8080" },
+	PUBLIC_API_URL: { public: true, schema: (input) => input ?? "http://localhost:8080" },
+	PUBLIC_INTERNAL_API_URL: { public: true, schema: (input) => input },
 });
