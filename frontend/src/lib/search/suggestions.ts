@@ -13,7 +13,10 @@ export function metadataSuggest(
 
 		let newSelected = value === "" ? -1 : 0;
 		if (selected > 0) {
-			newSelected = newSuggestions.findIndex((choice) => choice === prevSuggestions[selected]);
+			newSelected = Math.max(
+				newSuggestions.findIndex((choice) => choice === prevSuggestions[selected]),
+				0,
+			);
 		}
 
 		prevSuggestions = newSuggestions;
